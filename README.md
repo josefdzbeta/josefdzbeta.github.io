@@ -23,3 +23,9 @@ Consultar `dist/docs/content-inventory.md`, `dist/docs/source-index.json`, `dist
 Contenido: `dist/data.json`. Interacción: `src/app.js`. Modelos: `src/explorer.js`. Diseño: `dist/style.css`. El build no reemplaza los archivos de contenido y estilos.
 
 Publicación privada registrada en `.openai/hosting.json`. No se modificó el sitio oficial bamaire.es.
+
+## Copia local sin servidor ni login
+
+`node scripts/build-local.mjs` genera `../Bamaire-local.html`, un archivo autocontenido con datos, imágenes y JavaScript 3D incrustados. Abre ese HTML directamente en un navegador. Mapas y documentos enlazados siguen requiriendo Internet.
+
+El 5 de noviembre de 2026 se sustituyó la redacción promocional nueva por el texto de las páginas originales de Bamaire. `dist/docs/original-copy.json` conserva los párrafos y sus URLs. Se mantienen únicamente instrucciones de interacción y avisos de prototipo necesarios para no presentar modelos o muestras ilustrativos como verificados.

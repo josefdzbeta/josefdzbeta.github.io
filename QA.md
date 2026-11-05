@@ -18,3 +18,12 @@
 - Production model accuracy, material accuracy, stock and commercial terms require developer approval and the assets in `dist/docs/production-requirements.md`.
 - Responsive check used Chrome viewport emulation, not real mobile hardware. Screen-reader coverage and real-device touch/pinch behavior need production QA.
 - Original PDF links are preserved; no invented per-unit measurements were extracted from raster plans.
+
+## Revision — 5 November 2026
+
+- Hosting diagnosed as HTTP 401 “Sign in required”; site active, owner-only policy. User explicitly chose to preserve privacy and receive a local copy.
+- Re-fetched homepage and all eight development pages. Exact source comparison passed for company copy, hero text, locations, quality descriptions, specification excerpts and personalization introduction. Original paragraph inventory saved in `dist/docs/original-copy.json`.
+- Production build passed.
+- Standalone `Bamaire-local.html`: data, JS/Three.js and local images embedded; no script src dependencies or local absolute asset paths. Google Maps, webfonts and source PDF links remain external; fonts have system fallbacks.
+- Isolated JSDOM verification of the bundled standalone script: homepage content, collection and all eight project routes passed; selected home 2B plus finish sample 3 reached the enquiry state; no uncaught application errors. This test covers the no-WebGL/list fallback, not visual GPU rendering.
+- Direct file URL browser QA was blocked by the automation tool’s URL policy. No workaround was attempted. Direct double-click opening and visual verification of this revision remain for the user; prior desktop/mobile browser QA is recorded above.
