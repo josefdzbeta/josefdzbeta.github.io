@@ -27,3 +27,50 @@
 - Standalone `Bamaire-local.html`: data, JS/Three.js and local images embedded; no script src dependencies or local absolute asset paths. Google Maps, webfonts and source PDF links remain external; fonts have system fallbacks.
 - Isolated JSDOM verification of the bundled standalone script: homepage content, collection and all eight project routes passed; selected home 2B plus finish sample 3 reached the enquiry state; no uncaught application errors. This test covers the no-WebGL/list fallback, not visual GPU rendering.
 - Direct file URL browser QA was blocked by the automation tool’s URL policy. No workaround was attempted. Direct double-click opening and visual verification of this revision remain for the user; prior desktop/mobile browser QA is recorded above.
+
+## Revision — 6–7 November 2026 · architectural and material fidelity
+
+Sources: bamaire.es re-fetched 06.11.2026 (8 promotion pages unchanged since 04.11); 368 linked PDFs downloaded and inspected. Audit: `dist/docs/fidelity-audit.md`. Per-room validation: `dist/docs/model-validation.md`.
+
+Model accuracy (traced room area vs area printed on each plan, walled rooms):
+
+| Promotion | 3D dwellings published | Median Δ | 75th pct | 90th pct | Rejected (>20 % mean Δ) |
+|---|---|---|---|---|---|
+| Mykonos (Portal 1) | 30 / 32 | 1.3 % | 3.2 % | 11.1 % | 5C, BD |
+| Aura | 24 / 29 | 5.1 % | 6.9 % | 9.0 % | P1-3C, P2-2A, P2-3A, P2-3C, P2-3E |
+| Babilonia | 65 / 66 | 2.0 % | 4.4 % | 17.3 % | 1 |
+
+- Mykonos building: floors 1–4 assembled from the key plan of each PDF (IoU 0.78–0.95); ground floor and ático as key-plan outline; Portal 2 inferred mirror (labelled).
+- Independent check: Blender 4.4 (headless) rebuilt every published dwelling from the same JSON and rendered orthographic top views at the traced metric extent; overlays against the plan crops in `research/qa/blender/<promoción>/*_compare.jpg`. Draco GLBs exported (≈15–20 KB per dwelling, Mykonos `building.glb` 104 KB).
+
+Browser verification (Chrome engine in the desktop app, local server):
+
+- Mykonos explorer: building → planta 2 → 2A → plan overlay → corte → Cocina/Baño/Salón at eye level; 4B and 3A loaded; 5C shows "modelo no publicado" and keeps the PDF link. No console errors.
+- Finish configurator: Mykonos (default dwelling chosen by lowest Δ), Babilonia 1B (4 dorm., Δ 2 %); switching flooring, kitchen tile, bath set, carpentry, paint and concept extras updates materials in place; selections appear in the enquiry summary as "opción n de N del programa oficial" or "Idea adicional (no incluida)".
+- Performance (MacBook GPU, 1612×1228 canvas): building 19 draw calls / 57 k triangles / 0.38 ms per frame; dwelling 26 calls / 3.2 k triangles / ≈2 ms with shadows; dwelling load (fetch + build) 186 ms. Payload: first page JS 12.7 KB gz; 3D chunk 141 KB gz loaded only on pages with a viewer; `building.json` 10 KB gz; dwelling JSON ≈1.6 KB gz; plan overlay ≈75 KB, fetched only when toggled. Rendering is on demand (no idle frames), paused off-screen; shadow maps update only when the scene changes.
+- Mobile 375×812 emulation: no horizontal overflow; canvas pixel ratio capped at 1.25; 256 px procedural textures on narrow screens.
+- Standalone `Bamaire-local.html` (34.8 MB, 247 model files embedded): served from an empty folder, Mykonos 4B and the Babilonia configurator loaded with zero `/models/` network requests and no console errors. Opening by double-click (file://) was not tested by automation.
+
+Not verified: real mobile hardware, screen readers, frame rate on low-end GPUs (the hidden test pane throttles animation frames, so fps was not measured; GPU time per frame was). Hosted private Site not redeployed in this revision.
+
+## Revision 2 — 7 November 2026 · client instructions on Portal 2, heights, m², finishes, furniture
+
+- Portal 2 rendered with the same distribution as Portal 1 (mirrored), not as an inferred ghost.
+- Mykonos ground floor (BA–BE) and ático (5A–5C) placed by structure matching against floors 1 and 4 inside each level's key-plan outline: no overlaps, all inside the outline (`building.json` → `fit`). BA/BB/BC sit under 1A/1B/1C.
+- Room sizes fitted to the printed m² (boundaries without walls only). Model room-area Δ, median of all rooms: Mykonos 1,6 %, Aura 2,1 %, Babilonia 1,7 %, Ciudad de Évora 2,9 %, Orión 3,8 % (`docs/model-validation.md`).
+- New promotions in 3D: Ciudad de Évora 21 dwellings (off-white wall mode, inferred room names) and Orión 25 dwellings (tiled rasters, inferred names). Argo, La Pilara (OCR) — see the report for their status; Perseo traced but not published (two storeys per page, light room labels; raw error 62–89 %).
+- Heights from the published Mykonos elevation: ground 3,80 m, typical 3,30 m, clear 2,60 m.
+- Façade and views checked against Bamaire's images in the browser: fachada principal (picture-in-picture comparison), aerial render 01; single roof parapet, core overrun, solid ático parapets, grey cladding at balcony bays, tinted glass railings.
+- Furniture: beds from each plan's bed symbols (1A: two twin pairs + double, as drawn); sofa, TV unit, dining set, terrace furniture by free-space placement. Per-room "Mobiliario" toggles verified (one room off → 1 group hidden; Todo off/on → all hidden/shown).
+- Labels show only "xx,xx m²" (no "publicados").
+- Finish configurator quotes each family's memoria text (verified on Mykonos, Orión, Évora); skirting, door height and Aura's Silestone worktop applied from the published text.
+- Browser: no application errors after reload; an earlier pane tab showed WebGL shader-validation errors with empty logs that disappeared in a fresh tab (GPU process of the test pane, not reproducible).
+
+## Revision 3 — 7 November 2026 · Mykonos exterior, navigation, speed
+
+- Exterior rebuilt from the published elevations and end views (see `docs/fidelity-audit.md` §3b). Compared in the browser with the published images: alzado C/ María de Molina overlays bays, piers, balcony rows, window columns, ground-floor openings and overruns; render 03 (calibrated camera) overlays the left and centre bays and balcony rows; render 01 shows the same composition.
+- Navigation verified: façade hover → "3D · 2 dorm. · 63,40 m² · Vendida (web 06.11.2026)"; floor stack → floor 3 plan with 12 labelled apartments (both portals); click 3D → dwelling with breadcrumbs "Edificio › Planta 3 › 3D"; back via breadcrumb.
+- Timings (MacBook, debug marks): viewer setup 47–94 ms, JSON 5–120 ms, exterior build 3–20 ms, first frame 9–380 ms (texture upload). Building-view payload ≈ 330 KB gzip (3D code 151 KB, façade textures 161 KB, data 17 KB).
+- Cache-busting: `npm run build` writes `js/app-<hash>.js`, `style-<hash>.css` into `index.html`; data/model URLs carry `?v=<build>`. Stale "m² publicados" labels came from cached, unhashed bundles; current bundles contain no such text.
+- Mobile 375×812: no horizontal overflow; overview fits the whole building; floor stack on the right, breadcrumbs at the bottom.
+- Standalone copy rebuilt (51,6 MB, 468 embedded model files incl. façade textures); served from an empty folder it runs with zero model requests and no console errors.

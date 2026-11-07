@@ -1,0 +1,3000 @@
+{
+ "units": {
+  "P11A": {
+   "source": "Ciudad-de-Evora-p11a.pdf",
+   "superficieUtil": 122.67,
+   "fit": {
+    "meanAbsErrPct": 14.76,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 4.3,
+     "model": 4.25,
+     "errPct": -1.2,
+     "rawTrace": 4.19,
+     "rawErrPct": -2.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.44,
+     "model": 5.62,
+     "errPct": 3.3,
+     "rawTrace": 5.51,
+     "rawErrPct": 1.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 12.0,
+     "model": 11.0,
+     "errPct": -8.3,
+     "rawTrace": 8.32,
+     "rawErrPct": -30.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.0,
+     "model": 3.54,
+     "errPct": 18.0,
+     "rawTrace": 3.67,
+     "rawErrPct": 22.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 19.59,
+     "model": 19.15,
+     "errPct": -2.2,
+     "rawTrace": 19.4,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 3.59,
+     "model": 3.62,
+     "errPct": 0.8,
+     "rawTrace": 6.64,
+     "rawErrPct": 85.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 11.85,
+     "model": 12.03,
+     "errPct": 1.5,
+     "rawTrace": 11.94,
+     "rawErrPct": 0.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 5",
+     "printed": 8.47,
+     "model": 8.55,
+     "errPct": 0.9,
+     "rawTrace": 8.57,
+     "rawErrPct": 1.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 25.75,
+     "model": 26.84,
+     "errPct": 4.2,
+     "rawTrace": 26.43,
+     "rawErrPct": 2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 12.02,
+     "model": 12.15,
+     "errPct": 1.1,
+     "rawTrace": 12.04,
+     "rawErrPct": 0.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 1.49,
+     "model": 1.86,
+     "errPct": 24.8,
+     "rawTrace": 1.8,
+     "rawErrPct": 20.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 3.49,
+     "model": 3.26,
+     "errPct": -6.6,
+     "rawTrace": 3.29,
+     "rawErrPct": -5.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 11.68,
+     "model": 10.58,
+     "errPct": -9.4,
+     "rawTrace": 10.67,
+     "rawErrPct": -8.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 4.4
+  },
+  "P11B": {
+   "source": "Ciudad-de-Evora-p11b.pdf",
+   "superficieUtil": 87.53,
+   "fit": {
+    "meanAbsErrPct": 15.49,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 3",
+     "printed": 1.21,
+     "model": 1.21,
+     "errPct": 0.0,
+     "rawTrace": 2.13,
+     "rawErrPct": 76.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.19,
+     "model": 5.25,
+     "errPct": 1.2,
+     "rawTrace": 5.23,
+     "rawErrPct": 0.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.43,
+     "model": 2.56,
+     "errPct": 5.3,
+     "rawTrace": 2.62,
+     "rawErrPct": 7.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.8,
+     "model": 23.93,
+     "errPct": 5.0,
+     "rawTrace": 23.64,
+     "rawErrPct": 3.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.43,
+     "model": 13.29,
+     "errPct": -1.0,
+     "rawTrace": 13.27,
+     "rawErrPct": -1.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 5.12,
+     "model": 5.19,
+     "errPct": 1.4,
+     "rawTrace": 6.34,
+     "rawErrPct": 23.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 8.8,
+     "model": 9.17,
+     "errPct": 4.2,
+     "rawTrace": 9.22,
+     "rawErrPct": 4.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.89,
+     "model": 6.31,
+     "errPct": 7.1,
+     "rawTrace": 6.4,
+     "rawErrPct": 8.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.92,
+     "errPct": 1.0,
+     "rawTrace": 3.81,
+     "rawErrPct": -1.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 9.45,
+     "model": 9.33,
+     "errPct": -1.3,
+     "rawTrace": 8.83,
+     "rawErrPct": -6.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.33,
+     "model": 7.37,
+     "errPct": -21.0,
+     "rawTrace": 6.05,
+     "rawErrPct": -35.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 0,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.1
+  },
+  "P11C": {
+   "source": "Ciudad-de-Evora-p11c.pdf",
+   "superficieUtil": 109.5,
+   "fit": {
+    "meanAbsErrPct": 22.15,
+    "gap": 0.2,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 4.24,
+     "errPct": -1.4,
+     "rawTrace": 4.17,
+     "rawErrPct": -3.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 5",
+     "printed": 8.55,
+     "model": 6.44,
+     "errPct": -24.7,
+     "rawTrace": 6.42,
+     "rawErrPct": -24.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.72,
+     "model": 3.02,
+     "errPct": 11.0,
+     "rawTrace": 3.18,
+     "rawErrPct": 16.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 4.0,
+     "errPct": -1.5,
+     "rawTrace": 4.02,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 6",
+     "printed": 6.84,
+     "model": 6.78,
+     "errPct": -0.9,
+     "rawTrace": 6.55,
+     "rawErrPct": -4.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.12,
+     "model": 28.33,
+     "errPct": 28.1,
+     "rawTrace": 37.83,
+     "rawErrPct": 71.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.95,
+     "model": 4.92,
+     "errPct": -0.6,
+     "rawTrace": 4.73,
+     "rawErrPct": -4.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.0,
+     "model": 10.3,
+     "errPct": 3.0,
+     "rawTrace": 9.97,
+     "rawErrPct": -0.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.33,
+     "model": 15.54,
+     "errPct": 1.4,
+     "rawTrace": 15.42,
+     "rawErrPct": 0.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.01,
+     "model": 7.18,
+     "errPct": -34.8,
+     "rawTrace": 7.46,
+     "rawErrPct": -32.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 9.09,
+     "model": 9.06,
+     "errPct": -0.3,
+     "rawTrace": 0.05,
+     "rawErrPct": -99.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.56,
+     "model": 9.71,
+     "errPct": -8.0,
+     "rawTrace": 9.73,
+     "rawErrPct": -7.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.8
+  },
+  "P12A": {
+   "source": "Ciudad-de-Evora-p12a.pdf",
+   "superficieUtil": 122.67,
+   "fit": {
+    "meanAbsErrPct": 14.76,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 4.3,
+     "model": 4.25,
+     "errPct": -1.2,
+     "rawTrace": 4.19,
+     "rawErrPct": -2.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.44,
+     "model": 5.62,
+     "errPct": 3.3,
+     "rawTrace": 5.51,
+     "rawErrPct": 1.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 12.0,
+     "model": 11.0,
+     "errPct": -8.3,
+     "rawTrace": 8.32,
+     "rawErrPct": -30.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.0,
+     "model": 3.54,
+     "errPct": 18.0,
+     "rawTrace": 3.67,
+     "rawErrPct": 22.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 19.59,
+     "model": 19.15,
+     "errPct": -2.2,
+     "rawTrace": 19.4,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 3.59,
+     "model": 3.62,
+     "errPct": 0.8,
+     "rawTrace": 6.64,
+     "rawErrPct": 85.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 11.85,
+     "model": 12.03,
+     "errPct": 1.5,
+     "rawTrace": 11.94,
+     "rawErrPct": 0.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 5",
+     "printed": 8.47,
+     "model": 8.55,
+     "errPct": 0.9,
+     "rawTrace": 8.57,
+     "rawErrPct": 1.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 25.75,
+     "model": 26.84,
+     "errPct": 4.2,
+     "rawTrace": 26.43,
+     "rawErrPct": 2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 12.02,
+     "model": 12.15,
+     "errPct": 1.1,
+     "rawTrace": 12.04,
+     "rawErrPct": 0.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 1.49,
+     "model": 1.86,
+     "errPct": 24.8,
+     "rawTrace": 1.8,
+     "rawErrPct": 20.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 3.49,
+     "model": 3.26,
+     "errPct": -6.6,
+     "rawTrace": 3.29,
+     "rawErrPct": -5.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 11.68,
+     "model": 10.58,
+     "errPct": -9.4,
+     "rawTrace": 10.67,
+     "rawErrPct": -8.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 4.4
+  },
+  "P12B": {
+   "source": "Ciudad-de-Evora-p12b.pdf",
+   "superficieUtil": 87.53,
+   "fit": {
+    "meanAbsErrPct": 15.49,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 3",
+     "printed": 1.21,
+     "model": 1.21,
+     "errPct": 0.0,
+     "rawTrace": 2.13,
+     "rawErrPct": 76.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.19,
+     "model": 5.25,
+     "errPct": 1.2,
+     "rawTrace": 5.23,
+     "rawErrPct": 0.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.43,
+     "model": 2.56,
+     "errPct": 5.3,
+     "rawTrace": 2.62,
+     "rawErrPct": 7.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.8,
+     "model": 23.93,
+     "errPct": 5.0,
+     "rawTrace": 23.64,
+     "rawErrPct": 3.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.43,
+     "model": 13.29,
+     "errPct": -1.0,
+     "rawTrace": 13.27,
+     "rawErrPct": -1.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 5.12,
+     "model": 5.19,
+     "errPct": 1.4,
+     "rawTrace": 6.34,
+     "rawErrPct": 23.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 8.8,
+     "model": 9.17,
+     "errPct": 4.2,
+     "rawTrace": 9.22,
+     "rawErrPct": 4.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.89,
+     "model": 6.31,
+     "errPct": 7.1,
+     "rawTrace": 6.4,
+     "rawErrPct": 8.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.92,
+     "errPct": 1.0,
+     "rawTrace": 3.81,
+     "rawErrPct": -1.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 9.45,
+     "model": 9.33,
+     "errPct": -1.3,
+     "rawTrace": 8.83,
+     "rawErrPct": -6.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.33,
+     "model": 7.37,
+     "errPct": -21.0,
+     "rawTrace": 6.05,
+     "rawErrPct": -35.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 0,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.1
+  },
+  "P12C": {
+   "source": "Ciudad-de-Evora-p12c.pdf",
+   "superficieUtil": 109.5,
+   "fit": {
+    "meanAbsErrPct": 22.15,
+    "gap": 0.2,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 4.24,
+     "errPct": -1.4,
+     "rawTrace": 4.17,
+     "rawErrPct": -3.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 5",
+     "printed": 8.55,
+     "model": 6.44,
+     "errPct": -24.7,
+     "rawTrace": 6.42,
+     "rawErrPct": -24.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.72,
+     "model": 3.02,
+     "errPct": 11.0,
+     "rawTrace": 3.18,
+     "rawErrPct": 16.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 4.0,
+     "errPct": -1.5,
+     "rawTrace": 4.02,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 6",
+     "printed": 6.84,
+     "model": 6.78,
+     "errPct": -0.9,
+     "rawTrace": 6.55,
+     "rawErrPct": -4.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.12,
+     "model": 28.33,
+     "errPct": 28.1,
+     "rawTrace": 37.83,
+     "rawErrPct": 71.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.95,
+     "model": 4.92,
+     "errPct": -0.6,
+     "rawTrace": 4.73,
+     "rawErrPct": -4.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.0,
+     "model": 10.3,
+     "errPct": 3.0,
+     "rawTrace": 9.97,
+     "rawErrPct": -0.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.33,
+     "model": 15.54,
+     "errPct": 1.4,
+     "rawTrace": 15.42,
+     "rawErrPct": 0.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.01,
+     "model": 7.18,
+     "errPct": -34.8,
+     "rawTrace": 7.46,
+     "rawErrPct": -32.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 9.09,
+     "model": 9.06,
+     "errPct": -0.3,
+     "rawTrace": 0.05,
+     "rawErrPct": -99.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.56,
+     "model": 9.71,
+     "errPct": -8.0,
+     "rawTrace": 9.73,
+     "rawErrPct": -7.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.8
+  },
+  "P13B": {
+   "source": "Ciudad-de-Evora-p13b.pdf",
+   "superficieUtil": 87.53,
+   "fit": {
+    "meanAbsErrPct": 15.49,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 3",
+     "printed": 1.21,
+     "model": 1.21,
+     "errPct": 0.0,
+     "rawTrace": 2.13,
+     "rawErrPct": 76.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.19,
+     "model": 5.25,
+     "errPct": 1.2,
+     "rawTrace": 5.23,
+     "rawErrPct": 0.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.43,
+     "model": 2.56,
+     "errPct": 5.3,
+     "rawTrace": 2.62,
+     "rawErrPct": 7.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.8,
+     "model": 23.93,
+     "errPct": 5.0,
+     "rawTrace": 23.64,
+     "rawErrPct": 3.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.43,
+     "model": 13.29,
+     "errPct": -1.0,
+     "rawTrace": 13.27,
+     "rawErrPct": -1.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 5.12,
+     "model": 5.19,
+     "errPct": 1.4,
+     "rawTrace": 6.34,
+     "rawErrPct": 23.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 8.8,
+     "model": 9.17,
+     "errPct": 4.2,
+     "rawTrace": 9.22,
+     "rawErrPct": 4.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.89,
+     "model": 6.31,
+     "errPct": 7.1,
+     "rawTrace": 6.4,
+     "rawErrPct": 8.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.92,
+     "errPct": 1.0,
+     "rawTrace": 3.81,
+     "rawErrPct": -1.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 9.45,
+     "model": 9.33,
+     "errPct": -1.3,
+     "rawTrace": 8.83,
+     "rawErrPct": -6.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.33,
+     "model": 7.37,
+     "errPct": -21.0,
+     "rawTrace": 6.05,
+     "rawErrPct": -35.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 0,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.1
+  },
+  "P13C": {
+   "source": "Ciudad-de-Evora-p13c.pdf",
+   "superficieUtil": 109.5,
+   "fit": {
+    "meanAbsErrPct": 22.15,
+    "gap": 0.2,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 4.24,
+     "errPct": -1.4,
+     "rawTrace": 4.17,
+     "rawErrPct": -3.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 5",
+     "printed": 8.55,
+     "model": 6.44,
+     "errPct": -24.7,
+     "rawTrace": 6.42,
+     "rawErrPct": -24.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.72,
+     "model": 3.02,
+     "errPct": 11.0,
+     "rawTrace": 3.18,
+     "rawErrPct": 16.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 4.0,
+     "errPct": -1.5,
+     "rawTrace": 4.02,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 6",
+     "printed": 6.84,
+     "model": 6.78,
+     "errPct": -0.9,
+     "rawTrace": 6.55,
+     "rawErrPct": -4.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.12,
+     "model": 28.33,
+     "errPct": 28.1,
+     "rawTrace": 37.83,
+     "rawErrPct": 71.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.95,
+     "model": 4.92,
+     "errPct": -0.6,
+     "rawTrace": 4.73,
+     "rawErrPct": -4.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.0,
+     "model": 10.3,
+     "errPct": 3.0,
+     "rawTrace": 9.97,
+     "rawErrPct": -0.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.33,
+     "model": 15.54,
+     "errPct": 1.4,
+     "rawTrace": 15.42,
+     "rawErrPct": 0.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.01,
+     "model": 7.18,
+     "errPct": -34.8,
+     "rawTrace": 7.46,
+     "rawErrPct": -32.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 9.09,
+     "model": 9.06,
+     "errPct": -0.3,
+     "rawTrace": 0.05,
+     "rawErrPct": -99.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.56,
+     "model": 9.71,
+     "errPct": -8.0,
+     "rawTrace": 9.73,
+     "rawErrPct": -7.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.8
+  },
+  "P21A": {
+   "source": "Ciudad-de-Evora-p21a.pdf",
+   "superficieUtil": 92.4,
+   "fit": {
+    "meanAbsErrPct": 17.25,
+    "gap": 0.28,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.04,
+     "model": 9.91,
+     "errPct": -1.3,
+     "rawTrace": 9.39,
+     "rawErrPct": -6.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.21,
+     "model": 2.73,
+     "errPct": 23.5,
+     "rawTrace": 2.61,
+     "rawErrPct": 18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 1.32,
+     "model": 1.57,
+     "errPct": 18.9,
+     "rawTrace": 2.34,
+     "rawErrPct": 77.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.53,
+     "model": 12.25,
+     "errPct": -21.1,
+     "rawTrace": 12.99,
+     "rawErrPct": -16.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.46,
+     "model": 7.17,
+     "errPct": 31.3,
+     "rawTrace": 7.24,
+     "rawErrPct": 32.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.88,
+     "model": 22.74,
+     "errPct": -0.6,
+     "rawTrace": 21.97,
+     "rawErrPct": -4.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 6.43,
+     "model": 6.35,
+     "errPct": -1.2,
+     "rawTrace": 6.42,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.69,
+     "model": 10.8,
+     "errPct": 1.0,
+     "rawTrace": 10.4,
+     "rawErrPct": -2.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.47,
+     "model": 5.49,
+     "errPct": 22.8,
+     "rawTrace": 5.38,
+     "rawErrPct": 20.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.84,
+     "errPct": -1.0,
+     "rawTrace": 3.65,
+     "rawErrPct": -5.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.49,
+     "model": 9.56,
+     "errPct": 0.7,
+     "rawTrace": 10.03,
+     "rawErrPct": 5.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 1,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.0
+  },
+  "P21B": {
+   "source": "Ciudad-de-Evora-p21b.pdf",
+   "superficieUtil": 94.98,
+   "fit": {
+    "meanAbsErrPct": 26.42,
+    "gap": 0.11,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 2.13,
+     "model": 1.95,
+     "errPct": -8.5,
+     "rawTrace": 1.93,
+     "rawErrPct": -9.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.54,
+     "model": 2.93,
+     "errPct": 15.4,
+     "rawTrace": 2.97,
+     "rawErrPct": 16.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.98,
+     "errPct": -7.4,
+     "rawTrace": 3.98,
+     "rawErrPct": -7.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.26,
+     "errPct": -6.6,
+     "rawTrace": 4.49,
+     "rawErrPct": -1.5,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 4",
+     "printed": 1.82,
+     "model": 2.1,
+     "errPct": 15.4,
+     "rawTrace": 2.24,
+     "rawErrPct": 23.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.48,
+     "model": 9.99,
+     "errPct": -4.7,
+     "rawTrace": 10.21,
+     "rawErrPct": -2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 11.72,
+     "errPct": 15.7,
+     "rawTrace": 21.78,
+     "rawErrPct": 115.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.18,
+     "model": 6.97,
+     "errPct": -2.9,
+     "rawTrace": 7.03,
+     "rawErrPct": -2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.67,
+     "model": 24.32,
+     "errPct": -1.4,
+     "rawTrace": 23.92,
+     "rawErrPct": -3.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 9.95,
+     "model": 9.66,
+     "errPct": -2.9,
+     "rawTrace": 9.62,
+     "rawErrPct": -3.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.81,
+     "model": 13.7,
+     "errPct": -0.8,
+     "rawTrace": 6.69,
+     "rawErrPct": -51.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.43,
+     "model": 3.41,
+     "errPct": -0.6,
+     "rawTrace": 0.13,
+     "rawErrPct": -96.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 15,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 4.8
+  },
+  "P21C": {
+   "source": "Ciudad-de-Evora-p21c.pdf",
+   "superficieUtil": 100.5,
+   "fit": {
+    "meanAbsErrPct": 19.91,
+    "gap": 0.2,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.63,
+     "errPct": 1.5,
+     "rawTrace": 4.69,
+     "rawErrPct": 2.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 10.01,
+     "errPct": -1.2,
+     "rawTrace": 7.5,
+     "rawErrPct": -26.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 4.12,
+     "model": 4.17,
+     "errPct": 1.2,
+     "rawTrace": 7.91,
+     "rawErrPct": 92.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.78,
+     "errPct": -12.1,
+     "rawTrace": 4.23,
+     "rawErrPct": -1.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 3.28,
+     "model": 4.29,
+     "errPct": 30.8,
+     "rawTrace": 4.1,
+     "rawErrPct": 25.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.77,
+     "model": 3.53,
+     "errPct": 27.4,
+     "rawTrace": 3.41,
+     "rawErrPct": 23.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.94,
+     "model": 13.63,
+     "errPct": -2.2,
+     "rawTrace": 13.37,
+     "rawErrPct": -4.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.88,
+     "model": 8.08,
+     "errPct": -25.7,
+     "rawTrace": 7.31,
+     "rawErrPct": -32.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 25.94,
+     "model": 28.14,
+     "errPct": 8.5,
+     "rawTrace": 27.06,
+     "rawErrPct": 4.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.85,
+     "model": 11.12,
+     "errPct": 2.5,
+     "rawTrace": 11.08,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.34,
+     "model": 7.31,
+     "errPct": -0.4,
+     "rawTrace": 7.65,
+     "rawErrPct": 4.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.39,
+     "model": 2.82,
+     "errPct": 18.0,
+     "rawTrace": 3.01,
+     "rawErrPct": 25.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 20,
+    "window": 9,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.5
+  },
+  "P21D": {
+   "source": "Ciudad-de-Evora-p21d.pdf",
+   "superficieUtil": 98.79,
+   "fit": {
+    "meanAbsErrPct": 6.4,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Cocina",
+     "printed": 7.81,
+     "model": 7.57,
+     "errPct": -3.1,
+     "rawTrace": 6.4,
+     "rawErrPct": -18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 3.92,
+     "errPct": -3.4,
+     "rawTrace": 3.91,
+     "rawErrPct": -3.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.68,
+     "model": 3.18,
+     "errPct": 18.7,
+     "rawTrace": 3.1,
+     "rawErrPct": 15.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.8,
+     "model": 4.85,
+     "errPct": 1.0,
+     "rawTrace": 5.04,
+     "rawErrPct": 5.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.67,
+     "model": 22.07,
+     "errPct": -2.6,
+     "rawTrace": 21.88,
+     "rawErrPct": -3.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.06,
+     "model": 10.56,
+     "errPct": 5.0,
+     "rawTrace": 10.4,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.18,
+     "model": 4.06,
+     "errPct": -2.9,
+     "rawTrace": 3.97,
+     "rawErrPct": -5.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.55,
+     "model": 15.72,
+     "errPct": 1.1,
+     "rawTrace": 15.98,
+     "rawErrPct": 2.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.0,
+     "model": 4.84,
+     "errPct": -3.2,
+     "rawTrace": 4.95,
+     "rawErrPct": -1.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.06,
+     "model": 10.16,
+     "errPct": 1.0,
+     "rawTrace": 11.27,
+     "rawErrPct": 12.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.92,
+     "model": 11.85,
+     "errPct": -0.6,
+     "rawTrace": 11.9,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 2.7
+  },
+  "P22A": {
+   "source": "Ciudad-de-Evora-p22a.pdf",
+   "superficieUtil": 92.4,
+   "fit": {
+    "meanAbsErrPct": 17.25,
+    "gap": 0.28,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.04,
+     "model": 9.91,
+     "errPct": -1.3,
+     "rawTrace": 9.39,
+     "rawErrPct": -6.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.21,
+     "model": 2.73,
+     "errPct": 23.5,
+     "rawTrace": 2.61,
+     "rawErrPct": 18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 1.32,
+     "model": 1.57,
+     "errPct": 18.9,
+     "rawTrace": 2.34,
+     "rawErrPct": 77.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.53,
+     "model": 12.25,
+     "errPct": -21.1,
+     "rawTrace": 12.99,
+     "rawErrPct": -16.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.46,
+     "model": 7.17,
+     "errPct": 31.3,
+     "rawTrace": 7.24,
+     "rawErrPct": 32.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.88,
+     "model": 22.74,
+     "errPct": -0.6,
+     "rawTrace": 21.97,
+     "rawErrPct": -4.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 6.43,
+     "model": 6.35,
+     "errPct": -1.2,
+     "rawTrace": 6.42,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.69,
+     "model": 10.8,
+     "errPct": 1.0,
+     "rawTrace": 10.4,
+     "rawErrPct": -2.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.47,
+     "model": 5.49,
+     "errPct": 22.8,
+     "rawTrace": 5.38,
+     "rawErrPct": 20.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.84,
+     "errPct": -1.0,
+     "rawTrace": 3.65,
+     "rawErrPct": -5.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.49,
+     "model": 9.56,
+     "errPct": 0.7,
+     "rawTrace": 10.03,
+     "rawErrPct": 5.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 1,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.0
+  },
+  "P22B": {
+   "source": "Ciudad-de-Evora-p22b.pdf",
+   "superficieUtil": 94.98,
+   "fit": {
+    "meanAbsErrPct": 26.42,
+    "gap": 0.11,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 2.13,
+     "model": 1.95,
+     "errPct": -8.5,
+     "rawTrace": 1.93,
+     "rawErrPct": -9.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.54,
+     "model": 2.93,
+     "errPct": 15.4,
+     "rawTrace": 2.97,
+     "rawErrPct": 16.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.98,
+     "errPct": -7.4,
+     "rawTrace": 3.98,
+     "rawErrPct": -7.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.26,
+     "errPct": -6.6,
+     "rawTrace": 4.49,
+     "rawErrPct": -1.5,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 4",
+     "printed": 1.82,
+     "model": 2.1,
+     "errPct": 15.4,
+     "rawTrace": 2.24,
+     "rawErrPct": 23.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.48,
+     "model": 9.99,
+     "errPct": -4.7,
+     "rawTrace": 10.21,
+     "rawErrPct": -2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 11.72,
+     "errPct": 15.7,
+     "rawTrace": 21.78,
+     "rawErrPct": 115.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.18,
+     "model": 6.97,
+     "errPct": -2.9,
+     "rawTrace": 7.03,
+     "rawErrPct": -2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.67,
+     "model": 24.32,
+     "errPct": -1.4,
+     "rawTrace": 23.92,
+     "rawErrPct": -3.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 9.95,
+     "model": 9.66,
+     "errPct": -2.9,
+     "rawTrace": 9.62,
+     "rawErrPct": -3.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.81,
+     "model": 13.7,
+     "errPct": -0.8,
+     "rawTrace": 6.69,
+     "rawErrPct": -51.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.43,
+     "model": 3.41,
+     "errPct": -0.6,
+     "rawTrace": 0.13,
+     "rawErrPct": -96.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 15,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 4.8
+  },
+  "P22C": {
+   "source": "Ciudad-de-Evora-p22c.pdf",
+   "superficieUtil": 100.5,
+   "fit": {
+    "meanAbsErrPct": 19.91,
+    "gap": 0.2,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.63,
+     "errPct": 1.5,
+     "rawTrace": 4.69,
+     "rawErrPct": 2.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 10.01,
+     "errPct": -1.2,
+     "rawTrace": 7.5,
+     "rawErrPct": -26.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 4.12,
+     "model": 4.17,
+     "errPct": 1.2,
+     "rawTrace": 7.91,
+     "rawErrPct": 92.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.78,
+     "errPct": -12.1,
+     "rawTrace": 4.23,
+     "rawErrPct": -1.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 3.28,
+     "model": 4.29,
+     "errPct": 30.8,
+     "rawTrace": 4.1,
+     "rawErrPct": 25.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.77,
+     "model": 3.53,
+     "errPct": 27.4,
+     "rawTrace": 3.41,
+     "rawErrPct": 23.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.94,
+     "model": 13.63,
+     "errPct": -2.2,
+     "rawTrace": 13.37,
+     "rawErrPct": -4.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.88,
+     "model": 8.08,
+     "errPct": -25.7,
+     "rawTrace": 7.31,
+     "rawErrPct": -32.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 25.94,
+     "model": 28.14,
+     "errPct": 8.5,
+     "rawTrace": 27.06,
+     "rawErrPct": 4.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.85,
+     "model": 11.12,
+     "errPct": 2.5,
+     "rawTrace": 11.08,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.34,
+     "model": 7.31,
+     "errPct": -0.4,
+     "rawTrace": 7.65,
+     "rawErrPct": 4.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.39,
+     "model": 2.82,
+     "errPct": 18.0,
+     "rawTrace": 3.01,
+     "rawErrPct": 25.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 20,
+    "window": 9,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.5
+  },
+  "P22D": {
+   "source": "Ciudad-de-Evora-p22d.pdf",
+   "superficieUtil": 98.79,
+   "fit": {
+    "meanAbsErrPct": 6.4,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Cocina",
+     "printed": 7.81,
+     "model": 7.57,
+     "errPct": -3.1,
+     "rawTrace": 6.4,
+     "rawErrPct": -18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 3.92,
+     "errPct": -3.4,
+     "rawTrace": 3.91,
+     "rawErrPct": -3.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.68,
+     "model": 3.18,
+     "errPct": 18.7,
+     "rawTrace": 3.1,
+     "rawErrPct": 15.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.8,
+     "model": 4.85,
+     "errPct": 1.0,
+     "rawTrace": 5.04,
+     "rawErrPct": 5.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.67,
+     "model": 22.07,
+     "errPct": -2.6,
+     "rawTrace": 21.88,
+     "rawErrPct": -3.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.06,
+     "model": 10.56,
+     "errPct": 5.0,
+     "rawTrace": 10.4,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.18,
+     "model": 4.06,
+     "errPct": -2.9,
+     "rawTrace": 3.97,
+     "rawErrPct": -5.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.55,
+     "model": 15.72,
+     "errPct": 1.1,
+     "rawTrace": 15.98,
+     "rawErrPct": 2.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.0,
+     "model": 4.84,
+     "errPct": -3.2,
+     "rawTrace": 4.95,
+     "rawErrPct": -1.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.06,
+     "model": 10.16,
+     "errPct": 1.0,
+     "rawTrace": 11.27,
+     "rawErrPct": 12.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.92,
+     "model": 11.85,
+     "errPct": -0.6,
+     "rawTrace": 11.9,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 2.7
+  },
+  "P23A": {
+   "source": "Ciudad-de-Evora-p23a.pdf",
+   "superficieUtil": 92.4,
+   "fit": {
+    "meanAbsErrPct": 17.25,
+    "gap": 0.28,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.04,
+     "model": 9.91,
+     "errPct": -1.3,
+     "rawTrace": 9.39,
+     "rawErrPct": -6.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.21,
+     "model": 2.73,
+     "errPct": 23.5,
+     "rawTrace": 2.61,
+     "rawErrPct": 18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 1.32,
+     "model": 1.57,
+     "errPct": 18.9,
+     "rawTrace": 2.34,
+     "rawErrPct": 77.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.53,
+     "model": 12.25,
+     "errPct": -21.1,
+     "rawTrace": 12.99,
+     "rawErrPct": -16.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.46,
+     "model": 7.17,
+     "errPct": 31.3,
+     "rawTrace": 7.24,
+     "rawErrPct": 32.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.88,
+     "model": 22.74,
+     "errPct": -0.6,
+     "rawTrace": 21.97,
+     "rawErrPct": -4.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 6.43,
+     "model": 6.35,
+     "errPct": -1.2,
+     "rawTrace": 6.42,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.69,
+     "model": 10.8,
+     "errPct": 1.0,
+     "rawTrace": 10.4,
+     "rawErrPct": -2.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.47,
+     "model": 5.49,
+     "errPct": 22.8,
+     "rawTrace": 5.38,
+     "rawErrPct": 20.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 3.88,
+     "model": 3.84,
+     "errPct": -1.0,
+     "rawTrace": 3.65,
+     "rawErrPct": -5.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 9.49,
+     "model": 9.56,
+     "errPct": 0.7,
+     "rawTrace": 10.03,
+     "rawErrPct": 5.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 23,
+    "window": 1,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.0
+  },
+  "P23B": {
+   "source": "Ciudad-de-Evora-p23b.pdf",
+   "superficieUtil": 94.98,
+   "fit": {
+    "meanAbsErrPct": 26.42,
+    "gap": 0.11,
+    "thick": 0.025,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 2.13,
+     "model": 1.95,
+     "errPct": -8.5,
+     "rawTrace": 1.93,
+     "rawErrPct": -9.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.54,
+     "model": 2.93,
+     "errPct": 15.4,
+     "rawTrace": 2.97,
+     "rawErrPct": 16.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.98,
+     "errPct": -7.4,
+     "rawTrace": 3.98,
+     "rawErrPct": -7.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.26,
+     "errPct": -6.6,
+     "rawTrace": 4.49,
+     "rawErrPct": -1.5,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 4",
+     "printed": 1.82,
+     "model": 2.1,
+     "errPct": 15.4,
+     "rawTrace": 2.24,
+     "rawErrPct": 23.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.48,
+     "model": 9.99,
+     "errPct": -4.7,
+     "rawTrace": 10.21,
+     "rawErrPct": -2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 11.72,
+     "errPct": 15.7,
+     "rawTrace": 21.78,
+     "rawErrPct": 115.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.18,
+     "model": 6.97,
+     "errPct": -2.9,
+     "rawTrace": 7.03,
+     "rawErrPct": -2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.67,
+     "model": 24.32,
+     "errPct": -1.4,
+     "rawTrace": 23.92,
+     "rawErrPct": -3.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 9.95,
+     "model": 9.66,
+     "errPct": -2.9,
+     "rawTrace": 9.62,
+     "rawErrPct": -3.3,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.81,
+     "model": 13.7,
+     "errPct": -0.8,
+     "rawTrace": 6.69,
+     "rawErrPct": -51.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.43,
+     "model": 3.41,
+     "errPct": -0.6,
+     "rawTrace": 0.13,
+     "rawErrPct": -96.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 15,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 4.8
+  },
+  "P23C": {
+   "source": "Ciudad-de-Evora-p23c.pdf",
+   "superficieUtil": 100.5,
+   "fit": {
+    "meanAbsErrPct": 19.91,
+    "gap": 0.2,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 4.56,
+     "model": 4.63,
+     "errPct": 1.5,
+     "rawTrace": 4.69,
+     "rawErrPct": 2.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.13,
+     "model": 10.01,
+     "errPct": -1.2,
+     "rawTrace": 7.5,
+     "rawErrPct": -26.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 4.12,
+     "model": 4.17,
+     "errPct": 1.2,
+     "rawTrace": 7.91,
+     "rawErrPct": 92.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.3,
+     "model": 3.78,
+     "errPct": -12.1,
+     "rawTrace": 4.23,
+     "rawErrPct": -1.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 3.28,
+     "model": 4.29,
+     "errPct": 30.8,
+     "rawTrace": 4.1,
+     "rawErrPct": 25.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.77,
+     "model": 3.53,
+     "errPct": 27.4,
+     "rawTrace": 3.41,
+     "rawErrPct": 23.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 13.94,
+     "model": 13.63,
+     "errPct": -2.2,
+     "rawTrace": 13.37,
+     "rawErrPct": -4.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.88,
+     "model": 8.08,
+     "errPct": -25.7,
+     "rawTrace": 7.31,
+     "rawErrPct": -32.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 25.94,
+     "model": 28.14,
+     "errPct": 8.5,
+     "rawTrace": 27.06,
+     "rawErrPct": 4.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.85,
+     "model": 11.12,
+     "errPct": 2.5,
+     "rawTrace": 11.08,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 4",
+     "printed": 7.34,
+     "model": 7.31,
+     "errPct": -0.4,
+     "rawTrace": 7.65,
+     "rawErrPct": 4.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.39,
+     "model": 2.82,
+     "errPct": 18.0,
+     "rawTrace": 3.01,
+     "rawErrPct": 25.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 20,
+    "window": 9,
+    "balcony_door": 0,
+    "entrance": 1
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.5
+  },
+  "P23D": {
+   "source": "Ciudad-de-Evora-p23d.pdf",
+   "superficieUtil": 98.79,
+   "fit": {
+    "meanAbsErrPct": 6.4,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Cocina",
+     "printed": 7.81,
+     "model": 7.57,
+     "errPct": -3.1,
+     "rawTrace": 6.4,
+     "rawErrPct": -18.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 3.92,
+     "errPct": -3.4,
+     "rawTrace": 3.91,
+     "rawErrPct": -3.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 2.68,
+     "model": 3.18,
+     "errPct": 18.7,
+     "rawTrace": 3.1,
+     "rawErrPct": 15.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.8,
+     "model": 4.85,
+     "errPct": 1.0,
+     "rawTrace": 5.04,
+     "rawErrPct": 5.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 22.67,
+     "model": 22.07,
+     "errPct": -2.6,
+     "rawTrace": 21.88,
+     "rawErrPct": -3.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.06,
+     "model": 10.56,
+     "errPct": 5.0,
+     "rawTrace": 10.4,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.18,
+     "model": 4.06,
+     "errPct": -2.9,
+     "rawTrace": 3.97,
+     "rawErrPct": -5.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.55,
+     "model": 15.72,
+     "errPct": 1.1,
+     "rawTrace": 15.98,
+     "rawErrPct": 2.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.0,
+     "model": 4.84,
+     "errPct": -3.2,
+     "rawTrace": 4.95,
+     "rawErrPct": -1.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.06,
+     "model": 10.16,
+     "errPct": 1.0,
+     "rawTrace": 11.27,
+     "rawErrPct": 12.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.92,
+     "model": 11.85,
+     "errPct": -0.6,
+     "rawTrace": 11.9,
+     "rawErrPct": -0.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 2.7
+  },
+  "P24D": {
+   "source": "Ciudad-de-Evora-p24d.pdf",
+   "superficieUtil": 101.34,
+   "fit": {
+    "meanAbsErrPct": 27.68,
+    "gap": 0.11,
+    "thick": 0.035,
+    "walls": "white"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 7.81,
+     "model": 7.81,
+     "errPct": 0.0,
+     "rawTrace": 0.1,
+     "rawErrPct": -98.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 3",
+     "printed": 2.68,
+     "model": 2.85,
+     "errPct": 6.3,
+     "rawTrace": 3.03,
+     "rawErrPct": 13.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 4.06,
+     "model": 3.75,
+     "errPct": -7.6,
+     "rawTrace": 3.77,
+     "rawErrPct": -7.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 23.69,
+     "model": 23.38,
+     "errPct": -1.3,
+     "rawTrace": 23.2,
+     "rawErrPct": -2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.81,
+     "model": 10.88,
+     "errPct": 0.6,
+     "rawTrace": 10.89,
+     "rawErrPct": 0.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.81,
+     "model": 5.52,
+     "errPct": -5.0,
+     "rawTrace": 5.74,
+     "rawErrPct": -1.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 23.46,
+     "model": 25.07,
+     "errPct": 6.9,
+     "rawTrace": 43.04,
+     "rawErrPct": 83.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 5.0,
+     "model": 4.93,
+     "errPct": -1.4,
+     "rawTrace": 4.13,
+     "rawErrPct": -17.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 4.18,
+     "model": 3.88,
+     "errPct": -7.2,
+     "rawTrace": 3.9,
+     "rawErrPct": -6.7,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 15.55,
+     "model": 15.15,
+     "errPct": -2.6,
+     "rawTrace": 15.49,
+     "rawErrPct": -0.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.06,
+     "model": 10.06,
+     "errPct": 0.0,
+     "rawTrace": 0.12,
+     "rawErrPct": -98.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.92,
+     "model": 11.75,
+     "errPct": -1.4,
+     "rawTrace": 11.62,
+     "rawErrPct": -2.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "pdf-text",
+   "beds": 0,
+   "openings": {
+    "door": 17,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": true,
+   "keyPlan": null,
+   "areaWeightedErrPct": 3.0
+  }
+ },
+ "method": "Rooms traced from the plan raster of each published PDF; scale calibrated so the sum of traced interior rooms equals the sum of printed interior areas; sealing parameters chosen per unit to minimise mean absolute room-area error; placement from the blue highlight of the key plan printed on the same PDF.",
+ "rejected": {
+  "P11D": {
+   "source": "Ciudad-de-Evora-p11d.pdf",
+   "meanAbsErrPct": 49.15
+  },
+  "P12D": {
+   "source": "Ciudad-de-Evora-p12d.pdf",
+   "meanAbsErrPct": 49.15
+  },
+  "P13A": {
+   "source": "Ciudad-de-Evora-p13a.pdf",
+   "meanAbsErrPct": 37.48
+  },
+  "P13D": {
+   "source": "Ciudad-de-Evora-p13d.pdf",
+   "meanAbsErrPct": 49.15
+  },
+  "P14A": {
+   "source": "Ciudad-de-Evora-p14a.pdf",
+   "meanAbsErrPct": 77.49
+  },
+  "P14B": {
+   "source": "Ciudad-de-Evora-p14b.pdf",
+   "meanAbsErrPct": 57.2
+  },
+  "P14C": {
+   "source": "Ciudad-de-Evora-p14c.pdf",
+   "meanAbsErrPct": 42.05
+  },
+  "P14D": {
+   "source": "Ciudad-de-Evora-p14d.pdf",
+   "meanAbsErrPct": 72.01
+  },
+  "P1BA": {
+   "source": "Ciudad-de-Evora-p1ba.pdf",
+   "meanAbsErrPct": 64.96
+  },
+  "P1BB": {
+   "source": "Ciudad-de-Evora-p1bb.pdf",
+   "meanAbsErrPct": 56.74
+  },
+  "P24A": {
+   "source": "Ciudad-de-Evora-p24a.pdf",
+   "meanAbsErrPct": 50.62
+  },
+  "P24B": {
+   "source": "Ciudad-de-Evora-p24b.pdf",
+   "meanAbsErrPct": 44.4
+  },
+  "P24C": {
+   "source": "Ciudad-de-Evora-p24c.pdf",
+   "meanAbsErrPct": 37.38
+  },
+  "P2BA": {
+   "source": "Ciudad-de-Evora-p2ba.pdf",
+   "meanAbsErrPct": 65.23
+  },
+  "P2BB": {
+   "source": "Ciudad-de-Evora-p2bb.pdf",
+   "meanAbsErrPct": 62.57
+  }
+ }
+}

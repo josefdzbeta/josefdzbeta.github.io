@@ -32,19 +32,18 @@ Consulta documental: 4 de noviembre de 2026. Este sitio es una propuesta privada
 | Postventa | Canal y proceso oficial, campos de incidencia, adjuntos y seguimiento | Sustituir la derivación al correo corporativo por gestión real |
 | Legal | Responsable correcto y denominación social unificada; textos actualizados de privacidad/aviso; revisión de Google Maps/fuentes externas | Resolver discrepancias documentadas en el inventario |
 
-## Supuestos y limitaciones de la representación
+## Supuestos y limitaciones de la representación (revisión 7 de noviembre de 2026)
 
-El edificio tridimensional es una maqueta procedimental de demostración. No se obtuvo un modelo arquitectónico aprobado. Tampoco se trazaron interiores a partir de fotografías. Todas las viviendas 3D usan una distribución representativa, sin medidas y sin afirmaciones sobre dormitorios reales. El número y código de botones viene de los PDF publicados; Portal 2 no se habilita sin correspondencia documental verificada.
+Las viviendas de Mykonos (Portal 1) y Aura se han trazado de su propio plano publicado: muros, estancias, huecos y terrazas, con la escala calibrada por las superficies impresas. Desviación por estancia publicada en `docs/model-validation.md`; las viviendas con desviación media superior al 20 % no se muestran en 3D y remiten al PDF. Plantas 1–4 de Mykonos se sitúan con el plano llave de cada PDF; planta baja y ático solo como contorno. Portal 2 es un volumen inferido por simetría aparente en los renders: no hay planos de vivienda publicados.
 
-Las fichas enlazan mapas originales de cada promoción. No se verificaron mediante levantamiento la topografía, altura de edificios vecinos, vegetación, accesos ni orientación de cada hogar. No se representan ni se afirman esas características. En producción, Google Maps/Street View puede informar el contexto exterior respetando sus condiciones y atribuciones; nunca sustituye al proyecto arquitectónico.
-
-Los colores de las muestras son demostrativos y no constituyen productos aprobados. Los recuentos y familias son documentales. Las elecciones atribuidas a Dirección Facultativa no se ofrecen como decisiones del comprador. Los programas dependen de obra y plazo; las condiciones originales siguen siendo la referencia. No hay opciones de acabados nuevas inventadas como oferta contractual.
+No publicados y por tanto inferidos: alturas (2,50 m libres, 3,00 m entre plantas), sentido de apertura de puertas, posición de muebles de cocina y sanitarios, material por paño de fachada y orientación (sin norte en los planos). Las opciones de acabado reproducen el número de opciones publicado por familia; los tonos son orientativos y las ideas adicionales se marcan como «Concepto · no incluido». Auditoría completa: `docs/fidelity-audit.md`.
 
 ## Arquitectura y actualización
 
 - `dist/data.json`: contenido, proyectos, documentos, mapas y programas por desarrollo; fuente de la interfaz.
 - `src/app.js`: navegación, fichas, selección y formulario.
-- `src/explorer.js`: modelos y controles Three.js. Sustituir aquí la geometría procedimental por carga GLB y mapeo de IDs aprobados.
+- `src/explorer.js`: genera edificio, plantas y viviendas en tiempo de ejecución desde `models/<promoción>/*.json`. `src/finishes.js` (texturas procedurales a escala física) y `src/catalog.js` (programa oficial, memoria y conceptos).
+- `scripts/plans/` (trazado de planos) y `scripts/blender/` (validación y exportación GLB): ver `docs/fidelity-audit.md` §4.
 - `dist/assets/`: originales derivados de Bamaire, redimensionados para web. El índice completo mantiene sus URLs de origen.
 - `dist/style.css`: sistema visual y reglas adaptativas.
 - `dist/docs/`: auditoría, inventario de fuentes y requisitos.

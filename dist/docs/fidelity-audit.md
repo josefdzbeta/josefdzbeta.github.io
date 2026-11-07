@@ -1,0 +1,85 @@
+# Bamaire — architectural & material fidelity audit
+
+Audit date: 6–7 November 2026. Sources re-fetched from https://bamaire.es on 6 November 2026; all eight promotion pages were byte-identical to the 4 November snapshot, so the Spanish copy kept in `docs/original-copy.json` is still current. Every PDF linked from the eight promotion pages (368 files) was downloaded to `research/source-pdfs/<promoción>/` and inspected.
+
+Companion files: `docs/model-validation.md` (per-dwelling, per-room comparison with the plans), `models/<promoción>/validation.json` (machine-readable), `research/qa/` (trace overlays, Blender top renders vs plan).
+
+## 1. Omissions and inaccuracies found in the project (now fixed)
+
+| # | Finding | Source | Action |
+|---|---|---|---|
+| 1 | Ciudad de Évora: 36 dwelling plans were missing from the data (the page opens them with `window.open('http://www.bamaire.es/planos/…')`, which the earlier crawl did not follow). | https://bamaire.es/ciudaddeevora/ → e.g. https://bamaire.es/planos/Ciudad-de-Evora-p11a.pdf | Added to `data.json` (`downloadUrls` 2 → 38). |
+| 2a | Aura and Babilonia had no dwelling geometry at all; the personalisation configurator used one generic room. | https://bamaire.es/aura/ , https://bamaire.es/babilonia/ (dwelling PDFs) | 24 Aura and 65 Babilonia dwellings traced and validated; the configurator loads a real dwelling of the selected promotion (selector lists all published ones with their Δ). |
+| 2 | Mykonos explorer used a generic procedural building and one representative interior for every dwelling. | https://bamaire.es/mykonos/assets/mykonos-p1-1a.pdf … `-p1-be.pdf` (32 plans) | Replaced: every Portal 1 dwelling is traced from its own plan. 30 are published as 3D; 5C and BD exceed the 20 % error threshold and link to their PDF instead. |
+| 3 | Surfaces (útil / construida), room list and room areas were shown as "Ver plano original" although they are printed as text in each Mykonos PDF. | same PDFs | Shown per dwelling, quoted from the plan, with the traced value and deviation next to it. |
+| 4 | Mykonos building height and form: the published renders and rotating views show PB + 4 + ático (setback) and two portals with a symmetric façade; the old model had 6 identical slabs. | https://bamaire.es/mykonos/images/mikonos-giro-1.png … `-8.png`, `mykonos-fachada1.png`, `mykonos-fachada2.png`, `mykonos01-2500px.jpg` | Levels 1–4 assembled from traced dwellings; ground floor and ático modelled as key-plan outlines; Portal 2 shown as a translucent mirror labelled as inferred. |
+| 5 | Mykonos memoria does **not** include a furnished kitchen; Aura's does ("COCINA AMUEBLADA… laminados de alta presión, placa de inducción, campana…"). The old configurator implied kitchens for all. | https://bamaire.es/mykonos/assets/mykonos-memoriacalidad.pdf · https://bamaire.es/aura/assets/auramc.pdf | Kitchen furniture/worktops are labelled "Concepto · no incluido" for promotions without it in the memoria. |
+| 6 | SPC vinyl flooring is specified "apta para zonas húmedas… en interior de vivienda excepto baños" (Mykonos, Aura): kitchens carry the floor finish, baths carry ceramic. Babilonia / La Pilara programmes say "Cocina: solados y alicatados". | memorias above; https://bamaire.es/babilonia/assets/babilonia-memoria-calidades.pdf | Surface mapping follows each memoria (kitchen floor = tarima or tile per promotion). |
+| 7 | Published unit status: the Mykonos façade navigator colours each hotspot in its stylesheet (`boton-disponible` ×4, `boton-reservada` ×28; legend "línea verde: disponible / línea roja: vendida"). Not represented before. | https://bamaire.es/mykonos/css/index.css | Stored as a dated snapshot (`publishedUnitStatus`, 06.11.2026) and shown under "A consultar". Hotspot→code mapping is heuristic (nearest PDF link) and needs commercial confirmation. |
+| 8 | Swatches used arbitrary colours presented only as "muestra ilustrativa"; nothing tied them to the published programme counts. | programme lists in each memoria | Each official family now shows exactly the published number of options ("Programa oficial · 3 opciones"); tones are labelled "tono orientativo". Extra ideas (encimera, frentes, grifería) are in a separate "Concepto" block. |
+
+## 2. What the sources do and do not establish
+
+Established and used:
+
+- Room names and net areas, superficie útil and construida per dwelling (vector text in the PDFs).
+- Wall layout, room adjacency, door and window openings, terraces/patios (raster plan inside each PDF — traced).
+- Position of every typical-floor dwelling in the Portal 1 floor (blue highlight in the key plan printed on each PDF; overlap 0.78–0.95 IoU, scale agreement within ±3 % for 19 of 24 units; the F units deviate 11–13 % and 1E 6 %, so letter positions use the consensus of floors 1–4).
+- Street frontages (Calle María de Molina, calle peatonal) from key-plan labels; garage/storage layout (https://bamaire.es/mykonos/assets/mykonos-sotano.pdf, linked, not modelled).
+- Finish families and number of options per family; fixed specifications (sanitarios de porcelana vitrificada blanca, griferías monomando, platos de ducha de resina, gres espesorado en terrazas, falso techo continuo, carpintería PVC oscilobatiente, persianas de aluminio).
+
+Not published — modelled as inferred and labelled so in the interface:
+
+- Floor-to-floor and clear heights (3.00 m / 2.50 m used), sill and head heights (1.00 / 2.20 m used).
+- Door swing direction (doors are drawn open towards the non-circulation side).
+- Exact positions of kitchen units and sanitary ware (kitchen run anchored to the hob symbol detected on the plan; bathroom fixtures on the longest wall).
+- Orientation: no north arrow on any plan.
+- Façade material per panel (memoria lists ladrillo cara vista blanco, aplacado de gres porcelánico and monocapa "a elegir por Dirección Facultativa").
+- Real finish samples: no product names, formats, colours or photos are published for any programme (the page image `personalizacion-babilonia.jpg` shows people over a generic plan, not samples).
+
+## 3. Revision 2 (7 November 2026) — decisions taken on the client's instructions
+
+Dwellings now in 3D (traced from their own PDF, fitted to the printed m², furnished): Mykonos 32 (whole Portal 1, placed in the building; Portal 2 repeats it), Babilonia 64, Aura 26, Orión 22, Ciudad de Évora 21, Argo 17, Puerta La Pilara 39 (labels read by OCR) — see `model-validation.md`. Dwellings outside tolerance (raw trace > 35 % or fitted model > 15 % area-weighted) are listed there and keep their PDF link. Perseo is not modelled (see gaps).
+
+| Instruction | Implementation |
+|---|---|
+| Portal 2 "will be the same as Portal 1" | Portal 2 is rendered at full detail as a mirror of Portal 1 (shared gable), labelled "misma distribución que Portal 1". |
+| Ground floor and ático: match the PDFs as closely as possible | Each B/5 dwelling is placed by cross-correlating its walls with the structure of floor 1 / floor 4, constrained to the key-plan outline of its level, avoiding the stair/lift core and overlaps, and pulled towards its key-plan position. Result: BA under 1A, BB under 1B, BC under 1C (same structure), BD/BE on the remaining frontage; 5A/5B/5C inside the ático outline with no overlap. Scores per unit in `models/mykonos/building.json` (`fit`). |
+| Évora, Orión, Argo: plans print areas without names | The tracer accepts unnamed areas; it then names each room from the drawing: tiles vs wood floor, black hob symbol, contact with the outside, corridor width, size rank (Salón > Dormitorios). Names are flagged as inferred (° in the report). Évora draws walls off-white: a third wall-detection mode was added and is chosen automatically. Header areas (útil/construida) are excluded. |
+| La Pilara and Perseo: no text layer | Pages are rendered and OCR'd with Tesseract after keeping only glyph-sized dark strokes (walls and textures removed); names are paired to the nearest area below them; decimal commas lost by OCR are restored. |
+| Sizes from the m² in the PDFs | After tracing, the grid cell is recalibrated so interior rooms sum to the printed total, enclosed holes are given to their room, and boundaries between rooms that have no wall on the plan (or that meet a corridor at a doorway) are moved cell by cell until each room matches its printed m². Walls never move. Example: Mykonos 1A distribuidor 3,15 → 5,10 m² (printed 5,14), dormitorio 2 13,55 → 12,60 m² (12,42). |
+| Real finishes from the website text | Each promotion's memoria text is quoted under its programme family (e.g. "TARIMA LAMINADA DE ALTA RESISTENCIA tipo AC-5 Clase 33, con tablero de HDF … de 12 mm", "Encimera de Silestone o similar", "PUERTAS DE PASO MACIZAS LACADAS en BLANCO"), and the model applies what is stated: skirting 120×13 mm DM lacado blanco (Argo, Orión, Évora) / 110×13 mm (Babilonia) / PVC (Mykonos, Aura), interior doors 2,11 m (Argo, Orión, Évora), Aura's Silestone worktop as a memoria item instead of a concept. The site publishes **no brand, reference, format or photo for the individual options** of any programme, so option tones remain labelled orientative. |
+| Heights "as realistically as possible" | Measured on the published orthographic elevation `mykonos-fachada1.png` with window (≈1,2 m) and balcony-door (≈1,9 m) widths and the 69 m façade as scale: ground storey 3,80 m, typical storey 3,30 m, total ≈22,3 m to the ático parapet; clear height 2,60 m; window sill 1,00 m, head 2,25 m; parapet 1,10 m; lift/stair overrun 2,60 m. |
+| Building must match the images customers see | Façade: white brick volume, grey porcelain cladding on walls bounding balconies/terraces, grey-tinted glass railings with grey edge, dark window frames, solid white parapets on ático terraces, ground-floor patio walls with slatted top, roof parapet and core overrun. The explorer offers the published views (fachada principal/posterior, giro 1/3/5/7, aerial render 01) with the same camera direction and a picture-in-picture of Bamaire's image for comparison. |
+| Furniture in every apartment, hideable per room | Beds are placed from the lavender bed symbols of each plan (single 0,90×1,90 / double 1,50×2,00 at the drawn position and headboard side); sofas, coffee/TV units, dining tables with chairs, terrace furniture and plants are placed by a free-space solver that keeps door clearances and wall runs. Each room has its own furniture toggle ("Mobiliario") in the explorer and in the configurator. |
+| Remove "publicados" from sizes | Labels show only the m² value. |
+
+## 3b. Revision 3 (7 November 2026) — Mykonos exterior rebuilt from the published images
+
+- **Exterior shell from Bamaire's own elevations.** `scripts/plans/exterior.py` takes the orthographic elevations `mykonos-fachada1.png` (courtyard façade) and `mykonos-fachada2.png` (Calle María de Molina façade) at 16,13 px/m (1113 px ↔ 69 m), aligns them on the window rows, and rectifies the end walls from the near-frontal views `mikonos-giro-7.png` (pedestrian street) and `mikonos-giro-3.png` (far end). Each outward face of the 3D shell is mapped with that published image, so windows, cladding and railings are the ones customers see; the relief is real geometry: projecting white frame (0,45 m), recessed grey bays (0,35 m), white piers, balconies with grey cheeks and tinted-glass fronts at the 43 positions detected on the elevations, roof parapet and lift/stair overruns.
+- **Orientation proved, not assumed.** Fachada 2's centre bay covers dwelling 2D's terrace and its left bay 2C/2B; fachada 1's centre bay covers 2E and its right bay 2F/2A (terraces traced from the plans and placed with the key plans).
+- **Heights from the elevation:** ground floor +0,74 m (raised over the garage), floor 1 at 4,60 m, typical storey 3,27 m, roof ≈20,95 m, frame top 22,94 m.
+- **Camera-matched views.** The perspective renders 01 (aerial) and 03/04 (street) were calibrated with PnP from building corners (render 03: camera at street eye height 2,36 m, vertical FOV 30°, mean reprojection error 14,6 px on 2560 px; render 01: FOV 20°). The explorer reproduces each shot and can overlay the published image at adjustable opacity; the two elevations overlay at the exact scale.
+- **Navigation.** Hovering the façade highlights the apartment under the cursor (code, bedrooms, m², published status) and a click opens it; a floor stack beside the building highlights each storey and opens it as a plan with every apartment of both portals coloured by status; breadcrumbs, a back button and Esc return step by step; ↑/↓ change floor.
+- **Speed.** The building view no longer builds the 24 dwellings' walls: it loads a 1 KB façade spec and four façade images (161 KB) and builds in ~3 ms; dwelling interiors and finish textures are generated only when a dwelling opens; both 3D viewers start only when scrolled near; no shadow maps outside. Bundles and the stylesheet now carry content hashes and data/model requests a build id, so browsers cannot keep serving an old version (the cause of the "m² publicados" labels still seen after the previous fix).
+
+## 4. Remaining gaps
+
+| Gap | What would close it |
+|---|---|
+| Façade material per individual panel, exact frame/cornice geometry of the renders | Façade elevations from the Proyecto de Ejecución. |
+| Exact heights | Sections from the Proyecto de Ejecución (values above are measured on a marketing elevation). |
+| Rooms enclosed by walls that still deviate from their printed m² (wall drawn thick, appliance shadows) | Vector plans; walls are deliberately not moved to force areas. |
+| Inferred room names (Évora, Orión, Argo) and OCR'd names (La Pilara, Perseo) | Vector PDFs with text. |
+| Perseo: each PDF draws a two-storey house on one sheet, with names and areas as semi-transparent white raster text over textures; OCR recovers too few labels (raw trace 62–89 %). A storey splitter (`scripts/plans/duplex.py`) is ready. | Per-storey or vector PDFs, or a list of room areas per house type. |
+| Argo: walls drawn in tones close to the floor finish; 11 of 28 traced dwellings withdrawn after fitting | Vector plans. |
+| Option-level finish data (brand, reference, format, photo) | Bamaire's sample catalogue. |
+
+## 5. Method (reproducible)
+
+1. `scripts/plans/trace.py` — renders the plan area of a PDF with its text removed, extracts dark wall pixels, seals door/window gaps, splits rooms by watershed seeded at each printed label, calibrates metres per pixel so traced interior rooms sum to the printed interior areas, classifies openings, detects the entrance marker; per unit, 8 parameter combinations are tried and the one with the smallest mean room-area error is kept.
+2. `scripts/plans/batch.py` — parallel run for a promotion.
+3. `scripts/plans/assemble.py` — orients each key plan by its street labels, matches the dwelling footprint to the blue highlight (4 rotations, IoU), derives the floor frame.
+4. `scripts/plans/build_model.py` — removes islands, rejects units above 20 % mean error, writes `models/<promoción>/units/*.json`, `plans/*.jpg` (overlay), `building.json`, `index.json`, `validation.json`.
+5. `scripts/blender/validate_and_export.py` (Blender 4.4, headless) — rebuilds each dwelling independently from the JSON, renders an orthographic top view at the exact metric extent for overlay against the plan (`research/qa/blender/*/…_compare.jpg`), exports Draco GLBs (`research/qa/blender/*/<code>.glb`, `building.glb`) for architects/QA. The website itself builds geometry at runtime from the compact JSON (no GLB download needed).
+6. `scripts/plans/report.py` — writes `docs/model-validation.md`.

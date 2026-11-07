@@ -1,0 +1,4202 @@
+{
+ "units": {
+  "P1-CUARTA-12A": {
+   "source": "p1-cuarta-12a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 15.98,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 2.6,
+     "errPct": -36.7,
+     "rawTrace": 3.26,
+     "rawErrPct": -20.7,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 8.48,
+     "errPct": -18.1,
+     "rawTrace": 8.49,
+     "rawErrPct": -18.1,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 16.72,
+     "errPct": 16.1,
+     "rawTrace": 19.33,
+     "rawErrPct": 34.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.46,
+     "errPct": -1.5,
+     "rawTrace": 9.23,
+     "rawErrPct": -20.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.21,
+     "model": 11.04,
+     "errPct": -1.5,
+     "rawTrace": 11.45,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.9,
+     "errPct": 1.4,
+     "rawTrace": 2.7,
+     "rawErrPct": -5.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 25.96,
+     "errPct": 5.7,
+     "rawTrace": 24.5,
+     "rawErrPct": -0.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 15,
+    "window": 9,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 9.5
+  },
+  "P1-PRIMERA-3A": {
+   "source": "p1-primera-3a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 21.92,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.9,
+     "errPct": -5.1,
+     "rawTrace": 3.24,
+     "rawErrPct": -21.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 10.25,
+     "errPct": -1.1,
+     "rawTrace": 8.44,
+     "rawErrPct": -18.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.55,
+     "errPct": 1.0,
+     "rawTrace": 19.51,
+     "rawErrPct": 35.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.41,
+     "errPct": -1.9,
+     "rawTrace": 9.09,
+     "rawErrPct": -21.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.21,
+     "model": 11.13,
+     "errPct": -0.7,
+     "rawTrace": 8.62,
+     "rawErrPct": -23.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.52,
+     "errPct": -11.9,
+     "rawTrace": 2.7,
+     "rawErrPct": -5.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 25.03,
+     "errPct": 2.0,
+     "rawTrace": 27.35,
+     "rawErrPct": 11.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 5,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 2.0
+  },
+  "P1-PRIMERA-4B": {
+   "source": "p1-primera-4b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 11.02,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.53,
+     "errPct": 0.9,
+     "rawTrace": 8.13,
+     "rawErrPct": 9.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.53,
+     "model": 20.33,
+     "errPct": -17.1,
+     "rawTrace": 19.66,
+     "rawErrPct": -19.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.14,
+     "model": 3.29,
+     "errPct": 4.8,
+     "rawTrace": 3.68,
+     "rawErrPct": 17.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 12.11,
+     "model": 11.54,
+     "errPct": -4.7,
+     "rawTrace": 11.83,
+     "rawErrPct": -2.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.14,
+     "model": 14.72,
+     "errPct": 45.2,
+     "rawTrace": 15.07,
+     "rawErrPct": 48.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.8,
+     "model": 3.88,
+     "errPct": 2.1,
+     "rawTrace": 3.7,
+     "rawErrPct": -2.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.21,
+     "model": 14.67,
+     "errPct": 3.2,
+     "rawTrace": 13.98,
+     "rawErrPct": -1.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 1",
+     "printed": 5.35,
+     "model": 5.41,
+     "errPct": 1.1,
+     "rawTrace": 5.76,
+     "rawErrPct": 7.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.2,
+     "model": 10.31,
+     "errPct": 1.1,
+     "rawTrace": 10.13,
+     "rawErrPct": -0.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 4.37,
+     "model": 4.78,
+     "errPct": 9.4,
+     "rawTrace": 4.58,
+     "rawErrPct": 4.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 2,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 11.2
+  },
+  "P1-QUINTA-15A": {
+   "source": "p1-quinta-15a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 15.02,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 17.0,
+     "errPct": 127.9,
+     "rawTrace": 17.35,
+     "rawErrPct": 132.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.46,
+     "errPct": -1.5,
+     "rawTrace": 8.97,
+     "rawErrPct": -22.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza 2",
+     "printed": 80.32,
+     "model": 79.18,
+     "errPct": -1.4,
+     "rawTrace": 61.73,
+     "rawErrPct": -23.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 16.12,
+     "errPct": 11.9,
+     "rawTrace": 14.5,
+     "rawErrPct": 0.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 4.99,
+     "model": 5.37,
+     "errPct": 7.6,
+     "rawTrace": 6.92,
+     "rawErrPct": 38.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 24.19,
+     "errPct": -1.5,
+     "rawTrace": 26.68,
+     "rawErrPct": 8.7,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "ormitorio",
+     "printed": 10.36,
+     "model": 8.43,
+     "errPct": -18.6,
+     "rawTrace": 8.61,
+     "rawErrPct": -16.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 11.58,
+     "errPct": 3.3,
+     "rawTrace": 11.46,
+     "rawErrPct": 2.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 9,
+    "window": 4,
+    "balcony_door": 2,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 9.5
+  },
+  "P1-SEGUNDA-7B": {
+   "source": "p1-segunda-7b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 29.87,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.53,
+     "model": 24.17,
+     "errPct": -1.5,
+     "rawTrace": 22.29,
+     "rawErrPct": -9.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.14,
+     "model": 3.11,
+     "errPct": -1.0,
+     "rawTrace": 2.95,
+     "rawErrPct": -6.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 12.11,
+     "model": 11.97,
+     "errPct": -1.2,
+     "rawTrace": 9.38,
+     "rawErrPct": -22.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.14,
+     "model": 10.88,
+     "errPct": 7.3,
+     "rawTrace": 12.1,
+     "rawErrPct": 19.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.8,
+     "model": 3.02,
+     "errPct": -20.5,
+     "rawTrace": 2.94,
+     "rawErrPct": -22.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.21,
+     "model": 14.01,
+     "errPct": -1.4,
+     "rawTrace": 11.5,
+     "rawErrPct": -19.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Distribuidor",
+     "printed": 5.35,
+     "model": 5.51,
+     "errPct": 3.0,
+     "rawTrace": 12.65,
+     "rawErrPct": 136.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño 1",
+     "printed": 4.37,
+     "model": 3.79,
+     "errPct": -13.3,
+     "rawTrace": 3.65,
+     "rawErrPct": -16.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 2,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 3.9
+  },
+  "P1-TERCERA-10B": {
+   "source": "p1-tercera-10b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 10.76,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.53,
+     "model": 24.86,
+     "errPct": 1.3,
+     "rawTrace": 25.32,
+     "rawErrPct": 3.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.14,
+     "model": 3.14,
+     "errPct": 0.0,
+     "rawTrace": 3.35,
+     "rawErrPct": 6.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 12.11,
+     "model": 10.13,
+     "errPct": -16.4,
+     "rawTrace": 10.68,
+     "rawErrPct": -11.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.14,
+     "model": 12.52,
+     "errPct": 23.5,
+     "rawTrace": 13.67,
+     "rawErrPct": 34.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "afio",
+     "printed": 3.8,
+     "model": 3.57,
+     "errPct": -6.1,
+     "rawTrace": 3.35,
+     "rawErrPct": -11.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.21,
+     "model": 13.66,
+     "errPct": -3.9,
+     "rawTrace": 13.1,
+     "rawErrPct": -7.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño",
+     "printed": 5.35,
+     "model": 5.4,
+     "errPct": 0.9,
+     "rawTrace": 5.23,
+     "rawErrPct": -2.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.2,
+     "model": 9.38,
+     "errPct": -8.0,
+     "rawTrace": 9.19,
+     "rawErrPct": -9.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño 2",
+     "printed": 4.37,
+     "model": 4.32,
+     "errPct": -1.1,
+     "rawTrace": 4.17,
+     "rawErrPct": -4.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 8,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.3
+  },
+  "P2-BAJO-17A": {
+   "source": "p2-bajo-17a.pdf",
+   "superficieUtil": 70.24,
+   "fit": {
+    "meanAbsErrPct": 3.12,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 1.96,
+     "errPct": -35.5,
+     "rawTrace": 1.49,
+     "rawErrPct": -51.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.61,
+     "model": 10.05,
+     "errPct": -5.3,
+     "rawTrace": 10.01,
+     "rawErrPct": -5.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.74,
+     "model": 24.84,
+     "errPct": 0.4,
+     "rawTrace": 25.55,
+     "rawErrPct": 3.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.42,
+     "model": 19.61,
+     "errPct": 1.0,
+     "rawTrace": 19.27,
+     "rawErrPct": -0.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "istribul",
+     "printed": 3.4,
+     "model": 3.43,
+     "errPct": 0.9,
+     "rawTrace": 3.47,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.0,
+     "model": 14.28,
+     "errPct": 2.0,
+     "rawTrace": 13.76,
+     "rawErrPct": -1.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.11,
+     "model": 9.98,
+     "errPct": -1.3,
+     "rawTrace": 9.86,
+     "rawErrPct": -2.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio",
+     "printed": 21.24,
+     "model": 24.59,
+     "errPct": 15.8,
+     "rawTrace": 24.35,
+     "rawErrPct": 14.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 5.86,
+     "model": 6.14,
+     "errPct": 4.8,
+     "rawTrace": 6.06,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 3,
+   "openings": {
+    "door": 3,
+    "window": 3,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.3
+  },
+  "P2-BAJO-18B": {
+   "source": "p2-bajo-18b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 7.43,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 27.66,
+     "errPct": -4.3,
+     "rawTrace": 28.16,
+     "rawErrPct": -2.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 3.8,
+     "errPct": 25.0,
+     "rawTrace": 8.07,
+     "rawErrPct": 165.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.7,
+     "errPct": -13.5,
+     "rawTrace": 10.18,
+     "rawErrPct": -9.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.26,
+     "model": 11.2,
+     "errPct": -0.5,
+     "rawTrace": 10.67,
+     "rawErrPct": -5.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "stribuidor",
+     "printed": 4.99,
+     "model": 4.95,
+     "errPct": -0.8,
+     "rawTrace": 4.88,
+     "rawErrPct": -2.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "ano",
+     "printed": 3.59,
+     "model": 3.54,
+     "errPct": -1.4,
+     "rawTrace": 3.45,
+     "rawErrPct": -3.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.43,
+     "model": 19.17,
+     "errPct": -1.3,
+     "rawTrace": 13.79,
+     "rawErrPct": -29.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 9.7,
+     "errPct": -6.4,
+     "rawTrace": 9.75,
+     "rawErrPct": -5.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 17.63,
+     "errPct": 25.3,
+     "rawTrace": 17.3,
+     "rawErrPct": 23.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 11,
+    "window": 1,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.6
+  },
+  "P2-BAJO-19C": {
+   "source": "p2-bajo-19c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 17.75,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 20.79,
+     "errPct": 47.8,
+     "rawTrace": 20.97,
+     "rawErrPct": 49.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 9.18,
+     "errPct": -11.4,
+     "rawTrace": 9.18,
+     "rawErrPct": -11.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.43,
+     "model": 18.25,
+     "errPct": -6.1,
+     "rawTrace": 15.41,
+     "rawErrPct": -20.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 3.18,
+     "rawErrPct": -11.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.26,
+     "model": 11.1,
+     "errPct": -1.4,
+     "rawTrace": 10.01,
+     "rawErrPct": -11.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 8.77,
+     "errPct": -21.8,
+     "rawTrace": 9.47,
+     "rawErrPct": -15.5,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 3.07,
+     "errPct": 1.0,
+     "rawTrace": 7.56,
+     "rawErrPct": 148.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 25.97,
+     "errPct": -10.1,
+     "rawTrace": 26.57,
+     "rawErrPct": -8.1,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 9,
+    "window": 3,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 14.4
+  },
+  "P2-CUARTA-33A": {
+   "source": "p2-cuarta-33a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 31.61,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.61,
+     "errPct": -12.2,
+     "rawTrace": 3.43,
+     "rawErrPct": -16.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 6.11,
+     "errPct": -41.0,
+     "rawTrace": 6.4,
+     "rawErrPct": -38.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.28,
+     "errPct": -0.8,
+     "rawTrace": 12.44,
+     "rawErrPct": -13.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Bafio",
+     "printed": 3.59,
+     "model": 5.95,
+     "errPct": 65.7,
+     "rawTrace": 10.15,
+     "rawErrPct": 182.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.46,
+     "errPct": -1.5,
+     "rawTrace": 9.65,
+     "rawErrPct": -17.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.21,
+     "model": 11.04,
+     "errPct": -1.5,
+     "rawTrace": 9.07,
+     "rawErrPct": -19.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.63,
+     "errPct": -8.0,
+     "rawTrace": 2.82,
+     "rawErrPct": -1.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 27.39,
+     "errPct": 11.6,
+     "rawTrace": 28.71,
+     "rawErrPct": 16.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 8,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.9
+  },
+  "P2-CUARTA-34B": {
+   "source": "p2-cuarta-34b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 31.24,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.43,
+     "errPct": -0.4,
+     "rawTrace": 6.18,
+     "rawErrPct": -17.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 26.37,
+     "errPct": 7.4,
+     "rawTrace": 27.17,
+     "rawErrPct": 10.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.39,
+     "errPct": -16.4,
+     "rawTrace": 2.51,
+     "rawErrPct": -12.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.15,
+     "errPct": -4.1,
+     "rawTrace": 8.36,
+     "rawErrPct": -28.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.64,
+     "errPct": 1.4,
+     "rawTrace": 6.9,
+     "rawErrPct": 92.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.44,
+     "errPct": 0.3,
+     "rawTrace": 14.25,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 7.89,
+     "errPct": -23.8,
+     "rawTrace": 7.85,
+     "rawErrPct": -24.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 5,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.2
+  },
+  "P2-PRIMERA-22B": {
+   "source": "p2-primera-22b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 30.36,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.43,
+     "errPct": -0.4,
+     "rawTrace": 6.16,
+     "rawErrPct": -17.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 26.34,
+     "errPct": 7.3,
+     "rawTrace": 27.16,
+     "rawErrPct": 10.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.34,
+     "errPct": -18.2,
+     "rawTrace": 2.51,
+     "rawErrPct": -12.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.28,
+     "errPct": -3.0,
+     "rawTrace": 8.54,
+     "rawErrPct": -26.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 6.78,
+     "rawErrPct": 88.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.4,
+     "errPct": 0.0,
+     "rawTrace": 14.2,
+     "rawErrPct": -1.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 7.87,
+     "errPct": -24.0,
+     "rawTrace": 7.84,
+     "rawErrPct": -24.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 5,
+    "window": 5,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 6.9
+  },
+  "P2-PRIMERA-23C": {
+   "source": "p2-primera-23c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 22.24,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.65,
+     "model": 27.88,
+     "errPct": 13.1,
+     "rawTrace": 27.4,
+     "rawErrPct": 11.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 6.7,
+     "errPct": -10.2,
+     "rawTrace": 6.27,
+     "rawErrPct": -16.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.44,
+     "errPct": -14.7,
+     "rawTrace": 2.58,
+     "rawErrPct": -9.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.53,
+     "model": 11.38,
+     "errPct": -1.3,
+     "rawTrace": 8.57,
+     "rawErrPct": -25.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.54,
+     "errPct": 1.0,
+     "rawTrace": 18.08,
+     "rawErrPct": 25.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 7.34,
+     "errPct": -29.2,
+     "rawTrace": 7.94,
+     "rawErrPct": -23.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.91,
+     "errPct": -4.9,
+     "rawTrace": 3.07,
+     "rawErrPct": -25.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 10,
+    "window": 2,
+    "balcony_door": 2,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 10.5
+  },
+  "P2-QUINTA-38B": {
+   "source": "p2-quinta-38b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.07,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.51,
+     "errPct": 0.7,
+     "rawTrace": 7.31,
+     "rawErrPct": -2.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 23.09,
+     "errPct": -5.9,
+     "rawTrace": 22.48,
+     "rawErrPct": -8.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.37,
+     "errPct": -16.4,
+     "rawTrace": 9.47,
+     "rawErrPct": -15.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.72,
+     "errPct": -4.9,
+     "rawTrace": 2.94,
+     "rawErrPct": 2.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.48,
+     "errPct": -1.3,
+     "rawTrace": 10.11,
+     "rawErrPct": -13.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 5.08,
+     "errPct": 41.5,
+     "rawTrace": 8.01,
+     "rawErrPct": 123.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 16.54,
+     "errPct": 14.9,
+     "rawTrace": 16.46,
+     "rawErrPct": 14.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 10.27,
+     "errPct": -0.9,
+     "rawTrace": 9.21,
+     "rawErrPct": -11.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 6,
+    "window": 7,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.6
+  },
+  "P2-SEGUNDA-25A": {
+   "source": "p2-segunda-25a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 33.35,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 4.11,
+     "model": 3.38,
+     "errPct": -17.8,
+     "rawTrace": 3.22,
+     "rawErrPct": -21.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 10.28,
+     "errPct": -0.8,
+     "rawTrace": 8.32,
+     "rawErrPct": -19.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.4,
+     "model": 12.37,
+     "errPct": -14.1,
+     "rawTrace": 11.82,
+     "rawErrPct": -17.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.59,
+     "model": 3.62,
+     "errPct": 0.8,
+     "rawTrace": 7.16,
+     "rawErrPct": 99.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.63,
+     "model": 9.57,
+     "errPct": -17.7,
+     "rawTrace": 8.99,
+     "rawErrPct": -22.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.06,
+     "model": 2.53,
+     "errPct": 22.8,
+     "rawTrace": 2.65,
+     "rawErrPct": 28.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.55,
+     "model": 28.58,
+     "errPct": 16.4,
+     "rawTrace": 29.13,
+     "rawErrPct": 18.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.44,
+     "errPct": -0.3,
+     "rawTrace": 6.37,
+     "rawErrPct": -14.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 8,
+    "window": 6,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.1
+  },
+  "P2-SEGUNDA-26B": {
+   "source": "p2-segunda-26b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 24.46,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.5,
+     "errPct": 0.5,
+     "rawTrace": 6.98,
+     "rawErrPct": -6.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 20.17,
+     "errPct": -17.8,
+     "rawTrace": 18.71,
+     "rawErrPct": -23.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.21,
+     "model": 11.53,
+     "errPct": 2.9,
+     "rawTrace": 11.82,
+     "rawErrPct": 5.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.91,
+     "errPct": 1.7,
+     "rawTrace": 2.79,
+     "rawErrPct": -2.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.55,
+     "errPct": -0.7,
+     "rawTrace": 9.55,
+     "rawErrPct": -17.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 14.4,
+     "model": 19.9,
+     "errPct": 38.2,
+     "rawTrace": 23.18,
+     "rawErrPct": 61.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 9.01,
+     "errPct": -13.0,
+     "rawTrace": 8.89,
+     "rawErrPct": -14.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 18,
+    "window": 9,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 14.2
+  },
+  "P2-TERCERA-29A": {
+   "source": "p2-tercera-29a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 28.11,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.56,
+     "errPct": -13.4,
+     "rawTrace": 3.42,
+     "rawErrPct": -16.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 10.21,
+     "errPct": -1.4,
+     "rawTrace": 8.85,
+     "rawErrPct": -14.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.4,
+     "model": 13.66,
+     "errPct": -5.1,
+     "rawTrace": 12.66,
+     "rawErrPct": -12.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Bafio",
+     "printed": 3.59,
+     "model": 3.64,
+     "errPct": 1.4,
+     "rawTrace": 7.61,
+     "rawErrPct": 112.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 10.8,
+     "errPct": -7.1,
+     "rawTrace": 9.64,
+     "rawErrPct": -17.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 11.09,
+     "errPct": -1.1,
+     "rawTrace": 9.02,
+     "rawErrPct": -19.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.71,
+     "errPct": -5.2,
+     "rawTrace": 2.86,
+     "rawErrPct": 0.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.55,
+     "model": 26.89,
+     "errPct": 9.5,
+     "rawTrace": 28.65,
+     "rawErrPct": 16.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 9,
+    "window": 8,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 6.0
+  },
+  "P2-TERCERA-30B": {
+   "source": "p2-tercera-30b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.33,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 4.31,
+     "errPct": -42.2,
+     "rawTrace": 2.87,
+     "rawErrPct": -61.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 24.87,
+     "errPct": 1.3,
+     "rawTrace": 25.62,
+     "rawErrPct": 4.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 8.22,
+     "errPct": -26.7,
+     "rawTrace": 8.9,
+     "rawErrPct": -20.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.57,
+     "errPct": -10.1,
+     "rawTrace": 2.79,
+     "rawErrPct": -2.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.47,
+     "errPct": -1.4,
+     "rawTrace": 9.34,
+     "rawErrPct": -19.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.99,
+     "model": 4.0,
+     "errPct": 0.3,
+     "rawTrace": 7.73,
+     "rawErrPct": 93.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 16.22,
+     "errPct": 12.6,
+     "rawTrace": 15.82,
+     "rawErrPct": 9.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 9.99,
+     "errPct": -3.6,
+     "rawTrace": 8.73,
+     "rawErrPct": -15.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 6,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 10.5
+  },
+  "P3-BAJO-41A": {
+   "source": "p3-bajo-41a.pdf",
+   "superficieUtil": 70.24,
+   "fit": {
+    "meanAbsErrPct": 3.12,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 1.96,
+     "errPct": -35.5,
+     "rawTrace": 1.49,
+     "rawErrPct": -51.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.61,
+     "model": 10.05,
+     "errPct": -5.3,
+     "rawTrace": 10.01,
+     "rawErrPct": -5.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.74,
+     "model": 24.84,
+     "errPct": 0.4,
+     "rawTrace": 25.55,
+     "rawErrPct": 3.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.42,
+     "model": 19.61,
+     "errPct": 1.0,
+     "rawTrace": 19.27,
+     "rawErrPct": -0.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "istribul",
+     "printed": 3.4,
+     "model": 3.43,
+     "errPct": 0.9,
+     "rawTrace": 3.47,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.0,
+     "model": 14.28,
+     "errPct": 2.0,
+     "rawTrace": 13.76,
+     "rawErrPct": -1.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.11,
+     "model": 9.98,
+     "errPct": -1.3,
+     "rawTrace": 9.86,
+     "rawErrPct": -2.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio",
+     "printed": 21.24,
+     "model": 24.59,
+     "errPct": 15.8,
+     "rawTrace": 24.35,
+     "rawErrPct": 14.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 5.86,
+     "model": 6.14,
+     "errPct": 4.8,
+     "rawTrace": 6.06,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 3,
+   "openings": {
+    "door": 3,
+    "window": 3,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.3
+  },
+  "P3-BAJO-42B": {
+   "source": "p3-bajo-42b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 7.43,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 27.66,
+     "errPct": -4.3,
+     "rawTrace": 28.16,
+     "rawErrPct": -2.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 3.8,
+     "errPct": 25.0,
+     "rawTrace": 8.07,
+     "rawErrPct": 165.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.7,
+     "errPct": -13.5,
+     "rawTrace": 10.18,
+     "rawErrPct": -9.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.26,
+     "model": 11.2,
+     "errPct": -0.5,
+     "rawTrace": 10.67,
+     "rawErrPct": -5.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "stribuidor",
+     "printed": 4.99,
+     "model": 4.95,
+     "errPct": -0.8,
+     "rawTrace": 4.88,
+     "rawErrPct": -2.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "ano",
+     "printed": 3.59,
+     "model": 3.54,
+     "errPct": -1.4,
+     "rawTrace": 3.45,
+     "rawErrPct": -3.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.43,
+     "model": 19.17,
+     "errPct": -1.3,
+     "rawTrace": 13.79,
+     "rawErrPct": -29.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 9.7,
+     "errPct": -6.4,
+     "rawTrace": 9.75,
+     "rawErrPct": -5.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 17.63,
+     "errPct": 25.3,
+     "rawTrace": 17.3,
+     "rawErrPct": 23.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 11,
+    "window": 1,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.6
+  },
+  "P3-BAJO-43C": {
+   "source": "p3-bajo-43c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 17.65,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 18.2,
+     "errPct": 29.4,
+     "rawTrace": 20.95,
+     "rawErrPct": 48.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 10.28,
+     "errPct": -0.8,
+     "rawTrace": 9.15,
+     "rawErrPct": -11.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.43,
+     "model": 18.47,
+     "errPct": -4.9,
+     "rawTrace": 0.1,
+     "rawErrPct": -99.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.54,
+     "errPct": -1.4,
+     "rawTrace": 3.17,
+     "rawErrPct": -11.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.26,
+     "model": 11.12,
+     "errPct": -1.2,
+     "rawTrace": 10.01,
+     "rawErrPct": -11.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.58,
+     "errPct": -14.5,
+     "rawTrace": 9.62,
+     "rawErrPct": -14.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 3.04,
+     "errPct": 0.0,
+     "rawTrace": 22.61,
+     "rawErrPct": 643.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 26.67,
+     "errPct": -7.7,
+     "rawTrace": 26.5,
+     "rawErrPct": -8.3,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 8,
+    "window": 1,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 9.1
+  },
+  "P3-CUARTA-57A": {
+   "source": "p3-cuarta-57a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 31.61,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.61,
+     "errPct": -12.2,
+     "rawTrace": 3.43,
+     "rawErrPct": -16.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 6.11,
+     "errPct": -41.0,
+     "rawTrace": 6.4,
+     "rawErrPct": -38.2,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.28,
+     "errPct": -0.8,
+     "rawTrace": 12.44,
+     "rawErrPct": -13.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Bafio",
+     "printed": 3.59,
+     "model": 5.95,
+     "errPct": 65.7,
+     "rawTrace": 10.15,
+     "rawErrPct": 182.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.46,
+     "errPct": -1.5,
+     "rawTrace": 9.65,
+     "rawErrPct": -17.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.21,
+     "model": 11.04,
+     "errPct": -1.5,
+     "rawTrace": 9.07,
+     "rawErrPct": -19.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.63,
+     "errPct": -8.0,
+     "rawTrace": 2.82,
+     "rawErrPct": -1.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 27.39,
+     "errPct": 11.6,
+     "rawTrace": 28.71,
+     "rawErrPct": 16.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 8,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.9
+  },
+  "P3-CUARTA-58B": {
+   "source": "p3-cuarta-58b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 31.24,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.43,
+     "errPct": -0.4,
+     "rawTrace": 6.18,
+     "rawErrPct": -17.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 26.37,
+     "errPct": 7.4,
+     "rawTrace": 27.17,
+     "rawErrPct": 10.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.39,
+     "errPct": -16.4,
+     "rawTrace": 2.51,
+     "rawErrPct": -12.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.15,
+     "errPct": -4.1,
+     "rawTrace": 8.36,
+     "rawErrPct": -28.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.64,
+     "errPct": 1.4,
+     "rawTrace": 6.9,
+     "rawErrPct": 92.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.44,
+     "errPct": 0.3,
+     "rawTrace": 14.25,
+     "rawErrPct": -1.0,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 7.89,
+     "errPct": -23.8,
+     "rawTrace": 7.85,
+     "rawErrPct": -24.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 5,
+    "window": 4,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.2
+  },
+  "P3-PRIMERA-46B": {
+   "source": "p3-primera-46b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 30.36,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.43,
+     "errPct": -0.4,
+     "rawTrace": 6.16,
+     "rawErrPct": -17.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 26.34,
+     "errPct": 7.3,
+     "rawTrace": 27.16,
+     "rawErrPct": 10.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.34,
+     "errPct": -18.2,
+     "rawTrace": 2.51,
+     "rawErrPct": -12.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.28,
+     "errPct": -3.0,
+     "rawTrace": 8.54,
+     "rawErrPct": -26.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 6.78,
+     "rawErrPct": 88.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.4,
+     "errPct": 0.0,
+     "rawTrace": 14.2,
+     "rawErrPct": -1.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 7.87,
+     "errPct": -24.0,
+     "rawTrace": 7.84,
+     "rawErrPct": -24.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 5,
+    "window": 5,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 6.9
+  },
+  "P3-PRIMERA-47C": {
+   "source": "p3-primera-47c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 22.24,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.65,
+     "model": 27.88,
+     "errPct": 13.1,
+     "rawTrace": 27.4,
+     "rawErrPct": 11.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 6.7,
+     "errPct": -10.2,
+     "rawTrace": 6.27,
+     "rawErrPct": -16.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.44,
+     "errPct": -14.7,
+     "rawTrace": 2.58,
+     "rawErrPct": -9.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.53,
+     "model": 11.38,
+     "errPct": -1.3,
+     "rawTrace": 8.57,
+     "rawErrPct": -25.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.54,
+     "errPct": 1.0,
+     "rawTrace": 18.08,
+     "rawErrPct": 25.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 7.34,
+     "errPct": -29.2,
+     "rawTrace": 7.94,
+     "rawErrPct": -23.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.91,
+     "errPct": -4.9,
+     "rawTrace": 3.07,
+     "rawErrPct": -25.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 10,
+    "window": 2,
+    "balcony_door": 2,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 10.5
+  },
+  "P3-QUINTA-62B": {
+   "source": "p3-quinta-62b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.07,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.51,
+     "errPct": 0.7,
+     "rawTrace": 7.31,
+     "rawErrPct": -2.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 23.09,
+     "errPct": -5.9,
+     "rawTrace": 22.48,
+     "rawErrPct": -8.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.37,
+     "errPct": -16.4,
+     "rawTrace": 9.47,
+     "rawErrPct": -15.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.72,
+     "errPct": -4.9,
+     "rawTrace": 2.94,
+     "rawErrPct": 2.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.48,
+     "errPct": -1.3,
+     "rawTrace": 10.11,
+     "rawErrPct": -13.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 5.08,
+     "errPct": 41.5,
+     "rawTrace": 8.01,
+     "rawErrPct": 123.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 16.54,
+     "errPct": 14.9,
+     "rawTrace": 16.46,
+     "rawErrPct": 14.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 10.27,
+     "errPct": -0.9,
+     "rawTrace": 9.21,
+     "rawErrPct": -11.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 6,
+    "window": 7,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 8.6
+  },
+  "P3-SEGUNDA-49A": {
+   "source": "p3-segunda-49a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 33.35,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño 1",
+     "printed": 4.11,
+     "model": 3.38,
+     "errPct": -17.8,
+     "rawTrace": 3.22,
+     "rawErrPct": -21.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 10.28,
+     "errPct": -0.8,
+     "rawTrace": 8.32,
+     "rawErrPct": -19.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.4,
+     "model": 12.37,
+     "errPct": -14.1,
+     "rawTrace": 11.82,
+     "rawErrPct": -17.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.59,
+     "model": 3.62,
+     "errPct": 0.8,
+     "rawTrace": 7.16,
+     "rawErrPct": 99.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.63,
+     "model": 9.57,
+     "errPct": -17.7,
+     "rawTrace": 8.99,
+     "rawErrPct": -22.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.06,
+     "model": 2.53,
+     "errPct": 22.8,
+     "rawTrace": 2.65,
+     "rawErrPct": 28.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.55,
+     "model": 28.58,
+     "errPct": 16.4,
+     "rawTrace": 29.13,
+     "rawErrPct": 18.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.44,
+     "errPct": -0.3,
+     "rawTrace": 6.37,
+     "rawErrPct": -14.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 8,
+    "window": 6,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.1
+  },
+  "P3-SEGUNDA-50B": {
+   "source": "p3-segunda-50b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 24.46,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.5,
+     "errPct": 0.5,
+     "rawTrace": 6.98,
+     "rawErrPct": -6.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 20.17,
+     "errPct": -17.8,
+     "rawTrace": 18.71,
+     "rawErrPct": -23.8,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.21,
+     "model": 11.53,
+     "errPct": 2.9,
+     "rawTrace": 11.82,
+     "rawErrPct": 5.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.91,
+     "errPct": 1.7,
+     "rawTrace": 2.79,
+     "rawErrPct": -2.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.55,
+     "errPct": -0.7,
+     "rawTrace": 9.55,
+     "rawErrPct": -17.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 14.4,
+     "model": 19.9,
+     "errPct": 38.2,
+     "rawTrace": 23.18,
+     "rawErrPct": 61.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 9.01,
+     "errPct": -13.0,
+     "rawTrace": 8.89,
+     "rawErrPct": -14.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 18,
+    "window": 9,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 14.2
+  },
+  "P3-TERCERA-53A": {
+   "source": "p3-tercera-53a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 28.11,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.56,
+     "errPct": -13.4,
+     "rawTrace": 3.42,
+     "rawErrPct": -16.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 10.21,
+     "errPct": -1.4,
+     "rawTrace": 8.85,
+     "rawErrPct": -14.6,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.4,
+     "model": 13.66,
+     "errPct": -5.1,
+     "rawTrace": 12.66,
+     "rawErrPct": -12.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Bafio",
+     "printed": 3.59,
+     "model": 3.64,
+     "errPct": 1.4,
+     "rawTrace": 7.61,
+     "rawErrPct": 112.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 10.8,
+     "errPct": -7.1,
+     "rawTrace": 9.64,
+     "rawErrPct": -17.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 11.09,
+     "errPct": -1.1,
+     "rawTrace": 9.02,
+     "rawErrPct": -19.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.71,
+     "errPct": -5.2,
+     "rawTrace": 2.86,
+     "rawErrPct": 0.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.55,
+     "model": 26.89,
+     "errPct": 9.5,
+     "rawTrace": 28.65,
+     "rawErrPct": 16.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 9,
+    "window": 8,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 6.0
+  },
+  "P3-TERCERA-54B": {
+   "source": "p3-tercera-54b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.33,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 4.31,
+     "errPct": -42.2,
+     "rawTrace": 2.87,
+     "rawErrPct": -61.5,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 24.87,
+     "errPct": 1.3,
+     "rawTrace": 25.62,
+     "rawErrPct": 4.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 8.22,
+     "errPct": -26.7,
+     "rawTrace": 8.9,
+     "rawErrPct": -20.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.57,
+     "errPct": -10.1,
+     "rawTrace": 2.79,
+     "rawErrPct": -2.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.47,
+     "errPct": -1.4,
+     "rawTrace": 9.34,
+     "rawErrPct": -19.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.99,
+     "model": 4.0,
+     "errPct": 0.3,
+     "rawTrace": 7.73,
+     "rawErrPct": 93.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 16.22,
+     "errPct": 12.6,
+     "rawTrace": 15.82,
+     "rawErrPct": 9.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 9.99,
+     "errPct": -3.6,
+     "rawTrace": 8.73,
+     "rawErrPct": -15.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 7,
+    "window": 6,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 10.5
+  },
+  "P4-BAJO-65A": {
+   "source": "p4-bajo-65a.pdf",
+   "superficieUtil": 70.24,
+   "fit": {
+    "meanAbsErrPct": 3.2,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 1.97,
+     "errPct": -35.2,
+     "rawTrace": 1.48,
+     "rawErrPct": -51.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 10.61,
+     "model": 10.01,
+     "errPct": -5.7,
+     "rawTrace": 9.96,
+     "rawErrPct": -6.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Comedor",
+     "printed": 24.74,
+     "model": 24.94,
+     "errPct": 0.8,
+     "rawTrace": 25.6,
+     "rawErrPct": 3.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.42,
+     "model": 19.67,
+     "errPct": 1.3,
+     "rawTrace": 19.14,
+     "rawErrPct": -1.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "istribul",
+     "printed": 3.4,
+     "model": 3.42,
+     "errPct": 0.6,
+     "rawTrace": 3.47,
+     "rawErrPct": 2.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 14.0,
+     "model": 14.42,
+     "errPct": 3.0,
+     "rawTrace": 13.75,
+     "rawErrPct": -1.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.11,
+     "model": 9.78,
+     "errPct": -3.3,
+     "rawTrace": 9.88,
+     "rawErrPct": -2.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio",
+     "printed": 21.24,
+     "model": 24.68,
+     "errPct": 16.2,
+     "rawTrace": 24.33,
+     "rawErrPct": 14.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 5.86,
+     "model": 6.16,
+     "errPct": 5.1,
+     "rawTrace": 6.06,
+     "rawErrPct": 3.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 3,
+   "openings": {
+    "door": 4,
+    "window": 3,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 5.9
+  },
+  "P4-BAJO-66B": {
+   "source": "p4-bajo-66b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.33,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 27.68,
+     "errPct": -4.2,
+     "rawTrace": 28.13,
+     "rawErrPct": -2.7,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 3.8,
+     "errPct": 25.0,
+     "rawTrace": 8.07,
+     "rawErrPct": 165.5,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.71,
+     "errPct": -13.4,
+     "rawTrace": 10.18,
+     "rawErrPct": -9.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.26,
+     "model": 11.21,
+     "errPct": -0.4,
+     "rawTrace": 10.66,
+     "rawErrPct": -5.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "stribuidor",
+     "printed": 4.99,
+     "model": 4.84,
+     "errPct": -3.0,
+     "rawTrace": 1.85,
+     "rawErrPct": -62.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "ano",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 6.54,
+     "rawErrPct": 82.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 19.43,
+     "model": 19.19,
+     "errPct": -1.2,
+     "rawTrace": 13.8,
+     "rawErrPct": -29.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 9.71,
+     "errPct": -6.3,
+     "rawTrace": 9.73,
+     "rawErrPct": -6.1,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 17.64,
+     "errPct": 25.4,
+     "rawTrace": 17.29,
+     "rawErrPct": 22.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 14,
+    "window": 1,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.6
+  },
+  "P4-BAJO-67C": {
+   "source": "p4-bajo-67c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 21.27,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 9.07,
+     "errPct": 120.7,
+     "rawTrace": 10.17,
+     "rawErrPct": 147.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 6.86,
+     "errPct": -33.8,
+     "rawTrace": 9.53,
+     "rawErrPct": -8.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 13.95,
+     "errPct": -0.9,
+     "rawTrace": 11.5,
+     "rawErrPct": -18.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 18.96,
+     "model": 18.79,
+     "errPct": -0.9,
+     "rawTrace": 15.69,
+     "rawErrPct": -17.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño 2",
+     "printed": 3.59,
+     "model": 3.75,
+     "errPct": 4.5,
+     "rawTrace": 3.42,
+     "rawErrPct": -4.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.26,
+     "model": 11.73,
+     "errPct": 4.2,
+     "rawTrace": 10.7,
+     "rawErrPct": -5.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.66,
+     "errPct": -13.8,
+     "rawTrace": 10.07,
+     "rawErrPct": -10.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 3.04,
+     "model": 4.73,
+     "errPct": 55.6,
+     "rawTrace": 8.14,
+     "rawErrPct": 167.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 28.9,
+     "model": 28.5,
+     "errPct": -1.4,
+     "rawTrace": 28.12,
+     "rawErrPct": -2.7,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 15,
+    "window": 3,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 12.3
+  },
+  "P4-BAJO-68D": {
+   "source": "p4-bajo-68d.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 24.98,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 10.21,
+     "errPct": -1.4,
+     "rawTrace": 9.95,
+     "rawErrPct": -4.0,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.07,
+     "model": 18.1,
+     "errPct": 28.6,
+     "rawTrace": 18.34,
+     "rawErrPct": 30.3,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Patio privativo",
+     "printed": 18.96,
+     "model": 23.55,
+     "errPct": 24.2,
+     "rawTrace": 28.55,
+     "rawErrPct": 50.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "istribul",
+     "printed": 4.99,
+     "model": 5.13,
+     "errPct": 2.8,
+     "rawTrace": 7.95,
+     "rawErrPct": 59.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.36,
+     "model": 11.23,
+     "errPct": -1.1,
+     "rawTrace": 5.88,
+     "rawErrPct": -48.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 12.35,
+     "model": 12.19,
+     "errPct": -1.3,
+     "rawTrace": 11.63,
+     "rawErrPct": -5.8,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 27.65,
+     "model": 27.32,
+     "errPct": -1.2,
+     "rawTrace": 27.02,
+     "rawErrPct": -2.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Patio privativo 2",
+     "printed": 24.66,
+     "model": 32.03,
+     "errPct": 29.9,
+     "rawTrace": 30.66,
+     "rawErrPct": 24.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 6,
+    "window": 1,
+    "balcony_door": 3,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 13.6
+  },
+  "P4-PRIMERA-70B": {
+   "source": "p4-primera-70b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 30.36,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.43,
+     "errPct": -0.4,
+     "rawTrace": 6.16,
+     "rawErrPct": -17.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 26.34,
+     "errPct": 7.3,
+     "rawTrace": 27.16,
+     "rawErrPct": 10.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.34,
+     "errPct": -18.2,
+     "rawTrace": 2.51,
+     "rawErrPct": -12.2,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.28,
+     "errPct": -3.0,
+     "rawTrace": 8.54,
+     "rawErrPct": -26.6,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 6.78,
+     "rawErrPct": 88.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 14.4,
+     "errPct": 0.0,
+     "rawTrace": 14.2,
+     "rawErrPct": -1.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 10.36,
+     "model": 7.87,
+     "errPct": -24.0,
+     "rawTrace": 7.84,
+     "rawErrPct": -24.3,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 5,
+    "window": 5,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 6.9
+  },
+  "P4-PRIMERA-71C": {
+   "source": "p4-primera-71c.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 33.1,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.65,
+     "model": 30.03,
+     "errPct": 21.8,
+     "rawTrace": 29.02,
+     "rawErrPct": 17.7,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.25,
+     "errPct": -2.8,
+     "rawTrace": 6.72,
+     "rawErrPct": -9.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.79,
+     "errPct": -2.4,
+     "rawTrace": 2.69,
+     "rawErrPct": -5.9,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.53,
+     "model": 11.38,
+     "errPct": -1.3,
+     "rawTrace": 9.1,
+     "rawErrPct": -21.1,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Baño",
+     "printed": 3.59,
+     "model": 3.59,
+     "errPct": 0.0,
+     "rawTrace": 7.25,
+     "rawErrPct": 101.9,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 14.4,
+     "model": 12.05,
+     "errPct": -16.3,
+     "rawTrace": 11.71,
+     "rawErrPct": -18.7,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 10.36,
+     "model": 7.94,
+     "errPct": -23.4,
+     "rawTrace": 8.35,
+     "rawErrPct": -19.4,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño 2",
+     "printed": 4.11,
+     "model": 3.64,
+     "errPct": -11.4,
+     "rawTrace": 3.22,
+     "rawErrPct": -21.7,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 11,
+    "window": 5,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 14.0
+  },
+  "P4-PRIMERA-72D": {
+   "source": "p4-primera-72d.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 14.11,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 4.14,
+     "errPct": 0.7,
+     "rawTrace": 4.06,
+     "rawErrPct": -1.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 10.28,
+     "errPct": -0.8,
+     "rawTrace": 10.07,
+     "rawErrPct": -2.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Estancia",
+     "printed": 14.4,
+     "model": 14.21,
+     "errPct": -1.3,
+     "rawTrace": 14.0,
+     "rawErrPct": -2.8,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "istribuido",
+     "printed": 4.9,
+     "model": 7.87,
+     "errPct": 60.6,
+     "rawTrace": 8.4,
+     "rawErrPct": 71.4,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 11.53,
+     "model": 11.36,
+     "errPct": -1.5,
+     "rawTrace": 10.71,
+     "rawErrPct": -7.1,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 9.32,
+     "errPct": -16.9,
+     "rawTrace": 10.04,
+     "rawErrPct": -10.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 3.03,
+     "errPct": 5.9,
+     "rawTrace": 3.15,
+     "rawErrPct": 10.1,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.65,
+     "model": 23.98,
+     "errPct": -2.7,
+     "rawTrace": 23.88,
+     "rawErrPct": -3.1,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 8.1,
+     "errPct": 8.6,
+     "rawTrace": 7.74,
+     "rawErrPct": 3.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 10,
+    "window": 9,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 7.4
+  },
+  "P4-SEGUNDA-73A": {
+   "source": "p4-segunda-73a.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 25.24,
+    "gap": 0.15,
+    "thick": 0.03,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Dormitorio",
+     "printed": 10.36,
+     "model": 9.17,
+     "errPct": -11.5,
+     "rawTrace": 8.78,
+     "rawErrPct": -15.3,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 14.4,
+     "model": 20.27,
+     "errPct": 40.8,
+     "rawTrace": 23.27,
+     "rawErrPct": 61.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.63,
+     "model": 11.51,
+     "errPct": -1.0,
+     "rawTrace": 9.62,
+     "rawErrPct": -17.3,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Cocina",
+     "printed": 11.21,
+     "model": 7.81,
+     "errPct": -30.3,
+     "rawTrace": 9.03,
+     "rawErrPct": -19.4,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.98,
+     "errPct": 4.2,
+     "rawTrace": 2.86,
+     "rawErrPct": 0.0,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 23.38,
+     "errPct": -4.8,
+     "rawTrace": 21.45,
+     "rawErrPct": -12.6,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Terraza",
+     "printed": 7.46,
+     "model": 7.69,
+     "errPct": 3.1,
+     "rawTrace": 6.97,
+     "rawErrPct": -6.6,
+     "boundaryInferred": false,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 17,
+    "window": 6,
+    "balcony_door": 1,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 14.7
+  },
+  "P4-SEGUNDA-74B": {
+   "source": "p4-segunda-74b.pdf",
+   "superficieUtil": 90.0,
+   "fit": {
+    "meanAbsErrPct": 27.93,
+    "gap": 0.22,
+    "thick": 0.035,
+    "walls": "dark"
+   },
+   "rooms": [
+    {
+     "name": "Salón-Comedor",
+     "printed": 24.55,
+     "model": 25.53,
+     "errPct": 4.0,
+     "rawTrace": 27.46,
+     "rawErrPct": 11.9,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 2",
+     "printed": 11.21,
+     "model": 11.12,
+     "errPct": -0.8,
+     "rawTrace": 8.7,
+     "rawErrPct": -22.4,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Lavadero",
+     "printed": 2.86,
+     "model": 2.45,
+     "errPct": -14.3,
+     "rawTrace": 2.75,
+     "rawErrPct": -3.8,
+     "boundaryInferred": false,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio",
+     "printed": 11.63,
+     "model": 11.43,
+     "errPct": -1.7,
+     "rawTrace": 9.05,
+     "rawErrPct": -22.2,
+     "boundaryInferred": true,
+     "nameInferred": false
+    },
+    {
+     "name": "Dormitorio 1",
+     "printed": 14.4,
+     "model": 14.56,
+     "errPct": 1.1,
+     "rawTrace": 21.63,
+     "rawErrPct": 50.2,
+     "boundaryInferred": true,
+     "nameInferred": true
+    },
+    {
+     "name": "Dormitorio 3",
+     "printed": 10.36,
+     "model": 9.96,
+     "errPct": -3.9,
+     "rawTrace": 6.12,
+     "rawErrPct": -40.9,
+     "boundaryInferred": false,
+     "nameInferred": true
+    },
+    {
+     "name": "Baño",
+     "printed": 4.11,
+     "model": 3.65,
+     "errPct": -11.2,
+     "rawTrace": 3.29,
+     "rawErrPct": -20.0,
+     "boundaryInferred": true,
+     "nameInferred": false
+    }
+   ],
+   "labelsFrom": "ocr",
+   "beds": 5,
+   "openings": {
+    "door": 8,
+    "window": 6,
+    "balcony_door": 0,
+    "entrance": 0
+   },
+   "entranceMarkerFound": false,
+   "keyPlan": null,
+   "areaWeightedErrPct": 3.4
+  }
+ },
+ "method": "Rooms traced from the plan raster of each published PDF; scale calibrated so the sum of traced interior rooms equals the sum of printed interior areas; sealing parameters chosen per unit to minimise mean absolute room-area error; placement from the blue highlight of the key plan printed on the same PDF.",
+ "rejected": {
+  "P1-CUARTA-14C": {
+   "source": "p1-cuarta-14c.pdf",
+   "meanAbsErrPct": 43.14
+  },
+  "P1-QUINTA-16B": {
+   "source": "p1-quinta-16b.pdf",
+   "meanAbsErrPct": 40.94
+  },
+  "P1-SEGUNDA-8C": {
+   "source": "p1-segunda-8c.pdf",
+   "meanAbsErrPct": 44.78
+  },
+  "P1-TERCERA-11C": {
+   "source": "p1-tercera-11c.pdf",
+   "meanAbsErrPct": 44.88
+  },
+  "P2-BAJO-20D": {
+   "source": "p2-bajo-20d.pdf",
+   "meanAbsErrPct": 38.85
+  },
+  "P2-CUARTA-35C": {
+   "source": "p2-cuarta-35c.pdf",
+   "meanAbsErrPct": 89.6
+  },
+  "P2-CUARTA-36D": {
+   "source": "p2-cuarta-36d.pdf",
+   "meanAbsErrPct": 82.88
+  },
+  "P2-PRIMERA-21A": {
+   "source": "p2-primera-21a.pdf",
+   "meanAbsErrPct": 43.75
+  },
+  "P2-PRIMERA-24D": {
+   "source": "p2-primera-24d.pdf",
+   "meanAbsErrPct": 35.8
+  },
+  "P2-QUINTA-39C": {
+   "source": "p2-quinta-39c.pdf",
+   "meanAbsErrPct": 87.01
+  },
+  "P2-QUINTA-40D": {
+   "source": "p2-quinta-40d.pdf",
+   "meanAbsErrPct": 71.53
+  },
+  "P2-SEGUNDA-27C": {
+   "source": "p2-segunda-27c.pdf",
+   "meanAbsErrPct": 89.84
+  },
+  "P2-SEGUNDA-28D": {
+   "source": "p2-segunda-28d.pdf",
+   "meanAbsErrPct": 57.08
+  },
+  "P2-TERCERA-31C": {
+   "source": "p2-tercera-31c.pdf",
+   "meanAbsErrPct": 89.64
+  },
+  "P2-TERCERA-32D": {
+   "source": "p2-tercera-32d.pdf",
+   "meanAbsErrPct": 79.32
+  },
+  "P3-BAJO-44D": {
+   "source": "p3-bajo-44d.pdf",
+   "meanAbsErrPct": 38.85
+  },
+  "P3-CUARTA-59C": {
+   "source": "p3-cuarta-59c.pdf",
+   "meanAbsErrPct": 89.68
+  },
+  "P3-CUARTA-60D": {
+   "source": "p3-cuarta-60d.pdf",
+   "meanAbsErrPct": 82.83
+  },
+  "P3-PRIMERA-45A": {
+   "source": "p3-primera-45a.pdf",
+   "meanAbsErrPct": 43.75
+  },
+  "P3-PRIMERA-48D": {
+   "source": "p3-primera-48d.pdf",
+   "meanAbsErrPct": 35.8
+  },
+  "P3-QUINTA-63C": {
+   "source": "p3-quinta-63c.pdf",
+   "meanAbsErrPct": 87.01
+  },
+  "P3-QUINTA-64D": {
+   "source": "p3-quinta-64d.pdf",
+   "meanAbsErrPct": 71.53
+  },
+  "P3-SEGUNDA-51C": {
+   "source": "p3-segunda-51c.pdf",
+   "meanAbsErrPct": 89.84
+  },
+  "P3-SEGUNDA-52D": {
+   "source": "p3-segunda-52d.pdf",
+   "meanAbsErrPct": 57.08
+  },
+  "P3-TERCERA-55C": {
+   "source": "p3-tercera-55c.pdf",
+   "meanAbsErrPct": 89.64
+  },
+  "P3-TERCERA-56D": {
+   "source": "p3-tercera-56d.pdf",
+   "meanAbsErrPct": 79.32
+  },
+  "P4-SEGUNDA-75C": {
+   "source": "p4-segunda-75c.pdf",
+   "meanAbsErrPct": 81.9
+  },
+  "P4-SEGUNDA-76D": {
+   "source": "p4-segunda-76d.pdf",
+   "meanAbsErrPct": 62.45
+  },
+  "P4-TERCERA-77A": {
+   "source": "p4-tercera-77a.pdf",
+   "meanAbsErrPct": 45.92
+  },
+  "P4-TERCERA-78B": {
+   "source": "p4-tercera-78b.pdf",
+   "meanAbsErrPct": 47.9
+  },
+  "P1-BAJO-1A": {
+   "source": "p1-bajo-1a.pdf",
+   "meanAbsErrPct": 30.68,
+   "areaWeightedErrPct": 15.6,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P1-BAJO-2B": {
+   "source": "p1-bajo-2b.pdf",
+   "meanAbsErrPct": 34.55,
+   "areaWeightedErrPct": 33.5,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P1-CUARTA-13B": {
+   "source": "p1-cuarta-13b.pdf",
+   "meanAbsErrPct": 11.13,
+   "areaWeightedErrPct": 33.7,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P1-PRIMERA-5C": {
+   "source": "p1-primera-5c.pdf",
+   "meanAbsErrPct": 34.15,
+   "areaWeightedErrPct": 64.4,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P1-SEGUNDA-6A": {
+   "source": "p1-segunda-6a.pdf",
+   "meanAbsErrPct": 26.84,
+   "areaWeightedErrPct": 19.2,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P1-TERCERA-9A": {
+   "source": "p1-tercera-9a.pdf",
+   "meanAbsErrPct": 25.36,
+   "areaWeightedErrPct": 19.3,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P2-QUINTA-37A": {
+   "source": "p2-quinta-37a.pdf",
+   "meanAbsErrPct": 31.44,
+   "areaWeightedErrPct": 19.4,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P3-QUINTA-61A": {
+   "source": "p3-quinta-61a.pdf",
+   "meanAbsErrPct": 31.44,
+   "areaWeightedErrPct": 19.4,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P4-CUARTA-79A": {
+   "source": "p4-cuarta-79a.pdf",
+   "meanAbsErrPct": 30.95,
+   "areaWeightedErrPct": 16.9,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P4-CUARTA-80B": {
+   "source": "p4-cuarta-80b.pdf",
+   "meanAbsErrPct": 31.39,
+   "areaWeightedErrPct": 23.7,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P4-PRIMERA-69A": {
+   "source": "p4-primera-69a.pdf",
+   "meanAbsErrPct": 13.18,
+   "areaWeightedErrPct": 17.3,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P4-QUINTA-81A": {
+   "source": "p4-quinta-81a.pdf",
+   "meanAbsErrPct": 31.07,
+   "areaWeightedErrPct": 37.2,
+   "reason": "modelo ajustado fuera de tolerancia"
+  },
+  "P4-QUINTA-82B": {
+   "source": "p4-quinta-82b.pdf",
+   "meanAbsErrPct": 23.3,
+   "areaWeightedErrPct": 22.6,
+   "reason": "modelo ajustado fuera de tolerancia"
+  }
+ }
+}
