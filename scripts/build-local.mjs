@@ -12,7 +12,13 @@ const result = await build({stdin: {contents: imports + '(async()=>{\n' + app + 
 let js = result.outputFiles[0].text;
 let css = await readFile(path.join(dist, 'style.css'), 'utf8');
 let html = await readFile(path.join(dist, 'index.html'), 'utf8');
-const types = {'.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.md': 'text/plain;charset=utf-8'};
+// the hosted build wraps the site in an entry screen (build.mjs); this private file on disk opens directly
+if (html.includes('<div id="site-shell" hidden>')) {
+  const b = html.match(/<body([^>]*)>([\s\S]*?)<\/body>/i), open = '<div id="site-shell" hidden>';
+  const st = b[2].indexOf(open) + open.length, en = b[2].indexOf('</div><!-- /site-shell -->', st);
+  html = html.replace(b[0], () => `<body${b[1]}>${b[2].slice(st, en)}<script type="module" src="/js/app.js"></script></body>`).replace(/<link rel="stylesheet" href="\/access\.css">/g, '');
+}
+const types = {'.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.md': 'text/plain;charset=utf-8'};
 // 3D models: traced units, building, plan overlays, validation → in-memory file map read by explorer.getJSON/fileURL
 const files = {};
 async function walk(dir) {
@@ -20,6 +26,8 @@ async function walk(dir) {
     const full = path.join(dir, name);
     if ((await stat(full)).isDirectory()) { await walk(full); continue; }
     const url = '/' + path.relative(dist, full).split(path.sep).join('/'), ext = path.extname(name);
+    // photoreal turntable: one size per light keeps the file manageable (day: desktop frames, dusk: phone frames)
+    if (/\/turntable\/(day\/sm|dusk\/lg)\//.test(url)) continue;
     if (ext === '.json') files[url] = JSON.parse(await readFile(full, 'utf8'));
     else files[url] = 'data:' + (types[ext] || 'application/octet-stream') + ';base64,' + (await readFile(full)).toString('base64');
   }

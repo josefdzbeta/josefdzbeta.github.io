@@ -1,1 +1,1 @@
-{"name":"bamaire-showroom","version":"1.0.0","private":true,"type":"module","scripts":{"build":"node build.mjs","dev":"python3 -m http.server 4173 --directory dist"},"dependencies":{"three":"^0.180.0","esbuild":"^0.25.0"}}
+{"name":"bamaire-showroom","version":"1.0.0","private":true,"type":"module","scripts":{"build":"node build.mjs","build:pages":"node build.mjs --pages","dev":"python3 -m http.server 4173 --directory dist"},"dependencies":{"three":"^0.180.0","esbuild":"^0.25.0"}}

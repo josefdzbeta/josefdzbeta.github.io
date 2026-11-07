@@ -5,25 +5,14 @@ import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {programmeSlots, memoriaNotes, CONCEPTS, applyVariant as applyShared, setAnisotropy, textureCache} from './finishes.js';
+import {getJSON, fileURL, HEIGHTS, levelY, storeyH, levelName, STATUS, statusOf, fmt, tipHTML, navUI, apartmentBoxes as boxesOf, RENDER_VIEWS} from './shared.js';
+export {getJSON, fileURL, HEIGHTS, RENDER_VIEWS};
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const small = matchMedia('(max-width: 700px)').matches;
-// Heights are not published. Measured on the published orthographic elevation of Mykonos
-// (mykonos-fachada1.png, scale from 1,2 m windows / 1,9 m balcony doors / 69 m façade):
-export const HEIGHTS = {ground: .74, l1: 4.60, typical: 3.27, slab: .3, clear: 2.6, sill: 1.0, head: 2.25, parapet: 1.1, overrun: 2.6};
-const files = () => globalThis.__BAMAIRE_FILES || {};
-const V = typeof __BUILD__ !== 'undefined' ? '?v=' + __BUILD__ : '';
-export async function getJSON(url) {
-  const f = files()[url];
-  if (f) return typeof f === 'string' ? JSON.parse(f) : f;
-  const r = await fetch(url + V); if (!r.ok) throw new Error(url + ' ' + r.status); return r.json();
-}
-export const fileURL = url => files()[url] || url + V;
 const DEBUG = /[?&]debug/.test(location.search);
 export const marks = [];
 const mark = (n, t0) => { if (DEBUG) marks.push([n, Math.round(performance.now() - t0)]); };
-const levelY = lv => lv === 'B' ? HEIGHTS.ground : HEIGHTS.l1 + (Number(lv) - 1) * HEIGHTS.typical;
-const storeyH = lv => lv === 'B' ? HEIGHTS.l1 - HEIGHTS.ground : HEIGHTS.typical;
 
 // ------------------------------------------------------------------------------------------------
 // geometry helpers: boxes/quads with UVs in metres, bucketed per material, one draw call per bucket
@@ -536,14 +525,13 @@ function placeLabels(s, items) {
     });
   };
 }
-const fmt = n => n == null ? '—' : Number(n).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const roomLabel = r => ({name: r.name, text: `${fmt(r.area)} m²`});
 
 // ------------------------------------------------------------------------------------------------
 // building exterior: rebuilt from Bamaire's published elevations (see scripts/plans/exterior.py).
 // Every outward face is mapped with the published image itself, so windows, cladding and railings read
 // exactly as customers see them; relief (frame, bays, balconies, roof) is real geometry.
-function buildExterior(ex, mats) {
+export function buildExterior(ex, mats) {
   const P = new Builder(), L = ex.length, D = ex.depth, TOPY = ex.top, half = L / 2;
   const quad = (name, a, b, c, d, n, uv) => P.quad(name, a, b, c, d, n, uv);
   // textured quad on a long face (plane x = X): z0<z1, y0<y1; u from the face's z mapping
@@ -614,7 +602,7 @@ function buildExterior(ex, mats) {
 
 // surroundings measured from the renders/plans: street with parking on Calle María de Molina, slatted plot
 // fence, patios of the ground floor, courtyard with lawn and pool, pedestrian street at the Portal 1 end
-function buildSite(ex, b, mats) {
+export function buildSite(ex, b, mats) {
   const S = new Builder(), half = ex.length / 2, pz = Math.max(half + 2, ex.site?.patioZ?.[1] ?? half + 2);
   const px = ex.site?.patioX?.[1] ?? ex.depth + 6.5, cx = -8;
   S.box('pavement', -40, 70, -.32, -.3, -pz - 30, pz + 30, 1);
@@ -651,19 +639,7 @@ function buildSite(ex, b, mats) {
   return S;
 }
 
-// published views to compare against (bamaire.es/mykonos images). Perspective renders use cameras solved
-// with PnP from building corners (scripts: research notes); elevations are orthographic-like framings.
-export const RENDER_VIEWS = [
-  {id: 'r03', label: 'Render 03 · calle (día)', img: '/assets/ref-mykonos03.jpg', aspect: 16 / 9, cam: {pos: [71.4, 2.36, 55.81], fwd: [-.782, .125, -.61], fov: 30}},
-  {id: 'r04', label: 'Render 04 · calle (noche)', img: '/assets/ref-mykonos04.jpg', aspect: 16 / 9, cam: {pos: [71.4, 2.36, 55.81], fwd: [-.782, .125, -.61], fov: 30}},
-  {id: 'r01', label: 'Render 01 · aérea', img: '/assets/ref-mykonos01.jpg', aspect: 16 / 9, cam: {pos: [80.82, 45.06, 102.65], fwd: [-.568, -.299, -.767], fov: 20}},
-  {id: 'street', label: 'Alzado C/ María de Molina', img: '/assets/ref-mykonos-fachada2.jpg', fit: {dir: [1, 0, 0], el: 0, width: 77.06, centerY: 12.25, byWidth: true}},
-  {id: 'courtyard', label: 'Alzado al patio', img: '/assets/ref-mykonos-fachada1.jpg', fit: {dir: [-1, 0, 0], el: 0, width: 77.06, centerY: 11.72, byWidth: true}},
-  {id: 'peatonal', label: 'Testero calle peatonal', img: '/assets/ref-mykonos-giro-7.jpg', fit: {dir: [0, 0, 1], el: 12, width: 44}},
-  {id: 'far', label: 'Testero Portal 2', img: '/assets/ref-mykonos-giro-3.jpg', fit: {dir: [0, 0, -1], el: 12, width: 44}},
-];
 
-const STATUS_COLOR = {disponible: '#3f8f5a', vendida: '#b4564b'};
 
 // ------------------------------------------------------------------------------------------------
 // public: building → floor → dwelling explorer
@@ -677,7 +653,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   s.scene.add(root); root.add(buildingG, floorG, homeG, hoverG);
   const base = `/models/${promotion}`;
   let building = null, ex = null, mode = 'building', level = null, unit = null, unitBuilt = null, wallsCut = false, overlay = null;
-  let apartments = [], hoverTarget = null;
+  let apartments = [], hoverTarget = null, unitPortal = 1;
   const ui = navUI(container);
   const hint = t => { const el = container.querySelector('#viewer-hint'); if (el) el.textContent = t; };
 
@@ -708,20 +684,10 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     if (DEBUG) { const r0 = performance.now(); s.renderer.render(s.scene, s.camera); s.renderer.getContext().finish(); mark('firstRender(' + Math.round(performance.now() - r0) + 'ms)', t0); globalThis.__bamaireMarks = marks; }
   }
   // one box per apartment and portal (Portal 2 mirrors Portal 1)
-  function apartmentBoxes(b) {
-    const out = [];
-    for (const [lv, L] of Object.entries(b.levels)) for (const pu of L.units) {
-      const c = pu.cell || b.cell, x0 = pu.x, x1 = pu.x + pu.w * c, z0 = pu.y, z1 = pu.y + pu.h * c;
-      for (const portal of [1, 2]) {
-        const [a0, a1] = portal === 1 ? [z0, z1] : [-z1, -z0];
-        out.push({code: pu.code, portal, lv, box: new T.Box3(new T.Vector3(x0, levelY(lv), a0), new T.Vector3(x1, levelY(lv) + storeyH(lv) - .05, a1))});
-      }
-    }
-    return out;
-  }
-  const levelName = lv => lv === 'B' ? 'Planta baja' : lv === '5' ? 'Ático (planta 5)' : 'Planta ' + lv;
+  const apartmentBoxes = b => boxesOf(b).map(a => ({...a, box: new T.Box3(new T.Vector3(...a.min), new T.Vector3(...a.max))}));
+  const statusColor = (code, portal) => STATUS[statusOf(status, code, portal)]?.color;
   const info = code => unitsInfo[code] || {};
-  const tip = a => { const i = info(a.code), st = status[a.code]; return `<b>${a.portal === 2 ? 'Portal 2 · ' : ''}${a.code}</b>${i.bedrooms != null ? ` · ${i.bedrooms} dorm.` : ''}${i.util ? ` · ${fmt(i.util)} m²` : ''}${st ? `<br><span class="st ${st}">${st === 'disponible' ? 'Disponible' : 'Vendida'} (web 06.11.2026)</span>` : ''}${a.portal === 2 ? '<br><small>Misma distribución que Portal 1</small>' : ''}`; };
+  const tip = a => tipHTML(a, unitsInfo, status);
 
   function overview(instant) {
     const k = 1 / Math.pow(Math.min(1.25, Math.max(.45, s.camera.aspect || 1.2)) / 1.25, .85);
@@ -761,11 +727,11 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     for (const m of F.meshes(mats, {shadows: false})) floorG.add(m);
     const labels = [];
     for (const a of apartments.filter(a => a.lv === lv)) {
-      const st = status[a.code], sz = a.box.getSize(new T.Vector3()), ctr = a.box.getCenter(new T.Vector3());
-      const plate = new T.Mesh(new T.BoxGeometry(sz.x - .3, .06, sz.z - .3), new T.MeshBasicMaterial({color: STATUS_COLOR[st] || '#7f9c86', transparent: true, opacity: .28, depthWrite: false}));
+      const st = statusOf(status, a.code, a.portal), sz = a.box.getSize(new T.Vector3()), ctr = a.box.getCenter(new T.Vector3());
+      const plate = new T.Mesh(new T.BoxGeometry(sz.x - .3, .06, sz.z - .3), new T.MeshBasicMaterial({color: statusColor(a.code, a.portal) || '#7f9c86', transparent: true, opacity: .28, depthWrite: false}));
       plate.position.set(ctr.x, y + .05, ctr.z); plate.userData.apartment = a; floorG.add(plate);
       const i = info(a.code);
-      labels.push({name: (a.portal === 2 ? 'P2 · ' : '') + a.code, text: [i.bedrooms != null ? i.bedrooms + ' dorm.' : '', i.util ? fmt(i.util) + ' m²' : ''].filter(Boolean).join(' · '), pos: [ctr.x, y + .4, ctr.z], obj: floorG});
+      labels.push({name: (a.portal === 2 ? 'P2 · ' : '') + a.code, text: [i.bedrooms != null ? i.bedrooms + ' dorm.' : '', i.util ? fmt(i.util) + ' m²' : '', st ? STATUS[st].label : ''].filter(Boolean).join(' · '), pos: [ctr.x, y + .4, ctr.z], obj: floorG});
     }
     placeLabels(s, labels);
     clip(y + 1.25);
@@ -789,9 +755,10 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   async function selectHome(code, portal = 1) {
     const next = await getJSON(`${base}/units/${code}.json`).catch(() => null);
     if (!next) { hint(`${code}: modelo no disponible. Consulta el plano PDF original.`); callbacks.unitMissing?.(code); return; }
-    unit = next; unit.promotion = promotion; const u0 = performance.now(); callbacks.home?.(code, true);
+    unit = next; unit.promotion = promotion; unitPortal = portal; const u0 = performance.now(); callbacks.home?.(code, true, portal);
     const f = finishes();
     mode = 'home'; clearHover(); clip(null); disposeGroup(homeG); disposeGroup(floorG); buildingG.visible = false; homeG.visible = true;
+    homeG.scale.z = portal === 2 ? -1 : 1; homeG.updateMatrixWorld(true);
     s.renderer.shadowMap.enabled = true;
     unitBuilt = unitMeshes(unit, mats, {kitchenTile: f.state.slots.some(x => x.surface === 'kitchenAll') ? 'all' : 'wall', notes: f.state.notes});
     homeG.add(unitBuilt.group); overlay = planOverlay(unit, mats); homeG.add(overlay); mark('unitBuild ' + code + ' ' + Math.round(performance.now() - u0) + 'ms', t0);
@@ -807,7 +774,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     callbacks.unitLoaded?.(unit, unitBuilt);
   }
   function applyCut() { if (unitBuilt) clip(wallsCut ? 1.2 : null); }
-  function enterRoom(r) { wallsCut = false; applyCut(); eyeLevel(s, r); hint(`${r.name} · ${fmt(r.area)} m² · arrastra para mirar alrededor`); callbacks.room?.(r); }
+  function enterRoom(r) { wallsCut = false; applyCut(); eyeLevel(s, unitPortal === 2 ? {...r, center: [r.center[0], -r.center[1]], bbox: [r.bbox[0], r.bbox[1], -r.bbox[3], -r.bbox[2]]} : r); hint(`${r.name} · ${fmt(r.area)} m² · arrastra para mirar alrededor`); callbacks.room?.(r); }
 
   // ---- picking: façade apartments in the building view, plates on a floor, rooms in a dwelling
   const ray = new T.Raycaster(), ptr = new T.Vector2();
@@ -833,7 +800,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     const h = pick(e), a = h.apartment;
     if (mode === 'building' && a !== hoverTarget) {
       disposeGroup(hoverG); hoverTarget = a;
-      if (a) showBox(a.box, STATUS_COLOR[status[a.code]] || '#2f6f86', .3);
+      if (a) showBox(a.box, statusColor(a.code, a.portal) || '#2f6f86', .3);
       s.invalidate();
     }
     if (a && mode !== 'home') ui.tip(tip(a), e); else ui.tip(null);
@@ -858,7 +825,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   return {
     ready,
     selectFloor: n => ready.then(() => goFloor(n === 0 ? 'B' : String(n))),
-    selectHome: code => ready.then(() => selectHome(code)),
+    selectHome: (code, portal = 1) => ready.then(() => selectHome(code, portal)),
     building: () => ready.then(goBuilding),
     renderView(id) {
       const v = RENDER_VIEWS.find(x => x.id === id); if (!v || !ex) return;
@@ -895,37 +862,10 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
       else delta.multiplyScalar(action === 'in' ? .78 : 1.28);
       s.move(delta.add(s.controls.target).toArray(), s.controls.target.toArray());
     },
-    resize: s.resize, dispose: () => { removeEventListener('keydown', onKey); ui.dispose(); s.dispose(); },
+    resize: s.resize, dispose: () => { removeEventListener('keydown', onKey); s.dispose(); },
   };
 }
 
-// in-viewer navigation: breadcrumbs + back, floor stack, hover tooltip
-function navUI(container) {
-  const nav = document.createElement('div'); nav.className = 'v-nav';
-  nav.innerHTML = '<div class="v-crumbs" aria-label="Ruta"></div><div class="v-floors" role="group" aria-label="Plantas"></div><div class="v-tip" hidden></div>';
-  container.append(nav);
-  const crumbs = nav.querySelector('.v-crumbs'), floors = nav.querySelector('.v-floors'), tipEl = nav.querySelector('.v-tip');
-  return {
-    setCrumbs(list) {
-      crumbs.innerHTML = (list.length > 1 ? '<button class="v-back" aria-label="Volver">‹</button>' : '') + list.map(([t, f], i) => f ? `<button data-i="${i}">${t}</button>` : `<span>${t}</span>`).join('<i>›</i>');
-      crumbs.querySelectorAll('button[data-i]').forEach(b => b.onclick = () => list[Number(b.dataset.i)][1]());
-      const back = crumbs.querySelector('.v-back'); if (back) back.onclick = () => list.at(-2)[1]();
-    },
-    floors(levels, onPick, onHover) {
-      const order = levels.slice().sort((a, b) => levelY(b) - levelY(a));
-      floors.innerHTML = order.map(lv => `<button data-lv="${lv}" title="${lv === 'B' ? 'Planta baja' : lv === '5' ? 'Ático' : 'Planta ' + lv}">${lv === 'B' ? 'B' : lv === '5' ? 'Át' : lv}</button>`).join('');
-      floors.querySelectorAll('button').forEach(b => { b.onclick = () => onPick(b.dataset.lv); b.onmouseenter = () => onHover(b.dataset.lv); b.onmouseleave = () => onHover(null); b.onfocus = () => onHover(b.dataset.lv); b.onblur = () => onHover(null); });
-    },
-    activeFloor(lv) { floors.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lv === lv)); },
-    tip(html, e) {
-      if (!html) { tipEl.hidden = true; return; }
-      const r = container.getBoundingClientRect();
-      tipEl.innerHTML = html; tipEl.hidden = false;
-      tipEl.style.transform = `translate(${Math.min(e.clientX - r.left + 14, r.width - 230)}px,${e.clientY - r.top + 14}px)`;
-    },
-    dispose() { nav.remove(); },
-  };
-}
 
 // ------------------------------------------------------------------------------------------------
 // public: single-dwelling interior for the personalisation section

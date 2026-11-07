@@ -1,0 +1,190 @@
+:root {
+  --access-ink: #282f30;
+  --access-muted: #6b706d;
+  --access-line: #deded5;
+  --access-paper: #f4f2ed;
+  --access-blue: #3b5968;
+}
+
+.access-screen,
+.access-screen * { box-sizing: border-box; }
+.access-screen {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr);
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: auto;
+  background: var(--access-paper);
+  color: var(--access-ink);
+  font: 15px/1.6 'DM Sans', sans-serif;
+}
+.access-visual {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(30px, 5vw, 76px);
+  overflow: hidden;
+  color: #fff;
+  background: #27353a url('/assets/mykonos04-2500px.jpg') center 53% / cover no-repeat;
+}
+.access-visual::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(180deg, rgb(17 27 32 / 28%), transparent 40%, rgb(17 27 32 / 56%));
+}
+.access-visual > * { position: relative; z-index: 1; }
+.access-visual-brand { display: inline-flex; width: fit-content; }
+.access-visual-brand img { display: block; width: 142px; height: auto; object-fit: contain; }
+.access-visual-copy { max-width: 430px; }
+.access-overline {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.access-visual-copy p {
+  color: #fff;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(25px, 3vw, 43px);
+  font-weight: 350;
+  letter-spacing: -.045em;
+  line-height: 1.16;
+}
+.access-visual-index {
+  align-self: flex-end;
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+.access-panel {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 6.3vw, 92px) clamp(32px, 7.1vw, 110px);
+}
+.access-logo { display: block; width: clamp(144px, 13vw, 183px); height: auto; }
+.access-form-wrap { width: min(100%, 390px); margin: auto 0; padding: 64px 0; }
+.access-eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--access-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.access-form-wrap h1 {
+  margin: 0;
+  color: var(--access-ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(37px, 4.1vw, 56px);
+  font-weight: 400;
+  letter-spacing: -.065em;
+  line-height: 1.06;
+}
+.access-instruction { margin: 20px 0 35px; color: var(--access-muted); font-size: 13px; }
+#access-form { margin: 0; }
+#access-form label { display: block; margin-bottom: 9px; font-size: 11px; font-weight: 550; }
+.access-input-wrap {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  border-bottom: 1px solid #9fa6a1;
+  transition: border-color .2s, box-shadow .2s;
+}
+.access-input-wrap:focus-within { border-color: var(--access-blue); box-shadow: 0 1px var(--access-blue); }
+.access-input-wrap input {
+  width: 100%;
+  min-width: 0;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--access-ink);
+  font: inherit;
+  font-size: 15px;
+}
+.access-input-wrap input::placeholder { color: #9a9d98; opacity: 1; }
+.access-toggle {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--access-muted);
+  cursor: pointer;
+}
+.access-toggle:focus-visible,
+.access-submit:focus-visible { outline: 3px solid #7495a4; outline-offset: 4px; }
+.access-eye { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+.access-error { margin: 10px 0 0; color: #a13b31; font-size: 12px; }
+.access-submit {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 25px;
+  padding: 0 22px;
+  border: 1px solid var(--access-blue);
+  background: var(--access-blue);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  transition: background .2s, border-color .2s;
+  cursor: pointer;
+}
+.access-submit:hover { border-color: #283e49; background: #283e49; }
+.access-submit span { position: relative; display: block; width: 16px; height: 1px; background: currentColor; }
+.access-submit span::after { position: absolute; top: -3px; right: 0; width: 7px; height: 7px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; content: ''; transform: rotate(45deg); }
+.access-panel-footer { color: #8a8f8a; font-size: 9px; letter-spacing: .06em; }
+
+@media (max-width: 760px) {
+  .access-screen { display: flex; flex-direction: column; overflow-y: auto; }
+  .access-visual {
+    min-height: 0;
+    height: 34svh;
+    max-height: 310px;
+    flex: 0 0 34svh;
+    padding: 25px 7%;
+    background-position: center 55%;
+  }
+  .access-visual-brand img { width: 112px; }
+  .access-visual-copy { display: none; }
+  .access-visual-index { font-size: 8px; }
+  .access-panel { min-height: 66svh; flex: 1; padding: 27px 8% 22px; }
+  .access-logo { width: 145px; }
+  .access-form-wrap { width: 100%; max-width: 430px; margin: 0 auto; padding: 42px 0 35px; }
+  .access-eyebrow { margin-bottom: 12px; font-size: 9px; }
+  .access-form-wrap h1 { font-size: clamp(36px, 10vw, 47px); }
+  .access-instruction { margin: 15px 0 25px; font-size: 12px; }
+  .access-input-wrap { min-height: 52px; }
+  .access-input-wrap input { height: 50px; font-size: 16px; }
+  .access-submit { min-height: 52px; margin-top: 20px; }
+  .access-panel-footer { margin-top: 4px; font-size: 8px; }
+}
+@media (max-width: 380px) {
+  .access-visual { height: 30svh; flex-basis: 30svh; }
+  .access-panel { min-height: 70svh; padding-top: 22px; }
+  .access-logo { width: 130px; }
+  .access-form-wrap { padding: 30px 0; }
+  .access-form-wrap h1 { font-size: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .access-input-wrap, .access-submit { transition: none; }
+}

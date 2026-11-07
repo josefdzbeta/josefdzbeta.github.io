@@ -1,0 +1,33 @@
+<main class="access-screen" id="access-gate" aria-labelledby="access-title">
+  <section class="access-visual" aria-label="Bamaire">
+    <a class="access-visual-brand" href="https://bamaire.es" aria-label="Bamaire">
+      <img src="/assets/logobamaire-blanco.png" alt="Bamaire" width="160" height="52">
+    </a>
+    <div class="access-visual-copy">
+      <span class="access-overline">Badajoz · España</span>
+      <p>Pasión, Trabajo, Experiencia,<br>Diseño y Calidad</p>
+    </div>
+    <span class="access-visual-index" aria-hidden="true">01 — 08</span>
+  </section>
+
+  <section class="access-panel">
+    <img class="access-logo" src="/assets/bamaire.svg" alt="Bamaire · Construcciones y promociones" width="183" height="53">
+    <div class="access-form-wrap">
+      <span class="access-eyebrow">Bamaire</span>
+      <h1 id="access-title">Construcciones<br>y promociones</h1>
+      <p class="access-instruction">Introduce la contraseña para acceder al sitio.</p>
+      <form id="access-form" novalidate>
+        <label for="access-password">Contraseña</label>
+        <div class="access-input-wrap">
+          <input id="access-password" name="password" type="password" autocomplete="current-password" placeholder="Escribe la contraseña" required>
+          <button class="access-toggle" id="access-toggle" type="button" aria-label="Mostrar contraseña" aria-pressed="false">
+            <svg class="access-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          </button>
+        </div>
+        <p class="access-error" id="access-error" role="alert" hidden>La contraseña no es correcta. Inténtalo de nuevo.</p>
+        <button class="access-submit" type="submit">Entrar <span aria-hidden="true"></span></button>
+      </form>
+    </div>
+    <span class="access-panel-footer">Construcciones y Promociones Bamaire</span>
+  </section>
+</main>

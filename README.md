@@ -24,6 +24,12 @@ Contenido: `dist/data.json`. Interacción: `src/app.js`. Modelos: `src/explorer.
 
 Publicación privada registrada en `.openai/hosting.json`. No se modificó el sitio oficial bamaire.es.
 
+## GitHub Pages
+
+La versión pública se publica desde `dist/` en [josefdzbeta.github.io](https://josefdzbeta.github.io). Antes de mostrar la web aparece una pantalla de acceso con el logotipo de Bamaire; la contraseña compartida es `bamaire`. El control se hace en el navegador para facilitar el acceso a personas no técnicas; los archivos estáticos siguen siendo públicos. El sitio privado de ChatGPT continúa independiente.
+
+GitHub Actions ejecuta `npm ci`, `npm run build:pages` y publica `dist/` cuando se actualiza `main`. El diseño del acceso vive en `src/access-gate.html`, `src/access-gate.css` y `src/access-gate.js`; `build.mjs --pages` lo integra con la web compilada. `npm run build` sin `:pages` mantiene el sitio normal, sin puerta, para la publicación privada existente.
+
 ## Copia local sin servidor ni login
 
 `node scripts/build-local.mjs` genera `../Bamaire-local.html`, un archivo autocontenido con datos, imágenes y JavaScript 3D incrustados. Abre ese HTML directamente en un navegador. Mapas y documentos enlazados siguen requiriendo Internet.
@@ -44,6 +50,18 @@ python scripts/plans/prune.py dist/models/mykonos 15
 python scripts/plans/report.py dist
 python scripts/plans/exterior.py ../research/source-images/mykonos dist/models/mykonos/building.json dist/models/mykonos
 blender -b -P scripts/blender/validate_and_export.py -- dist/models/mykonos ../research/qa/blender/mykonos
+```
+
+Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, render Cycles de 36 vistas (día y atardecer) y empaquetado WebP:
+
+```sh
+python scripts/plans/context.py ../research/osm/mykonos-osm.json dist/models/mykonos/exterior.json ../research/turntable/context
+node scripts/export-scene.mjs dist/models/mykonos ../research/turntable/scene.json
+python scripts/plans/glow_masks.py dist/models/mykonos/tex ../research/turntable/glow
+blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/day --res 1600x1200 --samples 64
+blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/dusk --res 1600x1200 --samples 64 --mode dusk --glow ../research/turntable/glow
+python scripts/plans/turntable_pack.py ../research/turntable/day dist/models/mykonos/turntable day Día
+python scripts/plans/turntable_pack.py ../research/turntable/dusk dist/models/mykonos/turntable dusk Atardecer
 ```
 
 Detalle, resultados y lagunas: `dist/docs/fidelity-audit.md`.

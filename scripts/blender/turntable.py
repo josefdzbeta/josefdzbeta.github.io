@@ -1,0 +1,499 @@
+"""Photoreal turntable of Mykonos (Cycles) for the web's building view.
+
+  blender -b -P scripts/blender/turntable.py -- <scene.json> <context_dir> <tex_dir> <out_dir>
+          [--frames 36] [--res 1600x1200] [--samples 96] [--only 0,9] [--blend file.blend]
+          [--mode dusk --glow <dir of *_glow.png from scripts/plans/glow_masks.py>]
+
+scene.json   building + plot geometry exactly as the web builds it (scripts/export-scene.mjs)
+context_dir  OSM surroundings (scripts/plans/context.py): ground rasters + context.json
+tex_dir      façade textures from the published elevations (dist/models/mykonos/tex)
+out_dir      frame_###.png + cameras.json (camera of every frame, building frame, y up)
+
+The camera circles the building at a fixed height; the sun is fixed in the world, so the light moves
+across the façades as the building turns. Nothing here changes the published geometry: façades carry the
+published elevation images, glass/cladding/plaster only get physically based shading.
+"""
+import bpy, bmesh, json, math, os, sys, random
+import numpy as np
+from mathutils import Vector, Matrix, Euler
+
+argv = sys.argv[sys.argv.index('--') + 1:]
+scene_json, ctx_dir, tex_dir, out_dir = map(os.path.abspath, argv[:4])   # absolute: saving a .blend remaps relative paths
+opt = dict(zip(argv[4::2], argv[5::2]))
+NFR = int(opt.get('--frames', 36)); RW, RH = map(int, opt.get('--res', '1600x1200').split('x'))
+DUSK = opt.get('--mode') == 'dusk'; GLOW = os.path.abspath(opt['--glow']) if '--glow' in opt else None   # blue hour: lit windows, street lights
+SAMPLES = int(opt.get('--samples', 96)); ONLY = [int(v) for v in opt['--only'].split(',')] if '--only' in opt else None
+os.makedirs(out_dir, exist_ok=True)
+random.seed(11)
+
+# ring: target near the building centre, 140 m out, 42 m up (≈13° down, horizon at the top edge), vertical FOV 34°, 4:3
+RING = {'target': [10.0, 10.0, 0.0], 'radius': 140.0, 'height': 42.0, 'fovY': 34.0, 'aspect': RW / RH, 'start': 40.0, 'step': 360.0 / NFR}
+SUN = {'azimuth': 28.0, 'elevation': 44.0}   # degrees; azimuth in the building frame from +x towards +z
+
+B = lambda x, y, z: Vector((x, -z, y))       # building frame (y up) → Blender (z up)
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+sc = bpy.context.scene
+data = json.load(open(scene_json)); ctx = json.load(open(os.path.join(ctx_dir, 'context.json')))
+ex = data['exterior']
+
+
+# ------------------------------------------------------------------------------------------- materials
+def node_mat(name):
+    m = bpy.data.materials.new(name); m.use_nodes = True
+    nt = m.node_tree; bsdf = nt.nodes['Principled BSDF']
+    return m, nt, bsdf
+
+
+def plain(name, col, rough=.85, metal=0., spec=.5, bump=0., bump_scale=40., coat=0.):
+    m, nt, p = node_mat(name)
+    p.inputs['Base Color'].default_value = (*col, 1); p.inputs['Roughness'].default_value = rough
+    p.inputs['Metallic'].default_value = metal; p.inputs['Specular IOR Level'].default_value = spec
+    if coat: p.inputs['Coat Weight'].default_value = coat; p.inputs['Coat Roughness'].default_value = .05
+    if bump:
+        n = nt.nodes.new('ShaderNodeTexNoise'); n.inputs['Scale'].default_value = bump_scale; n.inputs['Detail'].default_value = 8
+        bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = bump; bm.inputs['Distance'].default_value = .01
+        nt.links.new(n.outputs['Fac'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    return m
+
+
+def srgb(h):
+    h = h.lstrip('#'); c = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    return tuple(v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4 for v in c)
+
+
+def facade_mat(name, path):
+    """Published elevation as albedo; glass (dark panes, teal balcony glass) glossy via a mask computed here."""
+    img = bpy.data.images.load(path); img.colorspace_settings.name = 'sRGB'
+    w, h = img.size; px = np.array(img.pixels[:], np.float32).reshape(h, w, 4)[..., :3]
+    lum = px.mean(2); r, g, b = px[..., 0], px[..., 1], px[..., 2]
+    teal = (g > r + .025) & (b > r + .015) & (lum > .27) & (lum < .86)
+    dark = lum < .40
+    mask = np.clip(teal * .8 + dark * 1.0, 0, 1).astype(np.float32)
+    mi = bpy.data.images.new(name + '_mask', w, h, alpha=False, float_buffer=False)
+    mi.colorspace_settings.name = 'Non-Color'
+    mi.pixels[:] = np.dstack([mask, mask, mask, np.ones_like(mask)]).ravel()
+    mi.pack()
+    m, nt, p = node_mat(name)
+    t = nt.nodes.new('ShaderNodeTexImage'); t.image = img; t.interpolation = 'Cubic'; t.extension = 'EXTEND'
+    tm = nt.nodes.new('ShaderNodeTexImage'); tm.image = mi; tm.extension = 'EXTEND'
+    # slightly lift the published whites (elevations are rendered flat) to a real white render albedo
+    cc = nt.nodes.new('ShaderNodeBrightContrast'); cc.inputs['Bright'].default_value = .02; cc.inputs['Contrast'].default_value = .06
+    nt.links.new(t.outputs['Color'], cc.inputs['Color']); nt.links.new(cc.outputs['Color'], p.inputs['Base Color'])
+    mr = nt.nodes.new('ShaderNodeMapRange'); mr.inputs['To Min'].default_value = .82; mr.inputs['To Max'].default_value = .05
+    nt.links.new(tm.outputs['Color'], mr.inputs['Value']); nt.links.new(mr.outputs['Result'], p.inputs['Roughness'])
+    sp = nt.nodes.new('ShaderNodeMapRange'); sp.inputs['To Min'].default_value = .35; sp.inputs['To Max'].default_value = 1.0
+    nt.links.new(tm.outputs['Color'], sp.inputs['Value']); nt.links.new(sp.outputs['Result'], p.inputs['Specular IOR Level'])
+    bw = nt.nodes.new('ShaderNodeRGBToBW'); nt.links.new(t.outputs['Color'], bw.inputs['Color'])
+    bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .25; bm.inputs['Distance'].default_value = .02
+    nt.links.new(bw.outputs['Val'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    gp = os.path.join(GLOW or '', os.path.basename(path).replace('.jpg', '_glow.png'))
+    if DUSK and GLOW and os.path.exists(gp):
+        gi = bpy.data.images.load(gp); gi.colorspace_settings.name = 'Non-Color'
+        tg = nt.nodes.new('ShaderNodeTexImage'); tg.image = gi; tg.extension = 'EXTEND'
+        k = nt.nodes.new('ShaderNodeMath'); k.operation = 'MULTIPLY'; k.inputs[1].default_value = 9.0
+        nt.links.new(tg.outputs['Color'], k.inputs[0]); nt.links.new(k.outputs[0], p.inputs['Emission Strength'])
+        p.inputs['Emission Color'].default_value = (1.0, .66, .36, 1)
+    return m
+
+
+def paving_mat(name, c1, c2, tile=.6, rough=.75):
+    m, nt, p = node_mat(name)
+    uv = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1 / tile, 1 / tile, 1)
+    br = nt.nodes.new('ShaderNodeTexBrick'); br.offset = .5
+    br.inputs['Color1'].default_value = (*c1, 1); br.inputs['Color2'].default_value = (*c2, 1); br.inputs['Mortar'].default_value = (*[v * .8 for v in c1], 1)
+    br.inputs['Scale'].default_value = 1; br.inputs['Mortar Size'].default_value = .02; br.inputs['Brick Width'].default_value = 1; br.inputs['Row Height'].default_value = 1
+    nt.links.new(uv.outputs['UV'], mp.inputs['Vector']); nt.links.new(mp.outputs['Vector'], br.inputs['Vector'])
+    nt.links.new(br.outputs['Color'], p.inputs['Base Color']); p.inputs['Roughness'].default_value = rough
+    bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .3; bm.inputs['Distance'].default_value = .01; bm.invert = True
+    nt.links.new(br.outputs['Fac'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    return m
+
+
+def slats_mat():
+    m, nt, p = node_mat('slats')
+    uv = nt.nodes.new('ShaderNodeTexCoord'); wv = nt.nodes.new('ShaderNodeTexWave'); wv.wave_profile = 'SAW'
+    wv.inputs['Scale'].default_value = 1.2; wv.bands_direction = 'Y'
+    nt.links.new(uv.outputs['UV'], wv.inputs['Vector'])
+    ramp = nt.nodes.new('ShaderNodeValToRGB'); ramp.color_ramp.elements[0].position = .72; ramp.color_ramp.elements[0].color = (*srgb('#7c8081'), 1)
+    ramp.color_ramp.elements[1].position = .78; ramp.color_ramp.elements[1].color = (*srgb('#1c1e1f'), 1)
+    nt.links.new(wv.outputs['Fac'], ramp.inputs['Fac']); nt.links.new(ramp.outputs['Color'], p.inputs['Base Color'])
+    p.inputs['Metallic'].default_value = .5; p.inputs['Roughness'].default_value = .45
+    return m
+
+
+def water_mat():
+    m, nt, p = node_mat('water')
+    p.inputs['Base Color'].default_value = (*srgb('#2f9fc0'), 1); p.inputs['Roughness'].default_value = .02; p.inputs['IOR'].default_value = 1.33
+    n = nt.nodes.new('ShaderNodeTexNoise'); n.inputs['Scale'].default_value = 3; n.inputs['Detail'].default_value = 4
+    bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .12
+    nt.links.new(n.outputs['Fac'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    return m
+
+
+def leaf_mat(name, cols):
+    m, nt, p = node_mat(name)
+    oi = nt.nodes.new('ShaderNodeObjectInfo'); ramp = nt.nodes.new('ShaderNodeValToRGB')
+    ramp.color_ramp.elements[0].color = (*srgb(cols[0]), 1); ramp.color_ramp.elements[1].color = (*srgb(cols[1]), 1)
+    nt.links.new(oi.outputs['Random'], ramp.inputs['Fac']); nt.links.new(ramp.outputs['Color'], p.inputs['Base Color'])
+    p.inputs['Roughness'].default_value = .55; p.inputs['Subsurface Weight'].default_value = .0
+    # thin translucent leaf: mix in a translucent lobe
+    tr = nt.nodes.new('ShaderNodeBsdfTranslucent'); nt.links.new(ramp.outputs['Color'], tr.inputs['Color'])
+    mix = nt.nodes.new('ShaderNodeMixShader'); mix.inputs['Fac'].default_value = .28
+    out = nt.nodes['Material Output']
+    nt.links.new(p.outputs['BSDF'], mix.inputs[1]); nt.links.new(tr.outputs['BSDF'], mix.inputs[2]); nt.links.new(mix.outputs['Shader'], out.inputs['Surface'])
+    return m
+
+
+def window_wall_mat(name, wall, glass, bw=3.1, rh=3.3):
+    """generic residential façade for neighbouring blocks: wall with a regular grid of dark glazed openings"""
+    m, nt, p = node_mat(name)
+    uv = nt.nodes.new('ShaderNodeTexCoord'); sep = nt.nodes.new('ShaderNodeSeparateXYZ'); nt.links.new(uv.outputs['UV'], sep.inputs['Vector'])
+    def band(out, period, lo, hi):
+        dv = nt.nodes.new('ShaderNodeMath'); dv.operation = 'DIVIDE'; dv.inputs[1].default_value = period; nt.links.new(out, dv.inputs[0])
+        fr = nt.nodes.new('ShaderNodeMath'); fr.operation = 'FRACT'; nt.links.new(dv.outputs[0], fr.inputs[0])
+        a = nt.nodes.new('ShaderNodeMath'); a.operation = 'GREATER_THAN'; a.inputs[1].default_value = lo; nt.links.new(fr.outputs[0], a.inputs[0])
+        b = nt.nodes.new('ShaderNodeMath'); b.operation = 'LESS_THAN'; b.inputs[1].default_value = hi; nt.links.new(fr.outputs[0], b.inputs[0])
+        mm = nt.nodes.new('ShaderNodeMath'); mm.operation = 'MULTIPLY'; nt.links.new(a.outputs[0], mm.inputs[0]); nt.links.new(b.outputs[0], mm.inputs[1])
+        return mm.outputs[0]
+    w = nt.nodes.new('ShaderNodeMath'); w.operation = 'MULTIPLY'
+    nt.links.new(band(sep.outputs['X'], bw, .28, .72), w.inputs[0]); nt.links.new(band(sep.outputs['Y'], rh, .32, .78), w.inputs[1])
+    mix = nt.nodes.new('ShaderNodeMix'); mix.data_type = 'RGBA'
+    mix.inputs['A'].default_value = (*srgb(wall), 1); mix.inputs['B'].default_value = (*srgb(glass), 1)
+    nt.links.new(w.outputs[0], mix.inputs['Factor']); nt.links.new(mix.outputs['Result'], p.inputs['Base Color'])
+    mr = nt.nodes.new('ShaderNodeMapRange'); mr.inputs['To Min'].default_value = .85; mr.inputs['To Max'].default_value = .08
+    nt.links.new(w.outputs[0], mr.inputs['Value']); nt.links.new(mr.outputs['Result'], p.inputs['Roughness'])
+    if DUSK:
+        cells = []
+        for axis, per in (('X', bw), ('Y', rh)):
+            dv = nt.nodes.new('ShaderNodeMath'); dv.operation = 'DIVIDE'; dv.inputs[1].default_value = per; nt.links.new(sep.outputs[axis], dv.inputs[0])
+            fl = nt.nodes.new('ShaderNodeMath'); fl.operation = 'FLOOR'; nt.links.new(dv.outputs[0], fl.inputs[0]); cells.append(fl.outputs[0])
+        cb = nt.nodes.new('ShaderNodeCombineXYZ'); nt.links.new(cells[0], cb.inputs['X']); nt.links.new(cells[1], cb.inputs['Y'])
+        oi = nt.nodes.new('ShaderNodeObjectInfo'); nt.links.new(oi.outputs['Random'], cb.inputs['Z'])
+        wn = nt.nodes.new('ShaderNodeTexWhiteNoise'); wn.noise_dimensions = '3D'; nt.links.new(cb.outputs['Vector'], wn.inputs['Vector'])
+        gt = nt.nodes.new('ShaderNodeMath'); gt.operation = 'GREATER_THAN'; gt.inputs[1].default_value = .7; nt.links.new(wn.outputs['Value'], gt.inputs[0])
+        lit = nt.nodes.new('ShaderNodeMath'); lit.operation = 'MULTIPLY'; nt.links.new(gt.outputs[0], lit.inputs[0]); nt.links.new(w.outputs[0], lit.inputs[1])
+        k = nt.nodes.new('ShaderNodeMath'); k.operation = 'MULTIPLY'; k.inputs[1].default_value = 5.0; nt.links.new(lit.outputs[0], k.inputs[0])
+        nt.links.new(k.outputs[0], p.inputs['Emission Strength']); p.inputs['Emission Color'].default_value = (1.0, .66, .36, 1)
+    return m
+
+
+MATS = {
+    'plaster': plain('plaster', srgb('#f2f0eb'), .88, bump=.04, bump_scale=60),
+    'cap': plain('cap', srgb('#f6f5f2'), .8),
+    'cladSide': plain('cladSide', srgb('#9f9d97'), .55, spec=.6),
+    'roof': plain('roof', srgb('#c3c5c2'), .92, bump=.15, bump_scale=25),
+    'paving': paving_mat('paving', srgb('#d9d3c8'), srgb('#cfc8bb'), .6),
+    'fenceWall': plain('fenceWall', srgb('#eeece7'), .85, bump=.03, bump_scale=50),
+    'slats': slats_mat(), 'water': water_mat(),
+    'poolEdge': plain('poolEdge', srgb('#ebe6dc'), .7, bump=.05),
+    'poolWall': plain('poolWall', srgb('#7fc2d4'), .3),
+    'lampHead': plain('lampHead', srgb('#f6f1e4'), .4),
+    'trunk': plain('trunk', srgb('#5a4a3b'), .9, bump=.2, bump_scale=15),
+    'leaf1': leaf_mat('leaf1', ('#3f5a22', '#6d8a34')), 'leaf2': leaf_mat('leaf2', ('#4b6427', '#86993e')),
+    'shrub': leaf_mat('shrub', ('#4a5a2a', '#7a8740')),
+    'nbWall': window_wall_mat('nbWall', '#ebe7df', '#3a4248'), 'nbWall2': window_wall_mat('nbWall2', '#e2ddd2', '#40464a', 3.4, 3.2),
+    'nbPlain': plain('nbPlain', srgb('#d4d6d6'), .6, spec=.6), 'nbRoof': plain('nbRoof', srgb('#bdbfbc'), .9),
+    'metal': plain('metal', srgb('#55595c'), .4, metal=.8), 'lamp': plain('lamp', srgb('#f4f2ea'), .3),
+    'tyre': plain('tyre', srgb('#151515'), .7), 'carGlass': plain('carGlass', srgb('#0d1013'), .05, spec=1),
+}
+for k, f in list(ex['faces'].items()) + list(ex['ends'].items()):
+    MATS['tex_' + k] = facade_mat('tex_' + k, os.path.join(tex_dir, f['texture']['file']))
+
+
+# ------------------------------------------------------------------------------------------- geometry
+def mesh_from_bucket(name, bk, mat):
+    p, n, u, idx = bk['p'], bk['n'], bk['u'], bk['i']
+    me = bpy.data.meshes.new(name)
+    verts = [tuple(B(p[i], p[i + 1], p[i + 2])) for i in range(0, len(p), 3)]
+    faces = [tuple(idx[i:i + 3]) for i in range(0, len(idx), 3)]
+    me.from_pydata(verts, [], faces)
+    uvl = me.uv_layers.new(name='UVMap')
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            vi = me.loops[li].vertex_index; uvl.data[li].uv = (u[vi * 2], u[vi * 2 + 1])
+    me.materials.append(mat); me.validate(); me.update()
+    for poly in me.polygons: poly.use_smooth = False
+    ob = bpy.data.objects.new(name, me); sc.collection.objects.link(ob)
+    return ob
+
+
+for k, bk in data['building'].items(): mesh_from_bucket('bld_' + k, bk, MATS.get(k, MATS['plaster']))
+for k, bk in data['site'].items():
+    if k in ('pavement', 'street', 'lineWhite', 'lawn', 'poolEdge', 'water'): continue      # replaced by the OSM ground / pool below
+    mesh_from_bucket('site_' + k, bk, MATS.get(k, MATS['plaster']))
+
+
+def box(name, x0, x1, y0, y1, z0, z1, mat, coll=None):
+    bm = bmesh.new()
+    vs = [bm.verts.new(B(x, y, z)) for y in (y0, y1) for (x, z) in ((x0, z0), (x1, z0), (x1, z1), (x0, z1))]
+    for f in ((0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)): bm.faces.new([vs[i] for i in f])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new(name); bm.to_mesh(me); bm.free(); me.materials.append(mat)
+    ob = bpy.data.objects.new(name, me); (coll or sc.collection).objects.link(ob); return ob
+
+
+# pool in the courtyard (sótano plan "Foso piscina"): coping, tiled basin, water 10 cm below the coping
+half = ex['length'] / 2; cx = -8
+px0, px1, pz0, pz1 = cx + 1.6, -2.0, -half + 3.4, -half + 14.6
+for a in ((cx + 1.2, px0, -half + 3, -half + 15), (px1, -1.6, -half + 3, -half + 15), (px0, px1, -half + 3, pz0), (px0, px1, pz1, -half + 15)):
+    box('pool_coping', a[0], a[1], .6, .74, a[2], a[3], MATS['poolEdge'])
+box('pool_basin', px0, px1, -.6, .6, pz0, pz1, MATS['poolWall'])
+box('pool_water', px0 + .01, px1 - .01, .5, .64, pz0 + .01, pz1 - .01, MATS['water'])
+
+# ground: OSM raster under everything, a wide meadow beyond it
+x0, x1, z0, z1 = ctx['extent']
+def ground_mat():
+    m, nt, p = node_mat('ground')
+    def img(f, cs):
+        i = bpy.data.images.load(os.path.join(ctx_dir, f)); i.colorspace_settings.name = cs
+        t = nt.nodes.new('ShaderNodeTexImage'); t.image = i; t.extension = 'EXTEND'; return t
+    a, r, h = img('ground_albedo.jpg', 'sRGB'), img('ground_rough.png', 'Non-Color'), img('ground_height.png', 'Non-Color')
+    nt.links.new(a.outputs['Color'], p.inputs['Base Color']); nt.links.new(r.outputs['Color'], p.inputs['Roughness'])
+    n = nt.nodes.new('ShaderNodeTexNoise'); n.inputs['Scale'].default_value = 6; n.inputs['Detail'].default_value = 12
+    tc = nt.nodes.new('ShaderNodeTexCoord'); nt.links.new(tc.outputs['Object'], n.inputs['Vector'])
+    mx = nt.nodes.new('ShaderNodeMath'); mx.operation = 'MULTIPLY_ADD'; mx.inputs[1].default_value = .06
+    nt.links.new(n.outputs['Fac'], mx.inputs[0]); nt.links.new(h.outputs['Color'], mx.inputs[2])
+    bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .8; bm.inputs['Distance'].default_value = .25
+    nt.links.new(mx.outputs['Value'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    return m
+me = bpy.data.meshes.new('ground')
+me.from_pydata([tuple(B(x0, -.3, z0)), tuple(B(x1, -.3, z0)), tuple(B(x1, -.3, z1)), tuple(B(x0, -.3, z1))], [], [(0, 1, 2, 3)])
+uvl = me.uv_layers.new(name='UVMap')
+for li, (u, v) in zip(me.polygons[0].loop_indices, ((0, 1), (1, 1), (1, 0), (0, 0))): uvl.data[li].uv = (u, v)
+me.materials.append(ground_mat()); ob = bpy.data.objects.new('ground', me); sc.collection.objects.link(ob)
+far = plain('far', srgb('#7f7a52'), .95, bump=.2, bump_scale=.05)
+me = bpy.data.meshes.new('farground'); R = 4000
+me.from_pydata([tuple(B(-R, -.34, -R)), tuple(B(R, -.34, -R)), tuple(B(R, -.34, R)), tuple(B(-R, -.34, R))], [], [(0, 1, 2, 3)])
+me.materials.append(far); sc.collection.objects.link(bpy.data.objects.new('farground', me))
+
+# neighbouring buildings: OSM footprints extruded, façades with a regular opening grid
+for k, bd in enumerate(ctx['buildings']):
+    pts = bd['pts']; h = bd['height'] - .3
+    if len(pts) < 3: continue
+    area = sum(pts[i][0] * pts[i - 1][1] - pts[i - 1][0] * pts[i][1] for i in range(len(pts))) / 2
+    if area > 0: pts = pts[::-1]
+    bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap')
+    lo = [bm.verts.new(B(x, -.3, z)) for x, z in pts]; hi = [bm.verts.new(B(x, h, z)) for x, z in pts]
+    s = 0.
+    for i in range(len(pts)):
+        j = (i + 1) % len(pts); L = math.dist(pts[i], pts[j])
+        f = bm.faces.new((lo[i], lo[j], hi[j], hi[i]))
+        for loop, uv in zip(f.loops, ((s, 0), (s + L, 0), (s + L, h), (s, h))): loop[uvl].uv = uv
+        f.material_index = 0; s += L
+    try:
+        top = bm.faces.new(hi); top.material_index = 1
+    except ValueError: pass
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new('nb%d' % k); bm.to_mesh(me); bm.free()
+    wall = MATS['nbPlain'] if bd['kind'] in ('commercial', 'retail', 'industrial', 'university') else MATS['nbWall' if k % 2 else 'nbWall2']
+    me.materials.append(wall); me.materials.append(MATS['nbRoof'])
+    sc.collection.objects.link(bpy.data.objects.new('nb%d' % k, me))
+
+
+# distant horizon: low blocks and tree clumps 0,5–2 km out (generic; the OSM extract covers ~250 m)
+hz = random.Random(3)
+for k in range(260):
+    a = hz.uniform(0, 2 * math.pi); r = hz.uniform(520, 2000); cx_, cz_ = 10 + r * math.cos(a), r * math.sin(a)
+    w_, d_, h_ = hz.uniform(14, 45), hz.uniform(12, 30), hz.choice([7, 10, 13, 16, 19, 22, 28])
+    o = box('hz%d' % k, cx_ - w_ / 2, cx_ + w_ / 2, -.3, h_, cz_ - d_ / 2, cz_ + d_ / 2, MATS['nbWall' if k % 2 else 'nbWall2'])
+    o.rotation_euler = (0, 0, hz.uniform(0, math.pi)); o.data.materials.append(MATS['nbRoof'])
+# ------------------------------------------------------------------------------------------- trees, shrubs
+protos = bpy.data.collections.new('protos'); sc.collection.children.link(protos)
+leaf_me = bpy.data.meshes.new('leaf')
+leaf_me.from_pydata([(0, -.05, 0), (.09, 0, 0), (0, .05, 0), (-.09, 0, 0)], [], [(0, 1, 2, 3)])
+def leafob(mat):
+    me = leaf_me.copy(); me.materials.append(mat)
+    o = bpy.data.objects.new('leaf_' + mat.name, me); protos.objects.link(o); return o
+LEAF = {k: leafob(MATS[k]) for k in ('leaf1', 'leaf2', 'shrub')}
+
+
+def tree_proto(name, trunk_h, crown_r, crown_s, count, leaf):
+    coll = bpy.data.collections.new(name)
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=.16, radius2=.08, depth=trunk_h + crown_r * .6, location=(0, 0, (trunk_h + crown_r * .6) / 2))
+    t = bpy.context.object; t.data.materials.append(MATS['trunk'])
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=crown_r, location=(0, 0, trunk_h + crown_r * crown_s[2] * .85))
+    c = bpy.context.object; c.scale = crown_s
+    for o in (t, c):
+        for cc in o.users_collection: cc.objects.unlink(o)
+        coll.objects.link(o)
+    c.modifiers.new('leaves', 'PARTICLE_SYSTEM'); st = c.particle_systems[0].settings
+    st.type = 'HAIR'; st.use_advanced_hair = True; st.count = count; st.emit_from = 'VOLUME'; st.distribution = 'RAND'
+    st.render_type = 'OBJECT'; st.instance_object = leaf; st.particle_size = 1.0; st.size_random = .45
+    st.use_rotations = True; st.rotation_mode = 'NONE'; st.rotation_factor_random = 1.0; st.phase_factor_random = 2.0
+    c.show_instancer_for_render = False; c.show_instancer_for_viewport = False
+    return coll
+
+
+TREES = [tree_proto('treeA', 2.4, 1.9, (1, 1, 1.15), 5200, LEAF['leaf1']), tree_proto('treeB', 2.8, 2.3, (1.1, 1, .9), 6400, LEAF['leaf2']),
+         tree_proto('treeC', 2.0, 1.5, (.9, .9, 1.3), 3800, LEAF['leaf1'])]
+SHRUB = tree_proto('shrub', .05, .9, (1.3, 1.1, .7), 900, LEAF['shrub'])
+# distant trees: same silhouette, solid crown (no leaf instances; they are a few pixels wide)
+FAR_TREE = bpy.data.collections.new('farTree')
+bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=2.0, location=(0, 0, 4.2)); o = bpy.context.object; o.scale = (1, 1, 1.1)
+o.data.materials.append(MATS['leaf1'])
+d_ = o.modifiers.new('d', 'DISPLACE'); tx = bpy.data.textures.new('clouds', 'CLOUDS'); tx.noise_scale = .6; d_.texture = tx; d_.strength = .6
+for cc in o.users_collection: cc.objects.unlink(o)
+FAR_TREE.objects.link(o)
+for c in TREES + [SHRUB, FAR_TREE]: protos.children.link(c)
+protos.hide_render = False
+layer_coll = bpy.context.view_layer.layer_collection.children['protos']; layer_coll.exclude = True
+
+
+def instance(coll, x, z, s, rot, name='inst'):
+    e = bpy.data.objects.new(name, None); e.instance_type = 'COLLECTION'; e.instance_collection = coll
+    e.location = B(x, -.3, z); e.scale = (s, s, s); e.rotation_euler = (0, 0, rot); sc.collection.objects.link(e)
+
+
+trees = [(x, z) for x, z, k in ctx['trees']] + [(x, z) for x, z in data['trees'] if x < 0]
+for i, (x, z) in enumerate(trees):
+    instance(TREES[i % 3], x, z, random.uniform(.8, 1.2), random.uniform(0, 6.28), 'tree')
+for k in range(700):
+    a = hz.uniform(0, 2 * math.pi); r = hz.uniform(300, 1300)
+    instance(FAR_TREE, 10 + r * math.cos(a), r * math.sin(a), hz.uniform(1.0, 1.8), hz.uniform(0, 6.28), 'fartree')
+for x, z in ctx['shrubs']:
+    instance(SHRUB, x, z, random.uniform(.6, 1.5), random.uniform(0, 6.28), 'shrub')
+
+
+# ------------------------------------------------------------------------------------------- cars, lamps
+cars = bpy.data.collections.new('cars'); sc.collection.children.link(cars)
+bpy.context.view_layer.layer_collection.children['cars'].exclude = True
+def car_proto(i, color):
+    coll = bpy.data.collections.new('car%d' % i); cars.children.link(coll)
+    paint = plain('paint%d' % i, srgb(color), .35, metal=.4, coat=1.)
+    def rbox(sx, sy, sz, loc, mat, bev):
+        bpy.ops.mesh.primitive_cube_add(size=1, location=loc); o = bpy.context.object; o.scale = (sx, sy, sz)
+        bpy.ops.object.transform_apply(scale=True)
+        m = o.modifiers.new('b', 'BEVEL'); m.width = bev; m.segments = 3
+        o.data.materials.append(mat)
+        for cc in o.users_collection: cc.objects.unlink(o)
+        coll.objects.link(o); return o
+    rbox(4.35, 1.78, .62, (0, 0, .62), paint, .22)
+    rbox(2.3, 1.58, .55, (-.25, 0, 1.15), MATS['carGlass'], .2)
+    rbox(2.2, 1.62, .08, (-.25, 0, 1.44), paint, .04)
+    for wx in (-1.35, 1.35):
+        for wy in (-.78, .78):
+            bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=.33, depth=.24, location=(wx, wy, .33), rotation=(math.pi / 2, 0, 0))
+            o = bpy.context.object; o.data.materials.append(MATS['tyre'])
+            for cc in o.users_collection: cc.objects.unlink(o)
+            coll.objects.link(o)
+    return coll
+CARS = [car_proto(i, c) for i, c in enumerate(['#f2f2f0', '#b9bcbf', '#2a2c30', '#1f3550', '#8c1d1d', '#d9d4c7', '#5d6266', '#f2f2f0'])]
+if DUSK:
+    pw = MATS['poolWall'].node_tree.nodes['Principled BSDF']; pw.inputs['Emission Color'].default_value = (.35, .8, 1.0, 1); pw.inputs['Emission Strength'].default_value = 2.5
+    lh = MATS['lampHead'].node_tree.nodes['Principled BSDF']; lh.inputs['Emission Color'].default_value = (1.0, .78, .52, 1); lh.inputs['Emission Strength'].default_value = 25
+lamp = bpy.data.collections.new('lamp'); cars.children.link(lamp)
+for args in (((.07, 7.2), (0, 0, 3.6)),):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=.07, depth=7.2, location=(0, 0, 3.6)); o = bpy.context.object; o.data.materials.append(MATS['metal'])
+    for cc in o.users_collection: cc.objects.unlink(o)
+    lamp.objects.link(o)
+bpy.ops.mesh.primitive_cube_add(size=1, location=(.55, 0, 7.15)); o = bpy.context.object; o.scale = (1.3, .22, .12); o.data.materials.append(MATS['metal'])
+for cc in o.users_collection: cc.objects.unlink(o)
+lamp.objects.link(o)
+bpy.ops.mesh.primitive_cube_add(size=1, location=(.95, 0, 7.06)); o = bpy.context.object; o.scale = (.5, .18, .04); o.data.materials.append(MATS['lampHead'])
+for cc in o.users_collection: cc.objects.unlink(o)
+lamp.objects.link(o)
+if DUSK:
+    ld = bpy.data.lights.new('streetlight', 'POINT'); ld.energy = 900; ld.color = (1.0, .76, .5); ld.shadow_soft_size = .25
+    lo_ = bpy.data.objects.new('streetlight', ld); lo_.location = (.95, 0, 6.85); lamp.objects.link(lo_)
+
+rnd = random.Random(5)
+for r in ctx['roads']:
+    if r['kind'] != 'residential': continue
+    pts = r['pts']
+    for a, b in zip(pts, pts[1:]):
+        L = math.dist(a, b)
+        if L < 1: continue
+        t = ((b[0] - a[0]) / L, (b[1] - a[1]) / L); n = (-t[1], t[0]); ang = math.atan2(-t[1], t[0])   # blender yaw of the road direction
+        for side in (-1, 1):
+            off = side * (r['width'] / 2 - 1.12)
+            for k in range(int(L // 5.0)):
+                u = 2.5 + k * 5.0 + 2.5
+                q = (a[0] + t[0] * u + n[0] * off, a[1] + t[1] * u + n[1] * off)
+                if abs(q[0] - 10) > 160 or abs(q[1]) > 170 or rnd.random() > .42: continue
+                instance(CARS[rnd.randrange(len(CARS))], q[0], q[1], 1.0, ang + (math.pi if rnd.random() < .5 else 0) + rnd.uniform(-.03, .03), 'car')
+            for k in range(int(L // 26)):                                       # street lights on the kerb
+                u = 13 + k * 26; q = (a[0] + t[0] * u + n[0] * side * (r['width'] / 2 + .6), a[1] + t[1] * u + n[1] * side * (r['width'] / 2 + .6))
+                if abs(q[0] - 10) > 170 or abs(q[1]) > 180: continue
+                instance(lamp, q[0], q[1], 1.0, ang + (math.pi / 2 if side < 0 else -math.pi / 2), 'lamp')
+
+
+if DUSK:
+    pl = bpy.data.lights.new('patio', 'POINT'); pl.energy = 60; pl.color = (1.0, .72, .45); pl.shadow_soft_size = .1
+    for z in range(-33, 34, 6):
+        for x in (ex['depth'] + 1.2, -1.2):
+            o = bpy.data.objects.new('patio', pl); o.location = B(x, 1.9, z + .5); sc.collection.objects.link(o)
+
+# ------------------------------------------------------------------------------------------- light, world, camera
+world = bpy.data.worlds.new('sky'); sc.world = world; world.use_nodes = True
+wn = world.node_tree; bg = wn.nodes['Background']
+sky = wn.nodes.new('ShaderNodeTexSky'); sky.sky_type = 'NISHITA'; sky.sun_disc = False
+sky.sun_elevation = math.radians(SUN['elevation']); sky.altitude = 200; sky.air_density = 1.0; sky.dust_density = 1.6; sky.ozone_density = 1.0
+az = math.radians(SUN['azimuth'])
+sd = B(math.cos(az), 0, math.sin(az)); sd.z = 0; sd.normalize()
+sky.sun_rotation = math.atan2(sd.y, sd.x) - math.pi / 2
+wn.links.new(sky.outputs['Color'], bg.inputs['Color']); bg.inputs['Strength'].default_value = .3
+if DUSK:   # blue hour: deep blue zenith to a soft peach horizon, no direct sun
+    tc = wn.nodes.new('ShaderNodeTexCoord'); sp = wn.nodes.new('ShaderNodeSeparateXYZ'); wn.links.new(tc.outputs['Generated'], sp.inputs['Vector'])
+    mr = wn.nodes.new('ShaderNodeMapRange'); mr.inputs['From Min'].default_value = -.02; mr.inputs['From Max'].default_value = .7; wn.links.new(sp.outputs['Z'], mr.inputs['Value'])
+    rp = wn.nodes.new('ShaderNodeValToRGB'); cr = rp.color_ramp
+    cr.elements[0].position = 0; cr.elements[0].color = (1.0, .55, .33, 1); cr.elements[1].position = 1; cr.elements[1].color = (.02, .06, .2, 1)
+    for pos, col in ((.06, (.85, .48, .42, 1)), (.18, (.33, .32, .55, 1)), (.45, (.08, .16, .40, 1))):
+        e = cr.elements.new(pos); e.color = col
+    wn.links.new(mr.outputs['Result'], rp.inputs['Fac']); wn.links.new(rp.outputs['Color'], bg.inputs['Color']); bg.inputs['Strength'].default_value = .55
+el = math.radians(SUN['elevation'])
+d = Vector((sd.x * math.cos(el), sd.y * math.cos(el), math.sin(el)))
+sun_data = bpy.data.lights.new('sun', 'SUN'); sun_data.energy = 0.0 if DUSK else 3.8; sun_data.angle = math.radians(.6); sun_data.color = (1.0, .96, .9)
+sun = bpy.data.objects.new('sun', sun_data); sc.collection.objects.link(sun)
+sun.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
+
+camd = bpy.data.cameras.new('cam'); camd.sensor_fit = 'VERTICAL'; camd.angle_y = math.radians(RING['fovY']); camd.clip_start = 1; camd.clip_end = 5000
+cam = bpy.data.objects.new('cam', camd); sc.collection.objects.link(cam); sc.camera = cam
+tgt = Vector(RING['target'])
+frames = []
+for i in range(NFR):
+    a = math.radians(RING['start'] + i * RING['step'])
+    pos = [tgt.x + RING['radius'] * math.cos(a), RING['height'], tgt.z + RING['radius'] * math.sin(a)]
+    frames.append({'i': i, 'angle': round(RING['start'] + i * RING['step'], 3), 'pos': [round(v, 4) for v in pos]})
+json.dump({'ring': RING, 'sun': SUN, 'frames': frames, 'res': [RW, RH], 'up': [0, 1, 0],
+           'note': 'building frame, metres, y up; vertical FOV; camera looks at ring.target'}, open(os.path.join(out_dir, 'cameras.json'), 'w'), indent=1)
+
+# render settings
+sc.render.engine = 'CYCLES'
+prefs = bpy.context.preferences.addons['cycles'].preferences
+try:
+    prefs.compute_device_type = 'METAL'; prefs.get_devices()
+    for dv in prefs.devices: dv.use = True
+    sc.cycles.device = 'GPU'
+except Exception as e:
+    print('GPU unavailable', e)
+sc.cycles.samples = SAMPLES; sc.cycles.use_adaptive_sampling = True; sc.cycles.adaptive_threshold = .02
+sc.cycles.use_denoising = True; sc.cycles.denoiser = 'OPENIMAGEDENOISE'
+sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 3; sc.cycles.glossy_bounces = 3; sc.cycles.transmission_bounces = 4
+sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False; sc.cycles.blur_glossy = 1.0
+sc.render.use_persistent_data = True
+sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = RW, RH, 100
+sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'; sc.view_settings.exposure = .8 if DUSK else -.45
+sc.render.image_settings.file_format = 'PNG'; sc.render.image_settings.color_mode = 'RGB'; sc.render.image_settings.color_depth = '8'
+# light aerial haze from the mist pass (distance only, no volume cost)
+vl = bpy.context.view_layer; vl.use_pass_mist = True
+world.mist_settings.start = 220; world.mist_settings.depth = 1400; world.mist_settings.falloff = 'QUADRATIC'
+sc.use_nodes = True; ct = sc.node_tree
+for nd in list(ct.nodes): ct.nodes.remove(nd)
+rl = ct.nodes.new('CompositorNodeRLayers'); comp = ct.nodes.new('CompositorNodeComposite')
+mix = ct.nodes.new('CompositorNodeMixRGB'); mix.blend_type = 'MIX'; mix.inputs[2].default_value = (.24, .28, .42, 1) if DUSK else (.70, .78, .88, 1)
+mul = ct.nodes.new('CompositorNodeMath'); mul.operation = 'MULTIPLY'; mul.inputs[1].default_value = .33
+ct.links.new(rl.outputs['Mist'], mul.inputs[0]); ct.links.new(mul.outputs[0], mix.inputs[0])
+ct.links.new(rl.outputs['Image'], mix.inputs[1]); ct.links.new(mix.outputs['Image'], comp.inputs['Image'])
+
+
+look = Vector(B(*RING['target']))
+todo = ONLY if ONLY is not None else range(NFR)
+for i in todo:
+    f = frames[i]; cam.location = B(*f['pos'])
+    cam.rotation_euler = (look - cam.location).to_track_quat('-Z', 'Y').to_euler()
+    sc.render.filepath = os.path.join(out_dir, 'frame_%03d.png' % i)
+    bpy.ops.render.render(write_still=True)
+    print('rendered', i, flush=True)
+if '--blend' in opt: bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(opt['--blend']), relative_remap=False)   # reference scene, after rendering
+print('done')
