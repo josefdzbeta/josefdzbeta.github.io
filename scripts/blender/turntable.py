@@ -4,6 +4,7 @@
           [--frames 36] [--res 1600x1200] [--samples 96] [--only 0,9] [--blend file.blend]
           [--mode dusk --glow <dir of *_glow.png from scripts/plans/glow_masks.py>]
           [--openings facade-openings.json] [--cam r03|r01 (published render camera, for comparison)]
+          [--assets ../research/assets/polyhaven (CC0 sky, textures, trees and shrubs)]
 
 scene.json   building + plot geometry exactly as the web builds it (scripts/export-scene.mjs)
 context_dir  OSM surroundings (scripts/plans/context.py): ground rasters + context.json
@@ -16,7 +17,7 @@ published elevation images, glass/cladding/plaster only get physically based sha
 """
 import bpy, bmesh, json, math, os, sys, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import facade_geo
+import facade_geo, assets
 import numpy as np
 from mathutils import Vector, Matrix, Euler
 
@@ -26,6 +27,7 @@ opt = dict(zip(argv[4::2], argv[5::2]))
 NFR = int(opt.get('--frames', 36)); RW, RH = map(int, opt.get('--res', '1600x1200').split('x'))
 DUSK = opt.get('--mode') == 'dusk'; GLOW = os.path.abspath(opt['--glow']) if '--glow' in opt else None   # blue hour: lit windows, street lights
 OPENINGS = json.load(open(opt['--openings'])) if '--openings' in opt else {}   # scripts/plans/facade_vector.py
+ASSETS = assets.set_root(os.path.abspath(opt['--assets'])) if '--assets' in opt else None   # CC0 Poly Haven assets (scripts/fetch_assets.py)
 CAM = opt.get('--cam')            # a published render's calibrated camera (r03, r01) instead of the ring
 SAMPLES = int(opt.get('--samples', 96)); ONLY = [int(v) for v in opt['--only'].split(',')] if '--only' in opt else None
 os.makedirs(out_dir, exist_ok=True)
@@ -282,6 +284,12 @@ MATS.update({
     'fac_railCap': plain('fac_railCap', srgb('#b8bcbf'), .3, metal=.9),
     'glassFence': thin_glass('glassFence', (.9, .95, .95), .02, refl=.08),
 })
+if ASSETS:
+    for k, args in {'fac_render': ('white_stucco_02', 2.0), 'roof': ('concrete_floor_02', 3.0), 'paving': ('precast_stone_paving', 2.4),
+                    'ramp': ('asphalt_02', 2.5), 'grass': ('leafy_grass', 1.6), 'poolEdge': ('precast_stone_paving', 1.6),
+                    'fenceWall': ('white_stucco_02', 2.0), 'planter': ('white_stucco_02', 1.5)}.items():
+        m = assets.pbr(k + '_scan', *args)
+        if m: MATS[k] = m
 for k, f in list(ex['faces'].items()) + list(ex['ends'].items()):
     MATS['tex_' + k] = facade_mat('tex_' + k, os.path.join(tex_dir, f['texture']['file']))
 
@@ -357,11 +365,64 @@ def ground_mat():
     bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .8; bm.inputs['Distance'].default_value = .25
     nt.links.new(mx.outputs['Value'], bm.inputs['Height']); nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
     return m
+def ground_mat_scan():
+    """OSM classes (ground_class.png) → scanned asphalt, paving, stone, grass; the raster albedo keeps the large-scale variation"""
+    m, nt, p = node_mat('ground_scan')
+    cls = bpy.data.images.load(os.path.join(ctx_dir, 'ground_class.png')); cls.colorspace_settings.name = 'Non-Color'
+    tc = nt.nodes.new('ShaderNodeTexCoord')
+    ci = nt.nodes.new('ShaderNodeTexImage'); ci.image = cls; ci.interpolation = 'Closest'; ci.extension = 'EXTEND'
+    alb = nt.nodes.new('ShaderNodeTexImage'); alb.image = bpy.data.images.load(os.path.join(ctx_dir, 'ground_albedo.jpg')); alb.extension = 'EXTEND'
+    hgt = nt.nodes.new('ShaderNodeTexImage'); hgt.image = bpy.data.images.load(os.path.join(ctx_dir, 'ground_height.png')); hgt.image.colorspace_settings.name = 'Non-Color'
+    cv = nt.nodes.new('ShaderNodeMath'); cv.operation = 'MULTIPLY'; cv.inputs[1].default_value = 255; nt.links.new(ci.outputs['Color'], cv.inputs[0])
+    K = ctx['classes']
+    def mask(*names):
+        acc = None
+        for nm in names:
+            c1 = nt.nodes.new('ShaderNodeMath'); c1.operation = 'COMPARE'; c1.inputs[1].default_value = K[nm]; c1.inputs[2].default_value = .5
+            nt.links.new(cv.outputs[0], c1.inputs[0])
+            if acc is None: acc = c1.outputs[0]
+            else: ad = nt.nodes.new('ShaderNodeMath'); ad.operation = 'ADD'; nt.links.new(acc, ad.inputs[0]); nt.links.new(c1.outputs[0], ad.inputs[1]); acc = ad.outputs[0]
+        return acc
+    layers = [(('meadow', 'soil', 'track'), 'aerial_grass_rock', 7.0, (.72, 1.0, .55)), (('lawn',), 'leafy_grass', 2.2, None), (('asphalt',), 'aerial_asphalt_01', 6.0, None),
+              (('cycle',), 'aerial_asphalt_01', 6.0, (1.0, .45, .38)), (('paving',), 'rectangular_paving', 2.4, None), (('promenade', 'plot'), 'precast_stone_paving', 2.6, (1.0, .93, .88))]
+    col = alb.outputs['Color']; rough = None; nrm = None
+    for names, tex, size, tint in layers:
+        if not assets.have('textures', tex): continue
+        f = mask(*names)                         # big surfaces (meadows, lawns, roads) are de-tiled
+        t = assets.detile(nt, tex, size) if tex in ('aerial_grass_rock', 'leafy_grass', 'aerial_asphalt_01') else assets.sockets(assets.tex_nodes(nt, tex, size, 'Object'))
+        c = t['color']
+        if tint:
+            mt = nt.nodes.new('ShaderNodeMix'); mt.data_type = 'RGBA'; mt.blend_type = 'MULTIPLY'; mt.inputs['Factor'].default_value = 1; mt.inputs['B'].default_value = (*tint, 1)
+            nt.links.new(c, mt.inputs['A']); c = mt.outputs['Result']
+        mx = nt.nodes.new('ShaderNodeMix'); mx.data_type = 'RGBA'; nt.links.new(f, mx.inputs['Factor']); nt.links.new(col, mx.inputs['A']); nt.links.new(c, mx.inputs['B']); col = mx.outputs['Result']
+        if 'rough' in t:
+            mr = nt.nodes.new('ShaderNodeMix'); mr.data_type = 'FLOAT'; nt.links.new(f, mr.inputs['Factor'])
+            if rough is None: mr.inputs['A'].default_value = .9
+            else: nt.links.new(rough, mr.inputs['A'])
+            nt.links.new(t['rough'], mr.inputs['B']); rough = mr.outputs['Result']
+        if 'normal' in t:
+            mn = nt.nodes.new('ShaderNodeMix'); mn.data_type = 'VECTOR'; nt.links.new(f, mn.inputs['Factor'])
+            if nrm is None:
+                gn = nt.nodes.new('ShaderNodeNewGeometry'); nt.links.new(gn.outputs['Normal'], mn.inputs['A'])
+            else: nt.links.new(nrm, mn.inputs['A'])
+            nt.links.new(t['normal'], mn.inputs['B']); nrm = mn.outputs['Result']
+    # lane and parking markings stay painted white
+    mk = mask('mark'); mw = nt.nodes.new('ShaderNodeMix'); mw.data_type = 'RGBA'; mw.inputs['B'].default_value = (.85, .85, .83, 1)
+    nt.links.new(mk, mw.inputs['Factor']); nt.links.new(col, mw.inputs['A']); col = mw.outputs['Result']
+    nt.links.new(col, p.inputs['Base Color'])
+    if rough is not None: nt.links.new(rough, p.inputs['Roughness'])
+    bm = nt.nodes.new('ShaderNodeBump'); bm.inputs['Strength'].default_value = .8; bm.inputs['Distance'].default_value = .25
+    nt.links.new(hgt.outputs['Color'], bm.inputs['Height'])
+    if nrm is not None: nt.links.new(nrm, bm.inputs['Normal'])
+    nt.links.new(bm.outputs['Normal'], p.inputs['Normal'])
+    return m
+
+
 me = bpy.data.meshes.new('ground')
 me.from_pydata([tuple(B(x0, -.3, z0)), tuple(B(x1, -.3, z0)), tuple(B(x1, -.3, z1)), tuple(B(x0, -.3, z1))], [], [(0, 1, 2, 3)])
 uvl = me.uv_layers.new(name='UVMap')
 for li, (u, v) in zip(me.polygons[0].loop_indices, ((0, 1), (1, 1), (1, 0), (0, 0))): uvl.data[li].uv = (u, v)
-me.materials.append(ground_mat()); ob = bpy.data.objects.new('ground', me); sc.collection.objects.link(ob)
+me.materials.append(ground_mat_scan() if ASSETS and os.path.exists(os.path.join(ctx_dir, 'ground_class.png')) else ground_mat()); ob = bpy.data.objects.new('ground', me); sc.collection.objects.link(ob)
 far = plain('far', srgb('#7f7a52'), .95, bump=.2, bump_scale=.05)
 me = bpy.data.meshes.new('farground'); R = 4000
 me.from_pydata([tuple(B(-R, -.34, -R)), tuple(B(R, -.34, -R)), tuple(B(R, -.34, R)), tuple(B(-R, -.34, R))], [], [(0, 1, 2, 3)])
@@ -452,6 +513,12 @@ d_ = o.modifiers.new('d', 'DISPLACE'); tx = bpy.data.textures.new('clouds', 'CLO
 for cc in o.users_collection: cc.objects.unlink(o)
 FAR_TREE.objects.link(o)
 for c in TREES + [SHRUB, FAR_TREE]: protos.children.link(c)
+TREE_SCALE = [1.0, 1.0, 1.0]; SHRUB_SCALE = 1.0
+if ASSETS:                                     # (collection, scale to a 6–7 m street tree)
+    scanned = [(n, s) for n, s in (('island_tree_01', 1.3), ('tree_small_02', 1.4), ('island_tree_02', 1.85), ('jacaranda_tree', .38)) if assets.have('models', n)]
+    if scanned:
+        TREES = [assets.model(n, protos)[0] for n, s in scanned]; TREE_SCALE = [s for n, s in scanned]
+    if assets.have('models', 'shrub_02'): SHRUB = assets.model('shrub_02', protos)[0]; SHRUB_SCALE = .32
 protos.hide_render = False
 layer_coll = bpy.context.view_layer.layer_collection.children['protos']; layer_coll.exclude = True
 
@@ -464,12 +531,13 @@ def instance(coll, x, z, s, rot, name='inst'):
 
 trees = [(x, z) for x, z, k in ctx['trees']] + [(x, z) for x, z in data['trees'] if x < 0]
 for i, (x, z) in enumerate(trees):
-    instance(TREES[i % 3], x, z, random.uniform(.8, 1.2), random.uniform(0, 6.28), 'tree')
+    k = (i * 7 + int(abs(x) * 3)) % len(TREES) if len(TREES) > 3 and i % 9 else i % min(3, len(TREES))   # jacarandas now and then
+    instance(TREES[k], x, z, random.uniform(.85, 1.15) * TREE_SCALE[k], random.uniform(0, 6.28), 'tree')
 for k in range(700):
     a = hz.uniform(0, 2 * math.pi); r = hz.uniform(300, 1300)
     instance(FAR_TREE, 10 + r * math.cos(a), r * math.sin(a), hz.uniform(1.0, 1.8), hz.uniform(0, 6.28), 'fartree')
 for x, z in ctx['shrubs']:
-    instance(SHRUB, x, z, random.uniform(.6, 1.5), random.uniform(0, 6.28), 'shrub')
+    instance(SHRUB, x, z, random.uniform(.6, 1.5) * SHRUB_SCALE, random.uniform(0, 6.28), 'shrub')
 if OPENINGS:                                           # greenery in the ático terrace planters, warm lights at dusk
     D5 = ex['levels']['5']
     for sgn in (1, -1):
@@ -510,19 +578,25 @@ if DUSK:
     pw = MATS['poolWall'].node_tree.nodes['Principled BSDF']; pw.inputs['Emission Color'].default_value = (.35, .8, 1.0, 1); pw.inputs['Emission Strength'].default_value = 2.5
     lh = MATS['lampHead'].node_tree.nodes['Principled BSDF']; lh.inputs['Emission Color'].default_value = (1.0, .78, .52, 1); lh.inputs['Emission Strength'].default_value = 25
 lamp = bpy.data.collections.new('lamp'); cars.children.link(lamp)
-for args in (((.07, 7.2), (0, 0, 3.6)),):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=.07, depth=7.2, location=(0, 0, 3.6)); o = bpy.context.object; o.data.materials.append(MATS['metal'])
-    for cc in o.users_collection: cc.objects.unlink(o)
-    lamp.objects.link(o)
-bpy.ops.mesh.primitive_cube_add(size=1, location=(.55, 0, 7.15)); o = bpy.context.object; o.scale = (1.3, .22, .12); o.data.materials.append(MATS['metal'])
+# modern street lamp as in Bamaire's renders (tall tapered pole, slim arm, flat LED head, dark blue-grey); the scanned
+# Poly Haven lamp is a classical lantern, which the published images do not show
+MATS['lampPole'] = plain('lampPole', srgb('#2b3a52'), .35, metal=.7)
+bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=.09, radius2=.05, depth=7.3, location=(0, 0, 3.65)); o = bpy.context.object; o.data.materials.append(MATS['lampPole'])
 for cc in o.users_collection: cc.objects.unlink(o)
 lamp.objects.link(o)
-bpy.ops.mesh.primitive_cube_add(size=1, location=(.95, 0, 7.06)); o = bpy.context.object; o.scale = (.5, .18, .04); o.data.materials.append(MATS['lampHead'])
+bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=.035, depth=1.0, location=(.45, 0, 7.18), rotation=(0, math.radians(84), 0)); o = bpy.context.object; o.data.materials.append(MATS['lampPole'])
+for cc in o.users_collection: cc.objects.unlink(o)
+lamp.objects.link(o)
+bpy.ops.mesh.primitive_cube_add(size=1, location=(.98, 0, 7.2)); o = bpy.context.object; o.scale = (.62, .24, .07); o.data.materials.append(MATS['lampPole'])
+bv = o.modifiers.new('bevel', 'BEVEL'); bv.width = .025; bv.segments = 3
+for cc in o.users_collection: cc.objects.unlink(o)
+lamp.objects.link(o)
+bpy.ops.mesh.primitive_cube_add(size=1, location=(.98, 0, 7.16)); o = bpy.context.object; o.scale = (.52, .18, .01); o.data.materials.append(MATS['lampHead'])
 for cc in o.users_collection: cc.objects.unlink(o)
 lamp.objects.link(o)
 if DUSK:
     ld = bpy.data.lights.new('streetlight', 'POINT'); ld.energy = 900; ld.color = (1.0, .76, .5); ld.shadow_soft_size = .25
-    lo_ = bpy.data.objects.new('streetlight', ld); lo_.location = (.95, 0, 6.85); lamp.objects.link(lo_)
+    lo_ = bpy.data.objects.new('streetlight', ld); lo_.location = (.98, 0, 6.95); lamp.objects.link(lo_)
 
 rnd = random.Random(5)
 for r in ctx['roads']:
@@ -602,6 +676,11 @@ d = Vector((sd.x * math.cos(el), sd.y * math.cos(el), math.sin(el)))
 sun_data = bpy.data.lights.new('sun', 'SUN'); sun_data.energy = 0.0 if DUSK else 3.8; sun_data.angle = math.radians(.6); sun_data.color = (1.0, .93, .84)
 sun = bpy.data.objects.new('sun', sun_data); sc.collection.objects.link(sun)
 sun.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
+if ASSETS and not DUSK:                          # blue hour keeps the procedural sky (the CC0 dusk skies have the sun above the horizon)
+    H = assets.hdri_world('kloofendal_48d_partly_cloudy_puresky', sun_dir=d, strength=1.0, scene=sc)
+    if H:
+        world = H[0]
+        if not DUSK: sun_data.energy = 0.0          # the HDRI's own sun lights the scene
 
 camd = bpy.data.cameras.new('cam'); camd.sensor_fit = 'VERTICAL'; camd.angle_y = math.radians(RING['fovY']); camd.clip_start = 1; camd.clip_end = 5000
 cam = bpy.data.objects.new('cam', camd); sc.collection.objects.link(cam); sc.camera = cam
@@ -629,7 +708,7 @@ sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 3; sc.cycles.glossy_bounc
 sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False; sc.cycles.blur_glossy = 1.0
 sc.render.use_persistent_data = True
 sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = RW, RH, 100
-sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast' if DUSK else 'AgX - Punchy'; sc.view_settings.exposure = .8 if DUSK else -.2
+sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast' if DUSK else 'AgX - Punchy'; sc.view_settings.exposure = .8 if DUSK else (-.2 + (.95 if ASSETS else 0))
 sc.render.image_settings.file_format = 'PNG'; sc.render.image_settings.color_mode = 'RGB'; sc.render.image_settings.color_depth = '8'
 # light aerial haze from the mist pass (distance only, no volume cost)
 vl = bpy.context.view_layer; vl.use_pass_mist = True

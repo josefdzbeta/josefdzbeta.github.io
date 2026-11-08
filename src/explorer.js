@@ -275,7 +275,9 @@ function furnish(u, g, k) {
       F.box('accent', headDir === 'W' ? x1 - .55 : x0 + .05, headDir === 'W' ? x1 - .05 : x0 + .55, .5, .53, z0 + .02, z1 - .02); }
   };
   const roomsByType = (pred) => u.rooms.map((r, i) => [r, i + 3]).filter(([r]) => pred(r));
-  const ensure = v => out[v - 3] ||= {builder: new Builder(), items: []};
+  const ensure = v => out[v - 3] ||= {builder: new Builder(), swap: new Builder(), models: [], items: []};
+  // model descriptor for the photoreal renders: centre, footprint along/across, facing (unit vector into the room)
+  const model = (v, kind, x0, x1, z0, z1, face, extra = {}) => ensure(v).models.push({kind, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, sx: Math.abs(x1 - x0), sz: Math.abs(z1 - z0), face, ...extra});
   // 1) beds: from the plan symbols when available
   const bedRooms = new Set();
   for (const [x, y, w, h, ri] of u.beds || []) {
@@ -298,7 +300,8 @@ function furnish(u, g, k) {
     bed(F, x0, x1, z0, z1, head); mark(x0, x1, z0, z1); bedRooms.add(v);
     ensure(v).items.push('cama (posición del plano)');
     // nightstands either side of the headboard
-    const ns = (a0, a1, b0, b1) => { if (fits(v, a0, a1, b0, b1)) { F.box('lacquer', a0, a1, 0, .5, b0, b1); mark(a0, a1, b0, b1); } };
+    const nsFace = {N: [0, 1], S: [0, -1], W: [1, 0], E: [-1, 0]}[head];
+    const ns = (a0, a1, b0, b1) => { if (fits(v, a0, a1, b0, b1)) { ensure(v).swap.box('lacquer', a0, a1, 0, .5, b0, b1); model(v, 'nightstand', a0, a1, b0, b1, nsFace); mark(a0, a1, b0, b1); } };
     if (head === 'N') { ns(x0 - .5, x0 - .05, z0, z0 + .4); ns(x1 + .05, x1 + .5, z0, z0 + .4); }
     if (head === 'S') { ns(x0 - .5, x0 - .05, z1 - .4, z1); ns(x1 + .05, x1 + .5, z1 - .4, z1); }
     if (head === 'W') { ns(x0, x0 + .4, z0 - .5, z0 - .05); ns(x0, x0 + .4, z1 + .05, z1 + .5); }
@@ -330,11 +333,13 @@ function furnish(u, g, k) {
       const sofa = box(.02, .92, mid - L / 2, mid + L / 2), zone = box(.02, 1.95, mid - L / 2, mid + L / 2);
       if (!fits(v, ...zone)) continue;
       const [sx0, sx1, sz0, sz1] = sofa;
-      F.box('fabric', sx0, sx1, 0, .42, sz0, sz1);
-      const back = box(.02, .22, mid - L / 2, mid + L / 2); F.box('fabric', back[0], back[1], .42, .82, back[2], back[3]);
+      const SW = ensure(v).swap, face = [n[0], n[1]];
+      SW.box('fabric', sx0, sx1, 0, .42, sz0, sz1);
+      const back = box(.02, .22, mid - L / 2, mid + L / 2); SW.box('fabric', back[0], back[1], .42, .82, back[2], back[3]);
       const arm1 = box(.22, .92, mid - L / 2, mid - L / 2 + .18), arm2 = box(.22, .92, mid + L / 2 - .18, mid + L / 2);
-      F.box('fabric', arm1[0], arm1[1], .42, .62, arm1[2], arm1[3]); F.box('fabric', arm2[0], arm2[1], .42, .62, arm2[2], arm2[3]);
-      const tbl = box(1.35, 1.9, mid - .5, mid + .5); F.box('wood', tbl[0], tbl[1], .36, .4, tbl[2], tbl[3]);
+      SW.box('fabric', arm1[0], arm1[1], .42, .62, arm1[2], arm1[3]); SW.box('fabric', arm2[0], arm2[1], .42, .62, arm2[2], arm2[3]);
+      model(v, 'sofa', sx0, sx1, sz0, sz1, face);
+      const tbl = box(1.35, 1.9, mid - .5, mid + .5); SW.box('wood', tbl[0], tbl[1], .36, .4, tbl[2], tbl[3]); model(v, 'coffeeTable', ...tbl, face);
       const rug = box(1.0, 2.3, mid - 1.1, mid + 1.1); if (fits(v, ...rug, true)) F.box('rug', rug[0], rug[1], 0, .012, rug[2], rug[3]);
       mark(...zone); ensure(v).items.push('sofá y mesa de centro');
       // TV unit on the facing wall run, if any
@@ -342,7 +347,7 @@ function furnish(u, g, k) {
       const facing = rr.find(q => q.dir === opp && q.len >= 1.6 && q.s0 < mid && q.s1 > mid);
       if (facing) { const t0 = Math.max(facing.s0, mid - .8), t1 = Math.min(facing.s1, mid + .8); const n2 = nrm(facing);
         const tv = (facing.dir === 'N' || facing.dir === 'S') ? [t0, t1, facing.wallPos, facing.wallPos + n2[1] * .4] : [facing.wallPos, facing.wallPos + n2[0] * .4, t0, t1];
-        if (fits(v, ...tv)) { F.box('lacquer', tv[0], tv[1], .1, .5, tv[2], tv[3]); mark(...tv); ensure(v).items.push('mueble TV'); } }
+        if (fits(v, ...tv)) { ensure(v).swap.box('lacquer', tv[0], tv[1], .1, .5, tv[2], tv[3]); model(v, 'tvUnit', ...tv, [n2[0], n2[1]]); mark(...tv); ensure(v).items.push('mueble TV'); } }
       break;
     }
     const spot = openSpot(v, .95);
@@ -350,13 +355,15 @@ function furnish(u, g, k) {
       const [cx, cz] = spot, along = (room.area > 20), tw = 1.6, td = .9;
       const hx = along ? tw / 2 : td / 2, hz = along ? td / 2 : tw / 2;
       if (fits(v, cx - hx - .55, cx + hx + .55, cz - hz - .55, cz + hz + .55, true)) {
-        F.box('wood', cx - hx, cx + hx, .72, .76, cz - hz, cz + hz);
-        for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) F.box('frameDark', cx + lx * (hx - .06) - .025, cx + lx * (hx - .06) + .025, 0, .72, cz + lz * (hz - .06) - .025, cz + lz * (hz - .06) + .025);
+        const SW = ensure(v).swap; model(v, 'diningTable', cx - hx, cx + hx, cz - hz, cz + hz, along ? [0, 1] : [1, 0]);
+        SW.box('wood', cx - hx, cx + hx, .72, .76, cz - hz, cz + hz);
+        for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) SW.box('frameDark', cx + lx * (hx - .06) - .025, cx + lx * (hx - .06) + .025, 0, .72, cz + lz * (hz - .06) - .025, cz + lz * (hz - .06) + .025);
         const chairs = along ? [[-.4, -1], [.4, -1], [-.4, 1], [.4, 1]] : [[-1, -.4], [-1, .4], [1, -.4], [1, .4]];
         for (const [a, b] of chairs) {
           const px = along ? cx + a : cx + a * (hx + .3), pz = along ? cz + b * (hz + .3) : cz + b;
-          F.box('fabric', px - .22, px + .22, .42, .47, pz - .22, pz + .22);
-          if (along) F.box('fabric', px - .22, px + .22, .47, .9, pz + b * .2 - .02, pz + b * .2 + .02); else F.box('fabric', px + a * .2 - .02, px + a * .2 + .02, .47, .9, pz - .22, pz + .22);
+          SW.box('fabric', px - .22, px + .22, .42, .47, pz - .22, pz + .22);
+          if (along) SW.box('fabric', px - .22, px + .22, .47, .9, pz + b * .2 - .02, pz + b * .2 + .02); else SW.box('fabric', px + a * .2 - .02, px + a * .2 + .02, .47, .9, pz - .22, pz + .22);
+          model(v, 'chair', px - .22, px + .22, pz - .22, pz + .22, along ? [0, -b] : [-a, 0]);
         }
         mark(cx - hx - .55, cx + hx + .55, cz - hz - .55, cz + hz + .55); ensure(v).items.push('mesa de comedor y sillas');
       }
@@ -365,8 +372,9 @@ function furnish(u, g, k) {
   // 4) terraces and patios: table and chairs; loungers on large patios
   for (const [room, v] of roomsByType(r => r.type === 'exterior' && r.area >= 3)) {
     const F = ensure(v).builder, spot = openSpot(v, .75);
-    if (spot) { const [cx, cz] = spot; F.box('outdoor', cx - .4, cx + .4, .7, .74, cz - .4, cz + .4); F.box('outdoor', cx - .04, cx + .04, 0, .7, cz - .04, cz + .04);
-      for (const [a, b] of [[-.7, 0], [.7, 0]]) { F.box('outdoor', cx + a - .23, cx + a + .23, .42, .46, cz + b - .23, cz + b + .23); F.box('outdoor', cx + a + Math.sign(a) * .21 - .02, cx + a + Math.sign(a) * .21 + .02, .46, .85, cz - .23, cz + .23); }
+    if (spot) { const [cx, cz] = spot, SW = ensure(v).swap; SW.box('outdoor', cx - .4, cx + .4, .7, .74, cz - .4, cz + .4); SW.box('outdoor', cx - .04, cx + .04, 0, .7, cz - .04, cz + .04);
+      for (const [a, b] of [[-.7, 0], [.7, 0]]) { SW.box('outdoor', cx + a - .23, cx + a + .23, .42, .46, cz + b - .23, cz + b + .23); SW.box('outdoor', cx + a + Math.sign(a) * .21 - .02, cx + a + Math.sign(a) * .21 + .02, .46, .85, cz - .23, cz + .23); }
+      model(v, 'terraceSet', cx - .95, cx + .95, cz - .45, cz + .45, [0, 1]);
       mark(cx - 1, cx + 1, cz - .5, cz + .5); ensure(v).items.push('mesa exterior'); }
     if (room.area >= 15) {
       for (let n = 0; n < 2; n++) { const sp = openSpot(v, .6); if (!sp) break; const [lx, lz] = sp;
@@ -374,7 +382,7 @@ function furnish(u, g, k) {
         F.box('outdoor', lx - .35, lx + .35, .25, .35, lz - .95, lz + .95); F.box('outdoor', lx - .35, lx + .35, .35, .7, lz - .95, lz - .55); mark(lx - .45, lx + .45, lz - 1.05, lz + 1.05); }
       ensure(v).items.push('tumbonas');
     }
-    const p2 = openSpot(v, .4); if (p2) { F.box('plant', p2[0] - .25, p2[0] + .25, 0, .9, p2[1] - .25, p2[1] + .25); }
+    const p2 = openSpot(v, .4); if (p2) { ensure(v).swap.box('plant', p2[0] - .25, p2[0] + .25, 0, .9, p2[1] - .25, p2[1] + .25); model(v, 'plant', p2[0] - .25, p2[0] + .25, p2[1] - .25, p2[1] + .25, [0, 1]); }
   }
   return out;
 }
@@ -501,6 +509,7 @@ function unitMeshes(u, mats, opts) {
   for (const [ri, f] of Object.entries(built.furniture)) {
     const grp = new T.Group(); grp.name = 'furniture-' + ri;
     for (const m of f.builder.meshes(mats)) grp.add(m);
+    for (const m of f.swap?.meshes(mats) || []) grp.add(m);
     built.group.add(grp); fg[ri] = grp;
   }
   built.furnitureGroups = fg;

@@ -26,7 +26,7 @@ for (const f of fs.readdirSync(path.join(modelDir, 'units')).sort()) {
   const b = buildUnit(u, {kitchenTile, notes});
   const res = {code: u.code, size: b.group.userData.size, height: 2.6,
     rooms: b.rooms.map(r => ({index: r.index, name: r.name, type: r.type, area: r.area, center: r.center, labelAt: r.labelAt, bbox: r.bbox})),
-    builder: dump(b.builder), furniture: Object.fromEntries(Object.entries(b.furniture).map(([k, v]) => [k, dump(v.builder)]))};
+    builder: dump(b.builder), furniture: Object.fromEntries(Object.entries(b.furniture).map(([k, v]) => [k, {fixed: dump(v.builder), swap: dump(v.swap), models: v.models}]))};
   fs.writeFileSync(path.join(out, u.code + '.json'), JSON.stringify(res));
   index.push(u.code);
 }

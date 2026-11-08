@@ -1,6 +1,7 @@
 """Photoreal 3D floor-plan renders of each traced dwelling (Cycles), for the dwelling view of the web.
 
   blender -b -P scripts/blender/dwelling.py -- <dwellings_dir> <out_dir> [--res 1600x1200] [--samples 96] [--only 1C,2A]
+          [--assets ../research/assets/polyhaven]   real furniture, scanned floors/tiles, HDRI sky
 
 dwellings_dir  geometry exported by scripts/export-units.mjs (exactly what the web builds from the traced plans)
 out_dir        <code>.png + <code>.json (camera and the pixel position of every room label, for the "+" pins)
@@ -11,6 +12,8 @@ windows); furniture keeps the web's layout (orientative) with rounded edges and 
 physical sky + soft sun. Portal 2 dwellings are the mirror image (the web flips the picture and the pins).
 """
 import bpy, bmesh, json, math, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import assets
 from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
 
@@ -19,6 +22,7 @@ src, out = map(os.path.abspath, argv[:2])
 opt = dict(zip(argv[2::2], argv[3::2]))
 RW, RH = map(int, opt.get('--res', '1600x1200').split('x')); SAMPLES = int(opt.get('--samples', 96))
 ONLY = opt['--only'].split(',') if '--only' in opt else None
+ASSETS = assets.set_root(os.path.abspath(opt['--assets'])) if '--assets' in opt else None   # CC0 Poly Haven (scripts/fetch_assets.py)
 CUT = 2.1      # section height: door heads, so rooms stay visible from the 3/4 view
 os.makedirs(out, exist_ok=True)
 B = lambda x, y, z: Vector((x, -z, y))
@@ -115,6 +119,81 @@ def materials():
     }
 
 
+def scanned(M):
+    if not ASSETS: return M
+    for k, args, kw in (('floor', ('laminate_floor_02', 2.0), {'coat': .15}), ('kitchenFloor', ('laminate_floor_02', 2.0), {'coat': .15}),
+                        ('terrace', ('patio_tiles', 2.4), {'sat': .3, 'tint': (1.35, 1.3, 1.22)}),
+                        # new build: walls keep the smooth procedural paint and bathrooms the clean procedural tiles
+                        ('wood', ('oak_veneer_01', 1.0), {'coat': .2}), ('fabric', ('rough_linen', .9), {'sat': 0, 'tint': (1.0, .93, .82)}),
+                        ('linen', ('rough_linen', .9), {'sat': 0, 'tint': (1.7, 1.68, 1.62)}), ('rug', ('wool_boucle', .8), {'sat': .15, 'tint': (1.1, 1.0, .86)}),
+                        ('sofa', ('rough_linen', .7), {'sat': 0, 'tint': (1.05, .98, .88)})):
+        m = assets.pbr(k + '_scan', *args, **kw)
+        if m: M[k] = m
+    return M
+
+
+# furniture models (Poly Haven, front = −Y): asset, oriented (front matters), fit ('uniform' keeps proportions, 'xy' fits the footprint)
+KIND = {'sofa': ('modern_sofa', True, 'proc'), 'coffeeTable': ('modern_coffee_table_01', False, 'xy'), 'tvUnit': ('modern_wooden_cabinet', True, 'xy'),
+        'diningTable': ('wooden_table_02', False, 'xy'), 'chair': ('dining_chair_02', True, 'uniform'), 'nightstand': ('painted_wooden_nightstand', True, 'xy'),
+        'terraceSet': ('outdoor_table_chair_set_01', False, 'xy'), 'plant': ('potted_plant_02', False, 'none')}
+
+
+def box_obj(name, x0, x1, y0, y1, z0, z1, mat, parent, bevel=0., seg=3, tilt=0.):
+    """box with UVs in metres (for the scanned textures), rounded by a bevel modifier, child of parent"""
+    me = bpy.data.meshes.new(name); c0 = ((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2)
+    v = [(x - c0[0], y - c0[1], z - c0[2]) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]
+    f = [(0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3)]
+    me.from_pydata(v, [], f); uv = me.uv_layers.new(name='UVMap')
+    for poly in me.polygons:
+        n = poly.normal; ax = (1, 2) if abs(n.x) > .5 else (0, 2) if abs(n.y) > .5 else (0, 1)
+        for li in poly.loop_indices: c = v[me.loops[li].vertex_index]; uv.data[li].uv = (c[ax[0]], c[ax[1]])
+    me.materials.append(mat); me.update()
+    ob = bpy.data.objects.new(name, me); bpy.context.scene.collection.objects.link(ob); ob.parent = parent; ob.location = c0
+    if tilt: ob.rotation_euler.x = tilt                      # about the box's own centre
+    if bevel: m = ob.modifiers.new('bevel', 'BEVEL'); m.width = bevel; m.segments = seg; m.harden_normals = True
+    for poly in me.polygons: poly.use_smooth = bool(bevel)
+    return ob
+
+
+def modern_sofa(d, M):
+    """low modern sofa in the web's footprint: recessed plinth, square arms, loose seat and back cushions in scanned linen"""
+    fx, fz = d['face']; yaw = math.atan2(fx, fz)
+    L, D = (d['sz'], d['sx']) if abs(fx) > abs(fz) else (d['sx'], d['sz'])
+    root = bpy.data.objects.new('f_sofa', None); root.location = B(d['cx'], 0, d['cz']); root.rotation_euler = (0, 0, yaw)
+    bpy.context.scene.collection.objects.link(root)
+    fab = M.get('sofa', M['fabric']); a = .17; hl, hd = L / 2, D / 2              # local: x along, −y front, +y back
+    box_obj('sofa_plinth', -hl + .06, hl - .06, -hd + .06, hd - .06, 0, .09, M.setdefault('sofaPlinth', plain('sofaPlinth', '#2a2826', .45)), root, .005, 2)
+    for sx in (-1, 1): box_obj('sofa_arm', sx * hl - (a if sx > 0 else 0), sx * hl + (0 if sx > 0 else a), -hd, hd, .09, .6, fab, root, .035, 4)
+    box_obj('sofa_back', -hl + a, hl - a, hd - .2, hd, .09, .74, fab, root, .035, 4)
+    box_obj('sofa_base', -hl + a, hl - a, -hd + .02, hd - .2, .09, .3, fab, root, .02, 3)
+    n = 3 if L - 2 * a > 1.9 else 2; w = (L - 2 * a) / n
+    for i in range(n):
+        x0 = -hl + a + i * w
+        box_obj('sofa_seat', x0 + .008, x0 + w - .008, -hd + .01, hd - .21, .3, .46, fab, root, .055, 5)
+        box_obj('sofa_cush', x0 + .012, x0 + w - .012, hd - .4, hd - .2, .46, .86, fab, root, .07, 5, tilt=math.radians(-9))
+    if assets.have('models', 'throw_pillows_01'):
+        pl = assets.place('throw_pillows_01', Vector((0, 0, 0)), 0, (.62,) * 3, label='f_pillows'); pl.parent = root
+        pl.location = (-hl + a + .35, hd - .48, .46); pl.rotation_euler.z = math.radians(-12)
+    return True
+
+
+def place_model(d, M=None):
+    k = KIND.get(d['kind'])
+    if k and k[2] == 'proc': return modern_sofa(d, M)
+    if not k or not assets.have('models', k[0]): return False
+    name, oriented, fit = k; size = assets.model(name)[1]
+    fx, fz = d['face']; yaw = math.atan2(fx, fz)                       # turns the model's −Y front to the facing vector
+    along, depth = (d['sz'], d['sx']) if abs(fx) > abs(fz) else (d['sx'], d['sz'])
+    ax, ay = size.x, size.y
+    if not oriented and (ax > ay) != (along > depth): yaw += math.pi / 2; ax, ay = ay, ax
+    cl = lambda v, a, b: max(a, min(b, v))
+    if fit == 'xy': sc = (cl(along / ax, .55, 1.4), cl(depth / ay, .55, 1.4), 1)
+    elif fit == 'uniform': s_ = cl(min(along / ax, depth / ay), .85 if d['kind'] == 'chair' else .78, 1.1); sc = (s_, s_, s_)
+    else: sc = (1, 1, 1)
+    assets.place(name, B(d['cx'], 0, d['cz']), yaw, sc, label='f_' + d['kind'])
+    return True
+
+
 def mesh(name, bk, mat, cap=None, bevel=0.):
     p, u, idx = bk['p'], bk['u'], bk['i']
     me = bpy.data.meshes.new(name)
@@ -141,13 +220,18 @@ def mesh(name, bk, mat, cap=None, bevel=0.):
 
 def render(code):
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    sc = bpy.context.scene; d = json.load(open(os.path.join(src, code + '.json'))); M = materials()
+    assets._models.clear()                                   # the factory reset dropped the imported models
+    sc = bpy.context.scene; d = json.load(open(os.path.join(src, code + '.json'))); M = scanned(materials())
     w, dd = d['size']
     for k, bk in d['builder'].items():
         cap = M['cap'] if k in ('paint', 'facade') else None
         mesh('u_' + k, bk, M.get(k, M['paint']), cap, bevel=.012 if k in ('cabinets', 'worktop', 'sanitary') else 0)
-    for room, buckets in d['furniture'].items():
-        for k, bk in buckets.items(): mesh(f'f{room}_{k}', bk, M.get(k, M['fabric']), bevel=.025 if k in ('fabric', 'linen', 'accent', 'rug') else .008)
+    for room, f in d['furniture'].items():
+        fixed, swap, models = (f.get('fixed', f), f.get('swap', {}), f.get('models', [])) if 'fixed' in f else (f, {}, [])
+        for k, bk in fixed.items(): mesh(f'f{room}_{k}', bk, M.get(k, M['fabric']), bevel=.025 if k in ('fabric', 'linen', 'accent', 'rug') else .008)
+        placed = [place_model(m, M) for m in models] if ASSETS else []
+        if not placed or not all(placed):                        # no model available: the web's own pieces
+            for k, bk in swap.items(): mesh(f's{room}_{k}', bk, M.get(k, M['fabric']), bevel=.025 if k in ('fabric', 'linen', 'accent', 'rug') else .008)
     # model slab and a soft ground far below: the dwelling reads as a cut-away architectural model
     bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1); me = bpy.data.meshes.new('slab'); bm.to_mesh(me); bm.free()
     sl = bpy.data.objects.new('slab', me); sl.scale = (w + .3, dd + .3, .3); sl.location = (0, 0, -.16); me.materials.append(M['slab']); sc.collection.objects.link(sl)
@@ -159,6 +243,8 @@ def render(code):
     world.node_tree.links.new(sky.outputs['Color'], bg.inputs['Color']); bg.inputs['Strength'].default_value = .28
     sd = bpy.data.lights.new('sun', 'SUN'); sd.energy = 4.6; sd.angle = math.radians(3); sd.color = (1, .92, .8)
     sun = bpy.data.objects.new('sun', sd); sun.rotation_euler = Vector((-.5, -.75, 1.4)).normalized().to_track_quat('Z', 'Y').to_euler(); sc.collection.objects.link(sun)
+    if ASSETS and assets.hdri_world('kloofendal_48d_partly_cloudy_puresky', sun_dir=Vector((-.5, -.75, 1.4)).normalized(), strength=1.0, scene=sc):
+        sd.energy = 0.0                                          # the HDRI's sun and sky light the cut-away model
     # camera: 3/4 view from above, long lens, fitted to the footprint
     cd = bpy.data.cameras.new('cam'); cd.sensor_fit = 'VERTICAL'; fov = math.radians(26); cd.angle_y = fov; cd.clip_start = .5; cd.clip_end = 400
     cam = bpy.data.objects.new('cam', cd); sc.collection.objects.link(cam); sc.camera = cam
@@ -179,7 +265,7 @@ def render(code):
     sc.cycles.max_bounces = 8; sc.cycles.diffuse_bounces = 4; sc.cycles.glossy_bounces = 4; sc.cycles.transmission_bounces = 6
     sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False; sc.cycles.blur_glossy = 1
     sc.render.resolution_x, sc.render.resolution_y, sc.render.resolution_percentage = RW, RH, 100
-    sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'; sc.view_settings.exposure = .15
+    sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'; sc.view_settings.exposure = .7 if ASSETS else .15
     sc.render.film_transparent = False
     sc.render.image_settings.file_format = 'PNG'; sc.render.image_settings.color_mode = 'RGB'
     sc.render.filepath = os.path.join(out, code + '.png'); bpy.ops.render.render(write_still=True)

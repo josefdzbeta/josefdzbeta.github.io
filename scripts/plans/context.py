@@ -157,6 +157,7 @@ def main(osm_path, ex_path, out):
     put('paving', COL['paving'], .05); put('promenade', COL['promenade'], .05); put('cycle', COL['cycle'], .06)
     put('track', COL['track'], .1); put('mark', COL['mark'], .03); put('plot', COL['plot'], .03)
     Image.fromarray(np.clip(alb, 0, 255).astype(np.uint8)).save(os.path.join(out, 'ground_albedo.jpg'), quality=90)
+    Image.fromarray(C.astype(np.uint8)).save(os.path.join(out, 'ground_class.png'))     # class ids for the textured ground (turntable.py)
     rough = np.full((H, W), .92, np.float32)
     rough[C == K['asphalt']] = .78; rough[np.isin(C, [K['paving'], K['promenade'], K['plot']])] = .7; rough[C == K['mark']] = .6
     Image.fromarray((rough * 255).astype(np.uint8)).save(os.path.join(out, 'ground_rough.png'))

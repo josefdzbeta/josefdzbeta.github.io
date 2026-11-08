@@ -10,7 +10,7 @@ used to project apartments. All variants share the same camera ring.
 import sys, os, json
 from PIL import Image
 
-SIZES = {'lg': ((1600, 1200), 80), 'sm': ((1200, 900), 74)}
+SIZES = {'lg': ((1600, 1200), 68), 'sm': ((1200, 900), 62)}   # scanned grass and trees compress less: lower q keeps the weight of revision 6
 
 
 # render 01's camera (PnP, 2026-11-07) is not accurate enough for a pixel comparison yet: only render 03 is offered

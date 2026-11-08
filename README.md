@@ -52,15 +52,16 @@ python scripts/plans/exterior.py ../research/source-images/mykonos dist/models/m
 blender -b -P scripts/blender/validate_and_export.py -- dist/models/mykonos ../research/qa/blender/mykonos
 ```
 
-Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, huecos vectorizados de los alzados, render Cycles de 36 vistas (día y atardecer) más las vistas con la cámara de los renders 03 y 01, y empaquetado WebP (`bash scripts/blender/render_all.sh` lanza todos los renders):
+Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, huecos vectorizados de los alzados, render Cycles de 36 vistas (día y atardecer) más las vistas con la cámara de los renders 03 y 01, y empaquetado WebP (`bash scripts/blender/render_all.sh` lanza todos los renders, también las viviendas). Cielo HDRI, texturas escaneadas, árboles, farolas y mobiliario son recursos CC0 de Poly Haven que se descargan aparte (≈610 MB, fuera de la web; sin ellos los renders usan los materiales procedurales):
 
 ```sh
+python scripts/fetch_assets.py ../research/assets/polyhaven
 python scripts/plans/context.py ../research/osm/mykonos-osm.json dist/models/mykonos/exterior.json ../research/turntable/context
 node scripts/export-scene.mjs dist/models/mykonos ../research/turntable/scene.json
 python scripts/plans/glow_masks.py dist/models/mykonos/tex ../research/turntable/glow
 python scripts/plans/facade_vector.py ../research/source-images/mykonos dist/models/mykonos/exterior.json dist/models/mykonos/tex ../research/turntable/facade-openings.json
-blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/day --res 1600x1200 --samples 64
-blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/dusk --res 1600x1200 --samples 64 --mode dusk --glow ../research/turntable/glow
+blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/day --res 1600x1200 --samples 64 --assets ../research/assets/polyhaven
+blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/dusk --res 1600x1200 --samples 64 --mode dusk --glow ../research/turntable/glow --assets ../research/assets/polyhaven
 python scripts/plans/turntable_pack.py ../research/turntable/day2 dist/models/mykonos/turntable day Día ../research/turntable/views
 python scripts/plans/turntable_pack.py ../research/turntable/dusk2 dist/models/mykonos/turntable dusk Atardecer
 python scripts/optimize_images.py dist
@@ -70,7 +71,7 @@ Viviendas fotorrealistas (planta 3D de cada vivienda trazada):
 
 ```sh
 node scripts/export-units.mjs dist/models/mykonos dist/data.json ../research/dwellings
-blender -b -P scripts/blender/dwelling.py -- ../research/dwellings ../research/dwellings-render --res 1600x1200 --samples 96
+blender -b -P scripts/blender/dwelling.py -- ../research/dwellings ../research/dwellings-render --res 1600x1200 --samples 96 --assets ../research/assets/polyhaven
 python scripts/plans/dwelling_pack.py ../research/dwellings-render dist/models/mykonos/dwellings
 ```
 
