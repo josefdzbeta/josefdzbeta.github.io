@@ -13,8 +13,8 @@
  "radius": 140.0,
  "height": 42.0,
  "sun": {
-  "azimuth": 28.0,
-  "elevation": 44.0
+  "azimuth": -25.0,
+  "elevation": 40.0
  },
  "files": [
   "f00.webp",
@@ -348,16 +348,24 @@
   "day": {
    "label": "D\u00eda",
    "bytes": {
-    "lg": 4029046,
-    "sm": 2318260
+    "lg": 3728232,
+    "sm": 2111882
    }
   },
   "dusk": {
    "label": "Atardecer",
    "bytes": {
-    "lg": 2549360,
-    "sm": 1497862
+    "lg": 2452288,
+    "sm": 1442146
    }
   }
- }
+ },
+ "views": [
+  {
+   "id": "r03",
+   "label": "Render 03 \u00b7 calle",
+   "file": "views/r03.webp",
+   "ref": "/assets/ref-mykonos03.jpg"
+  }
+ ]
 }

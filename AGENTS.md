@@ -6,7 +6,7 @@ This file is the starting guide for AI assistants and developers working in this
 
 Bamaire is a Spanish-language residential promotions website and interactive showroom prototype. It is a static site served from `dist/`; the official Bamaire site is `https://bamaire.es` and is not modified by this repository.
 
-The current hosted Site is `https://bamaire-arquitectura-jf.almondpartridge.chatgpt.site`. It is private to its owner. Preserve that audience unless the user explicitly asks to change it. The project ID and static output configuration are in `.openai/hosting.json`.
+Deployment is through GitHub (user instruction, 8 November 2026): pushing to `main` of `github.com/josefdzbeta/josefdzbeta.github.io` runs `.github/workflows/pages.yml`, which publishes `https://josefdzbeta.github.io`. The earlier ChatGPT Site (`https://bamaire-arquitectura-jf.almondpartridge.chatgpt.site`, project ID in `.openai/hosting.json`) is no longer deployed to; leave it and its project ID untouched.
 
 ## Project files
 
@@ -14,7 +14,7 @@ The current hosted Site is `https://bamaire-arquitectura-jf.almondpartridge.chat
 - `src/viewer.js` — Mykonos viewer: photoreal turntable for the building (`src/turntable.js`, pre-rendered frames in `dist/models/mykonos/turntable/`, no WebGL) and the 3D explorer loaded on demand for floors and dwellings. `src/shared.js` holds data access, heights, status per portal (Portal 2 = "Próximamente") and the in-viewer navigation.
 - `src/explorer.js` — Three.js building/floor/dwelling views generated at runtime from `dist/models/<promotion>/` (traced from the published plan PDFs).
 - `src/finishes.js`, `src/catalog.js` — procedural physically scaled textures; official programme slots, memoria facts and concept extras.
-- `scripts/plans/` — plan tracing, key-plan assembly, model build and validation report; `exterior.py` builds the Mykonos exterior (façade textures + spec) from the published elevations; `context.py` the OpenStreetMap surroundings (reflected to match the published plans); `scripts/blender/` — headless Blender validation renders, GLB export and the Cycles turntable (`turntable.py`; pack with `scripts/plans/turntable_pack.py`). See `dist/docs/fidelity-audit.md`.
+- `scripts/plans/` — plan tracing, key-plan assembly, model build and validation report; `exterior.py` builds the Mykonos exterior (façade textures + spec) from the published elevations; `context.py` the OpenStreetMap surroundings (reflected to match the published plans); `facade_vector.py` vectorises the openings of the published elevations; `scripts/blender/` — headless Blender validation renders, GLB export and the Cycles turntable (`turntable.py` + `facade_geo.py` for real façade geometry; `render_all.sh` renders day, dusk and the views calibrated on Bamaire's renders 03/01; pack with `scripts/plans/turntable_pack.py`). `scripts/optimize_images.py` writes the responsive WebP variants in `dist/assets/opt/` (rerun after adding images). See `dist/docs/fidelity-audit.md`.
 - `dist/index.html` — static HTML shell and global header/footer.
 - `dist/style.css` — site styling and responsive breakpoints.
 - `src/access-gate.html`, `src/access-gate.css`, `src/access-gate.js` — the public GitHub Pages entry screen, branding, and shared passcode flow. `build.mjs` wraps the compiled site behind it.
@@ -26,9 +26,9 @@ The current hosted Site is `https://bamaire-arquitectura-jf.almondpartridge.chat
 - `scripts/build-local.mjs` — creates the self-contained local HTML copy at `../Bamaire-local.html`.
 - `README.md` — setup and feature overview; `QA.md` — recorded verification and limitations.
 
-`npm run build` bundles `src/app.js` and `src/explorer.js` into `dist/js/` with content-hashed names and updates the script/stylesheet references. `npm run build:pages` additionally wraps the page in the public access screen and copies its CSS/JS into `dist/`; the existing private Site build uses `npm run build` and stays ungated. Edit `dist/style.css`; the hashed copy is generated. Neither build regenerates `dist/data.json`, `dist/style.css` or `dist/models/` (use `scripts/plans/`).
+`npm run build` bundles `src/app.js` and `src/explorer.js` into `dist/js/` with content-hashed names and updates the script/stylesheet references. `npm run build:pages` additionally wraps the page in the public access screen and copies its CSS/JS into `dist/`; local development uses `npm run build` and stays ungated. Edit `dist/style.css`; the hashed copy is generated. Neither build regenerates `dist/data.json`, `dist/style.css` or `dist/models/` (use `scripts/plans/`).
 
-The GitHub Pages deployment runs `npm ci` and `npm run build`, then publishes `dist/` from the `main` branch. Its public entry URL is `https://josefdzbeta.github.io`; the access screen compares the visitor's input to the shared passcode `bamaire` in browser code. Keep this as a simple front-end gate, per the user's instruction; the files are public and the gate is not server-side authentication. The existing ChatGPT Site remains owner-private.
+The GitHub Pages deployment runs `npm ci` and `npm run build`, then publishes `dist/` from the `main` branch. Its public entry URL is `https://josefdzbeta.github.io`; the access screen compares the visitor's input to the shared passcode `bamaire` in browser code. Keep this as a simple front-end gate, per the user's instruction; the repository and files are public and the gate is not server-side authentication.
 
 ## Copy and accuracy rules
 
@@ -57,9 +57,8 @@ The resulting file is `../Bamaire-local.html`; `../Bamaire-local.zip` is the pac
 
 ## Publishing and credentials
 
-- Preserve the existing Site project ID in `.openai/hosting.json`; do not create a replacement Site for this project.
-- Keep the Site private. Never widen access as a workaround for preview or phone access.
-- The user separately requested a publicly hosted GitHub Pages version with a simple branded passcode screen. Publish that version through GitHub Actions; this does not change the audience of the existing private Site.
-- For a hosted source edit, follow the installed Sites skill and its source helper workflow. Confirm the current Site owner and audience first, build and package from the exact source commit, then use the private deployment path.
+- Deploy only through GitHub: commit on `main` and push; the Pages workflow builds with `npm ci` + `npm run build:pages` and publishes `dist/`. Check the run (Actions tab or `api.github.com/repos/josefdzbeta/josefdzbeta.github.io/actions/runs`) and the live site afterwards. Commit and push only when the user asks.
+- Everything in the repository is public (models, plans, turntable frames, the passcode). Do not add anything that must stay private.
+- Do not deploy to the ChatGPT Site any more and do not create a replacement Site; keep `.openai/hosting.json` as it is.
 - Keep repository credentials and access tokens in session memory and pass them only through the supported helper's stdin. Never put credentials in source files, shell history, logs, or this guide.
 - Do not add a custom domain or change DNS unless the user requests it and confirms they control that domain.

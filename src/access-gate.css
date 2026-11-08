@@ -31,7 +31,7 @@
   padding: clamp(30px, 5vw, 76px);
   overflow: hidden;
   color: #fff;
-  background: #27353a url('/assets/mykonos04-2500px.jpg') center 53% / cover no-repeat;
+  background: #27353a url('/assets/opt/mykonos04-2500px-1280.webp') center 53% / cover no-repeat;
 }
 .access-visual::before {
   position: absolute;

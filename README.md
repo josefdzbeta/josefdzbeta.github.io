@@ -52,16 +52,18 @@ python scripts/plans/exterior.py ../research/source-images/mykonos dist/models/m
 blender -b -P scripts/blender/validate_and_export.py -- dist/models/mykonos ../research/qa/blender/mykonos
 ```
 
-Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, render Cycles de 36 vistas (día y atardecer) y empaquetado WebP:
+Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, huecos vectorizados de los alzados, render Cycles de 36 vistas (día y atardecer) más las vistas con la cámara de los renders 03 y 01, y empaquetado WebP (`bash scripts/blender/render_all.sh` lanza todos los renders):
 
 ```sh
 python scripts/plans/context.py ../research/osm/mykonos-osm.json dist/models/mykonos/exterior.json ../research/turntable/context
 node scripts/export-scene.mjs dist/models/mykonos ../research/turntable/scene.json
 python scripts/plans/glow_masks.py dist/models/mykonos/tex ../research/turntable/glow
+python scripts/plans/facade_vector.py ../research/source-images/mykonos dist/models/mykonos/exterior.json dist/models/mykonos/tex ../research/turntable/facade-openings.json
 blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/day --res 1600x1200 --samples 64
 blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/dusk --res 1600x1200 --samples 64 --mode dusk --glow ../research/turntable/glow
-python scripts/plans/turntable_pack.py ../research/turntable/day dist/models/mykonos/turntable day Día
-python scripts/plans/turntable_pack.py ../research/turntable/dusk dist/models/mykonos/turntable dusk Atardecer
+python scripts/plans/turntable_pack.py ../research/turntable/day2 dist/models/mykonos/turntable day Día ../research/turntable/views
+python scripts/plans/turntable_pack.py ../research/turntable/dusk2 dist/models/mykonos/turntable dusk Atardecer
+python scripts/optimize_images.py dist
 ```
 
 Detalle, resultados y lagunas: `dist/docs/fidelity-audit.md`.

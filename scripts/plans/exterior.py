@@ -19,7 +19,10 @@ from PIL import Image
 LENGTH, DEPTH = 69.0, 20.0
 PPM = 16.13                     # px per metre on both elevations (1113 px ↔ 69 m)
 U0 = 62                         # left building edge (px) on both elevations
-GROUND = {'fachada1': 389.0, 'fachada2': 387.6}   # fachada2 aligned on the window rows of fachada1
+# ground line (px) of the courtyard datum y = 0 on each elevation. fachada2 is drawn down to the street, ≈0,95 m
+# below the courtyard: its window rows (sill 1,04 / head 2,22 m above each floor, as on fachada1) and roof line
+# (22,9 m) put the datum 15,3 px above its bottom edge (row 387,6).
+GROUND = {'fachada1': 389.0, 'fachada2': 372.3}
 TOP = 22.94                     # top of the frame / parapet (m)
 LEVELS = {'B': .74, '1': 4.60, '2': 7.87, '3': 11.14, '4': 14.41, '5': 17.68, 'roof': 20.95}
 

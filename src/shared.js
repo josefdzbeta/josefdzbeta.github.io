@@ -92,7 +92,7 @@ export const RENDER_VIEWS = [
   {id: 'r03', label: 'Render 03 · calle (día)', img: '/assets/ref-mykonos03.jpg', aspect: 16 / 9, cam: {pos: [71.4, 2.36, 55.81], fwd: [-.782, .125, -.61], fov: 30}},
   {id: 'r04', label: 'Render 04 · calle (noche)', img: '/assets/ref-mykonos04.jpg', aspect: 16 / 9, cam: {pos: [71.4, 2.36, 55.81], fwd: [-.782, .125, -.61], fov: 30}},
   {id: 'r01', label: 'Render 01 · aérea', img: '/assets/ref-mykonos01.jpg', aspect: 16 / 9, cam: {pos: [80.82, 45.06, 102.65], fwd: [-.568, -.299, -.767], fov: 20}},
-  {id: 'street', label: 'Alzado C/ María de Molina', img: '/assets/ref-mykonos-fachada2.jpg', fit: {dir: [1, 0, 0], el: 0, width: 77.06, centerY: 12.25, byWidth: true}},
+  {id: 'street', label: 'Alzado C/ María de Molina', img: '/assets/ref-mykonos-fachada2.jpg', fit: {dir: [1, 0, 0], el: 0, width: 77.06, centerY: 11.3, byWidth: true}},
   {id: 'courtyard', label: 'Alzado al patio', img: '/assets/ref-mykonos-fachada1.jpg', fit: {dir: [-1, 0, 0], el: 0, width: 77.06, centerY: 11.72, byWidth: true}},
   {id: 'peatonal', label: 'Testero calle peatonal', img: '/assets/ref-mykonos-giro-7.jpg', fit: {dir: [0, 0, 1], el: 12, width: 44}},
   {id: 'far', label: 'Testero Portal 2', img: '/assets/ref-mykonos-giro-3.jpg', fit: {dir: [0, 0, -1], el: 12, width: 44}},

@@ -35,7 +35,7 @@ ROADS = {
 }
 PATHS = {'pedestrian': 9.0, 'footway': 2.6, 'cycleway': 2.4, 'path': 2.0, 'track': 3.0, 'steps': 2.0}
 COL = {  # sRGB albedo
-    'meadow_dry': (146, 136, 92), 'meadow_green': (98, 116, 58), 'lawn': (80, 114, 46), 'soil': (140, 118, 88),
+    'meadow_dry': (122, 128, 76), 'meadow_green': (84, 116, 50), 'lawn': (72, 120, 44), 'soil': (140, 118, 88),
     'asphalt': (62, 63, 66), 'paving': (188, 182, 171), 'promenade': (190, 172, 158), 'cycle': (128, 70, 60),
     'track': (150, 132, 104), 'mark': (225, 225, 220), 'plot': (198, 193, 184),
 }

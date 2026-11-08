@@ -36,8 +36,8 @@ await walk(path.join(dist, 'models'));
 const filesJS = 'globalThis.__BAMAIRE_FILES=' + JSON.stringify(files).replaceAll('</script', '<\\/script') + ';';
 html = html.replace(/<link rel="stylesheet" href="\/style(-\w+)?\.css">/, () => '<style>' + css + '</style>')
   .replace(/<script type="module" src="\/js\/app(-\w+)?\.js"><\/script>/, () => '<script>' + filesJS + '</script><script>' + js.replaceAll('</script', '<\\/script') + '</script>');
-for (const folder of ['assets', 'docs']) for (const name of await readdir(path.join(dist, folder))) {
-  const ref = '/' + folder + '/' + name; if (!html.includes(ref)) continue;
+for (const folder of ['assets', 'docs']) for (const name of (await readdir(path.join(dist, folder), {recursive: true})).sort((a, b) => b.length - a.length)) {
+  const ref = '/' + folder + '/' + name.split(path.sep).join('/'); if (!html.includes(ref) || ref.endsWith('/opt/index.json') || (await stat(path.join(dist, folder, name))).isDirectory()) continue;   // no srcset offline: originals are embedded
   const bytes = await readFile(path.join(dist, folder, name));
   const uri = 'data:' + (types[path.extname(name)] || 'application/octet-stream') + ';base64,' + bytes.toString('base64');
   html = html.replaceAll(ref, uri);

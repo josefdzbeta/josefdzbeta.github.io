@@ -713,7 +713,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   // ---- floor: cut the building above the floor, show its apartments coloured by published status
   function goFloor(lv) {
     if (!building) return;
-    level = lv; mode = 'floor'; clearHover(); disposeGroup(floorG); homeG.visible = false; buildingG.visible = true; floorG.visible = true;
+    level = lv; mode = 'floor'; clearHover(); disposeGroup(floorG); homeG.visible = false; buildingG.visible = true; floorG.visible = true; walkOff();
     const L = building.levels[lv], y = levelY(lv), F = new Builder(), c0 = building.cell;
     for (const [x, z, w, h] of L.slab) { const sc = L.slabCell, [ox, oz] = L.offset || [0, 0];
       for (const m of [1, -1]) { const za = m * (oz + z * sc), zb = m * (oz + (z + h) * sc); F.box('slab', ox + x * sc, ox + (x + w) * sc, y - .3, y, Math.min(za, zb), Math.max(za, zb)); } }
@@ -745,36 +745,161 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   function goBuilding() {
     callbacks.building?.();
     mode = 'building'; level = null; clearHover(); disposeGroup(floorG); clip(null); homeG.visible = false; buildingG.visible = true;
-    disposeGroup(homeG); unitBuilt = null;
+    clearHome(); unitBuilt = null; walkOff();
     placeLabels(s, []); overview(); ui.setCrumbs([['Edificio', null]]); ui.activeFloor(null);
     hint('Pasa el cursor por la fachada · pulsa una vivienda o elige una planta');
   }
   function clip(y) { s.renderer.clippingPlanes = y == null ? [] : [new T.Plane(new T.Vector3(0, -1, 0), y)]; s.renderer.shadowMap.needsUpdate = true; s.invalidate(); }
 
   // ---- dwelling interior
+  // built dwellings are cached (geometry kept when leaving) and can be prepared ahead (hover / tap on the turntable)
+  const builtCache = new Map();
+  const tileOf = f => f.state.slots.some(x => x.surface === 'kitchenAll') ? 'all' : 'wall';
+  async function prepare(code) {
+    const u = await getJSON(`${base}/units/${code}.json`).catch(() => null); if (!u) return null;
+    const f = finishes(), key = code + '|' + tileOf(f);
+    if (!builtCache.has(key)) {
+      builtCache.set(key, unitMeshes(u, mats, {kitchenTile: tileOf(f), notes: f.state.notes}));
+      if (builtCache.size > 8) { const [k0, b0] = builtCache.entries().next().value; if (b0 !== unitBuilt) { disposeGroup(b0.group); builtCache.delete(k0); } }
+    }
+    return {u, built: builtCache.get(key)};
+  }
+  function clearHome() { if (unitBuilt?.group.parent === homeG) homeG.remove(unitBuilt.group); disposeGroup(homeG); }
+  function fitHome(view = 'perspective') {
+    const [w, d] = unitBuilt.group.userData.size, r = Math.hypot(w, d) / 2 + .4;
+    const vf = 40 * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * (s.camera.aspect || 1)), dist = r / Math.sin(Math.min(vf, hf) / 2) * .9;
+    const dir = view === 'top' ? new T.Vector3(0, 1, .002) : new T.Vector3(.42, .86, .5).normalize();
+    s.move(dir.multiplyScalar(dist).toArray(), [0, 0, 0], orbitMode(s, .3, 60));
+  }
   async function selectHome(code, portal = 1) {
     const next = await getJSON(`${base}/units/${code}.json`).catch(() => null);
     if (!next) { hint(`${code}: modelo no disponible. Consulta el plano PDF original.`); callbacks.unitMissing?.(code); return; }
     unit = next; unit.promotion = promotion; unitPortal = portal; const u0 = performance.now(); callbacks.home?.(code, true, portal);
     const f = finishes();
-    mode = 'home'; clearHover(); clip(null); disposeGroup(homeG); disposeGroup(floorG); buildingG.visible = false; homeG.visible = true;
+    mode = 'home'; clearHover(); clip(null); clearHome(); disposeGroup(floorG); buildingG.visible = false; homeG.visible = true;
     homeG.scale.z = portal === 2 ? -1 : 1; homeG.updateMatrixWorld(true);
     s.renderer.shadowMap.enabled = true;
-    unitBuilt = unitMeshes(unit, mats, {kitchenTile: f.state.slots.some(x => x.surface === 'kitchenAll') ? 'all' : 'wall', notes: f.state.notes});
+    unitBuilt = (await prepare(code)).built;
+    for (const g of Object.values(unitBuilt.furnitureGroups)) g.visible = true;
     homeG.add(unitBuilt.group); overlay = planOverlay(unit, mats); homeG.add(overlay); mark('unitBuild ' + code + ' ' + Math.round(performance.now() - u0) + 'ms', t0);
     applyCut();
     unitBuilt.rooms.forEach(r => { const [x0, x1, z0, z1] = r.bbox, m = new T.Mesh(new T.BoxGeometry(x1 - x0, .02, z1 - z0), mats.hit); m.position.set((x0 + x1) / 2, .01, (z0 + z1) / 2); m.userData.room = r; homeG.add(m); });
     placeLabels(s, unitBuilt.rooms.map(r => ({...roomLabel(r), pos: [r.labelAt[0], .2, r.labelAt[1]], obj: homeG})));
     s.fitShadow(new T.Box3().setFromObject(unitBuilt.group));
-    const [w, d] = unitBuilt.group.userData.size, k = 1.45 / Math.min(1, Math.max(.55, s.camera.aspect));
-    s.move([w * .5 * k, Math.max(w, d) * 1.0 * k, d * .85 * k], [0, 0, 0], orbitMode(s, .3, 60));
+    eye = false; fitHome();
     const lv = code.startsWith('B') ? 'B' : code[0]; level = lv;
     ui.setCrumbs([['Edificio', () => goBuilding()], [levelName(lv), () => goFloor(lv)], [(portal === 2 ? 'Portal 2 · ' : '') + code, null]]); ui.activeFloor(lv);
-    hint(`${code} · pulsa una estancia para verla a la altura de los ojos`);
+    hint(`${code} · pulsa una estancia o un punto del plano para recorrerla`);
+    homeUI();
     callbacks.unitLoaded?.(unit, unitBuilt);
   }
   function applyCut() { if (unitBuilt) clip(wallsCut ? 1.2 : null); }
-  function enterRoom(r) { wallsCut = false; applyCut(); eyeLevel(s, unitPortal === 2 ? {...r, center: [r.center[0], -r.center[1]], bbox: [r.bbox[0], r.bbox[1], -r.bbox[3], -r.bbox[2]]} : r); hint(`${r.name} · ${fmt(r.area)} m² · arrastra para mirar alrededor`); callbacks.room?.(r); }
+  function enterRoom(r) {
+    const m = unitPortal === 2 ? -1 : 1, [x0, x1, z0, z1] = r.bbox, dir = x1 - x0 > Math.abs(z1 - z0) ? [1, 0] : [0, m];
+    eyeAt(r.center[0], m * r.center[1], dir, r);
+  }
+
+  // ---- dwelling walkthrough: room bar, plan with your position, ↑↓/W S to walk, ←→/A D to turn, wheel to step,
+  // click on the floor or on the plan to go there; walls stop you (traced grid of the dwelling)
+  const roomBar = document.createElement('div'); roomBar.className = 'v-rooms'; roomBar.hidden = true;
+  const mini = document.createElement('canvas'); mini.className = 'v-minimap'; mini.hidden = true;
+  mini.setAttribute('role', 'img'); mini.setAttribute('aria-label', 'Plano de la vivienda con tu posición: pulsa un punto para ir allí');
+  container.append(roomBar, mini);
+  let eye = false, grid = null, planCv = null, curRoom = null;
+  const TYPE_COL = {bedroom: [217, 211, 234], bath: [207, 227, 234], kitchen: [240, 220, 196], living_kitchen: [239, 226, 200], living: [242, 232, 207],
+    circulation: [230, 228, 221], exterior: [219, 232, 208], laundry: [216, 230, 222], other: [232, 230, 224]};
+  const mz = () => unitPortal === 2 ? -1 : 1;
+  const cellOf = (x, z) => [Math.floor((mz() * z + unit.h * unit.cell / 2) / unit.cell), Math.floor((x + unit.w * unit.cell / 2) / unit.cell)];
+  const valAt = (x, z) => { const [i, j] = cellOf(x, z); return i < 0 || j < 0 || i >= unit.h || j >= unit.w ? 0 : grid[i * unit.w + j]; };
+  const walkable = (x, z) => { const v = valAt(x, z); return v === 2 || v >= 3; };
+  const roomAt = (x, z) => { const v = valAt(x, z); return v >= 3 ? unitBuilt.rooms.find(r => r.index === v - 3) || null : null; };
+  function homeUI() {
+    grid = decodeGrid(unit);
+    const rooms = unitBuilt.rooms.filter(r => r.area == null || r.area > .9);
+    roomBar.innerHTML = '<button data-r="all">Vista general</button>' + rooms.map(r => `<button data-r="${r.index}">${r.name}</button>`).join('') +
+      '<span class="v-walk-help">↑ ↓ avanzar · ← → girar · pulsa el suelo para ir</span>';
+    roomBar.querySelectorAll('button').forEach(b => b.onclick = () => b.dataset.r === 'all' ? overviewHome() : enterRoom(unitBuilt.rooms.find(r => r.index === Number(b.dataset.r))));
+    // plan image: one pixel per traced cell, mirrored for Portal 2 so it matches the 3D
+    const W = unit.w, H = unit.h; planCv = document.createElement('canvas'); planCv.width = W; planCv.height = H;
+    const g = planCv.getContext('2d'), img = g.createImageData(W, H);
+    for (let i = 0; i < H; i++) for (let j = 0; j < W; j++) {
+      const v = grid[i * W + j], row = mz() > 0 ? i : H - 1 - i, o = (row * W + j) * 4;
+      const c = v === 1 ? [70, 74, 77] : v === 2 ? [250, 250, 248] : v >= 3 ? TYPE_COL[kindOf(unit.rooms[v - 3]?.type)] || TYPE_COL.other : null;
+      if (c) { img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2]; img.data[o + 3] = 255; }
+    }
+    g.putImageData(img, 0, 0);
+    roomBar.hidden = false; mini.hidden = false; markRoom(); drawMini();
+  }
+  function walkOff() { eye = false; keys.clear(); curRoom = null; roomBar.hidden = true; mini.hidden = true; }
+  function markRoom() { roomBar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.r === (eye && curRoom ? String(curRoom.index) : eye ? '' : 'all'))); }
+  function overviewHome() { eye = false; curRoom = null; markRoom(); fitHome(); hint(`${unit.code} · pulsa una estancia o un punto del plano para recorrerla`); }
+  function eyeAt(x, z, dir, room) {
+    wallsCut = false; applyCut(); eye = true;
+    Object.assign(s.controls, {minDistance: .05, maxDistance: .15, rotateSpeed: -.45, enablePan: false, maxPolarAngle: Math.PI * .8, minPolarAngle: Math.PI * .2});
+    s.move([x - dir[0] * .1, 1.5, z - dir[1] * .1], [x, 1.485, z], small ? 70 : 62);
+    setRoom(room || roomAt(x, z));
+  }
+  function setRoom(r) {
+    if (r === curRoom) return; curRoom = r; markRoom();
+    if (r) { hint(`${r.name} · ${fmt(r.area)} m² · arrastra para mirar · ↑ ↓ para avanzar`); callbacks.room?.(r); }
+  }
+  const lookDir = () => { const d = s.controls.target.clone().sub(s.camera.position); d.y = 0; return d.lengthSq() ? d.normalize() : new T.Vector3(1, 0, 0); };
+  function walkTo(x, z) { if (!walkable(x, z)) return false; const d = lookDir(); eyeAt(x, z, [d.x, d.z]); return true; }
+  function step(dist) {                              // move the eye along the view, sliding along walls
+    const tg = s.controls.target, d = lookDir().multiplyScalar(dist), probe = Math.sign(dist) * .28;
+    const dn = lookDir().multiplyScalar(probe);
+    const ok = (x, z) => walkable(x, z) && walkable(x + dn.x, z + dn.z);
+    let mv = null;
+    if (ok(tg.x + d.x, tg.z + d.z)) mv = d; else if (ok(tg.x + d.x, tg.z)) mv = new T.Vector3(d.x, 0, 0); else if (ok(tg.x, tg.z + d.z)) mv = new T.Vector3(0, 0, d.z);
+    if (!mv) return;
+    s.camera.position.add(mv); tg.add(mv); s.controls.update(); s.invalidate(); setRoom(roomAt(tg.x, tg.z) || curRoom); drawMini();
+  }
+  function turn(a) { const tg = s.controls.target, off = s.camera.position.clone().sub(tg).applyAxisAngle(new T.Vector3(0, 1, 0), a); s.camera.position.copy(tg).add(off); s.controls.update(); s.invalidate(); drawMini(); }
+  const keys = new Set(); let walkRaf = 0, lastT = 0;
+  const KEYMAP = {ArrowUp: 'f', KeyW: 'f', ArrowDown: 'b', KeyS: 'b', ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r'};
+  function walkKey(e, down) {
+    const k = KEYMAP[e.code]; if (!k) return;
+    if (!down) { keys.delete(k); return; }
+    if (mode !== 'home' || !eye || !container.isConnected) return;
+    if (!container.matches(':hover') && document.activeElement?.closest('#viewer') !== container) return;
+    if (e.target.closest?.('input, select, textarea')) return;
+    e.preventDefault(); keys.add(k);
+    if (!walkRaf) { lastT = performance.now(); walkRaf = requestAnimationFrame(walkLoop); }
+  }
+  function walkLoop(t) {
+    walkRaf = 0; const dt = Math.min(.05, (t - lastT) / 1000); lastT = t;
+    if (!keys.size || mode !== 'home' || !eye) return;
+    if (keys.has('l') || keys.has('r')) turn((keys.has('l') ? 1 : -1) * 1.5 * dt);
+    const f = (keys.has('f') ? 1 : 0) - (keys.has('b') ? 1 : 0); if (f) step(f * 1.5 * dt);
+    walkRaf = requestAnimationFrame(walkLoop);
+  }
+  const onKeyDown = e => walkKey(e, true), onKeyUp = e => walkKey(e, false);
+  addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp);
+  s.renderer.domElement.addEventListener('wheel', e => { if (mode === 'home' && eye) { e.preventDefault(); step(-Math.sign(e.deltaY) * .45); } }, {passive: false});
+  s.controls.addEventListener('change', () => { if (mode === 'home') drawMini(); });
+  function miniFit() {
+    const r = mini.getBoundingClientRect(), dpr = Math.min(devicePixelRatio, 2), W = unit.w, H = unit.h;
+    if (mini.width !== Math.round(r.width * dpr)) { mini.width = Math.round(r.width * dpr); mini.height = Math.round(r.height * dpr); }
+    const k = Math.min((mini.width - 12) / W, (mini.height - 12) / H);
+    return {k, ox: (mini.width - W * k) / 2, oy: (mini.height - H * k) / 2};
+  }
+  function drawMini() {
+    if (mini.hidden || !planCv || !unit) return;
+    const g = mini.getContext('2d'), {k, ox, oy} = miniFit(), c = unit.cell;
+    g.clearRect(0, 0, mini.width, mini.height); g.imageSmoothingEnabled = false; g.drawImage(planCv, ox, oy, unit.w * k, unit.h * k);
+    const P = (x, z) => [ox + (x + unit.w * c / 2) / c * k, oy + (z + unit.h * c / 2) / c * k];
+    const at = eye ? s.controls.target : s.camera.position, d = lookDir(), [px, py] = P(at.x, at.z), R = Math.max(18, k * 7);
+    const a = Math.atan2(d.z, d.x);
+    g.fillStyle = 'rgba(59,89,104,.28)'; g.beginPath(); g.moveTo(px, py); g.arc(px, py, R, a - .55, a + .55); g.closePath(); g.fill();
+    g.fillStyle = '#3b5968'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(px, py, Math.max(4, k * 1.6), 0, 7); g.fill(); g.stroke();
+  }
+  mini.addEventListener('click', e => {
+    if (!unit) return;
+    const r = mini.getBoundingClientRect(), dpr = mini.width / r.width, {k, ox, oy} = miniFit(), c = unit.cell;
+    const x = ((e.clientX - r.left) * dpr - ox) / k * c - unit.w * c / 2, z = ((e.clientY - r.top) * dpr - oy) / k * c - unit.h * c / 2;
+    if (!walkable(x, z)) return;
+    if (eye) walkTo(x, z); else { const d = new T.Vector3(-x, 0, -z); d.y = 0; d.lengthSq() < .01 ? d.set(1, 0, 0) : d.normalize(); eyeAt(x, z, [d.x, d.z]); }
+  });
 
   // ---- picking: façade apartments in the building view, plates on a floor, rooms in a dwelling
   const ray = new T.Raycaster(), ptr = new T.Vector2();
@@ -809,6 +934,11 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   el.addEventListener('pointerleave', () => { if (mode === 'building') clearHover(); ui.tip(null); });
   el.addEventListener('pointerup', e => {
     if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+    if (mode === 'home' && eye) {
+      setPtr(e); const hit = ray.intersectObjects(homeG.children.filter(m => m.userData.room), false)[0];
+      if (hit) walkTo(hit.point.x, hit.point.z);
+      return;
+    }
     const h = pick(e);
     if (h.apartment) { ui.tip(null); selectHome(h.apartment.code, h.apartment.portal); }
     else if (h.room) enterRoom(h.room);
@@ -826,6 +956,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     ready,
     selectFloor: n => ready.then(() => goFloor(n === 0 ? 'B' : String(n))),
     selectHome: (code, portal = 1) => ready.then(() => selectHome(code, portal)),
+    prefetch: code => ready.then(() => new Promise(r => (globalThis.requestIdleCallback || setTimeout)(() => r(prepare(code)), {timeout: 800}))),
     building: () => ready.then(goBuilding),
     renderView(id) {
       const v = RENDER_VIEWS.find(x => x.id === id); if (!v || !ex) return;
@@ -851,7 +982,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     setFinish(slot, option) { if (!fin) { pending.chosen[slot] = option; return; } fin.state.chosen[slot] = option; fin.apply(); s.renderer.shadowMap.needsUpdate = true; s.invalidate(); },
     setConcept(name, option) { if (!fin) { pending.concept[name] = option; return; } fin.state.concept[name] = option; fin.apply(); s.invalidate(); },
     view(v) {
-      if (mode === 'home' && unitBuilt) { const [w, d] = unitBuilt.group.userData.size; s.move(v === 'top' ? [0, Math.max(w, d) * 1.5, .01] : [w * .55, Math.max(w, d) * 1.05, d * .95], [0, 0, 0], orbitMode(s)); }
+      if (mode === 'home' && unitBuilt) { eye = false; curRoom = null; markRoom(); fitHome(v); }
       else if (mode === 'floor') goFloor(level);
       else if (ex) { if (v === 'top') s.move([0, 150, .1], [0, 0, 0], orbitMode(s, 12, 260)); else overview(); }
     },
@@ -862,7 +993,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
       else delta.multiplyScalar(action === 'in' ? .78 : 1.28);
       s.move(delta.add(s.controls.target).toArray(), s.controls.target.toArray());
     },
-    resize: s.resize, dispose: () => { removeEventListener('keydown', onKey); s.dispose(); },
+    resize: s.resize, dispose: () => { removeEventListener('keydown', onKey); removeEventListener('keydown', onKeyDown); removeEventListener('keyup', onKeyUp); roomBar.remove(); mini.remove(); s.dispose(); },
   };
 }
 

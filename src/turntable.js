@@ -7,7 +7,7 @@ import {getJSON, fileURL, hasFile, bundled, levelY, storeyH, STATUS, statusOf, t
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ZENITH = {day: '#bfd0e0', dusk: '#1f2c4e'};          // sky above the frame when a tall viewer extends it
 
-export async function createTurntable(container, {base, building, published = {}, info = {}, ui, onApartment, onFloor, hint}) {
+export async function createTurntable(container, {base, building, published = {}, info = {}, ui, onApartment, onFloor, onHover, hint}) {
   const m = await getJSON(`${base}/turntable/manifest.json`);
   const N = m.frames.length, [W, H] = m.size, tanH = Math.tan(m.fovY * Math.PI / 360), aspect = W / H;
   const layer = document.createElement('div'); layer.className = 'tt';
@@ -38,19 +38,21 @@ export async function createTurntable(container, {base, building, published = {}
     for (let i = 0; i < N; i++) if (!seen.has(i)) out.push(i);
     return out;
   }
-  let queue = order(), inflight = 0;
+  let queue = order(), inflight = 0, unlocked = false, loaded = 0;
+  const EAGER = Math.max(4, Math.round(N / 4));                      // frame 0 + every 90°… before any interaction
+  const unlock = () => { if (!unlocked) { unlocked = true; pump(); } };
   const first = new Promise(res => { pump(res); });
   function pump(onFirst) {
-    while (inflight < 4 && queue.length) {
+    while (inflight < 4 && queue.length && (unlocked || loaded + inflight < EAGER)) {
       const i = queue.shift(), im = new Image(), g = gen; im.decoding = 'async'; inflight++;
       // decode off the main thread before a frame becomes eligible (capped: background tabs may defer decode())
-      im.onload = () => Promise.race([im.decode().catch(() => {}), new Promise(r => setTimeout(r, 300))]).then(() => { inflight--; if (g !== gen) return pump(); imgs[i] = im; ready[i] = 1; onFirst?.(); onFirst = null; if (!alive) return; if (nearest(frame) === i) draw(); pump(); });
+      im.onload = () => Promise.race([im.decode().catch(() => {}), new Promise(r => setTimeout(r, 300))]).then(() => { inflight--; if (g !== gen) return pump(); imgs[i] = im; ready[i] = 1; loaded++; onFirst?.(); onFirst = null; if (!alive) return; if (nearest(frame) === i) draw(); pump(); });
       im.onerror = () => { inflight--; pump(onFirst); };
       im.src = fileURL(`${base}/turntable/${variant}/${key}/${m.files[i]}`);
     }
   }
   // switch frame set (size or light): keep showing the current picture until the new one arrives
-  function reload() { gen++; imgs = new Array(N).fill(null); ready = new Uint8Array(N); queue = order(frame); pump(); }
+  function reload() { gen++; loaded = 0; imgs = new Array(N).fill(null); ready = new Uint8Array(N); queue = order(frame); pump(); }
   const nearest = f => { for (let d = 0; d <= N / 2; d++) { if (ready[(f + d) % N]) return (f + d) % N; if (ready[(f - d + N) % N]) return (f - d + N) % N; } return -1; };
 
   // ---- camera of a frame: eye on the ring, looking at the target, y up, vertical FOV
@@ -166,7 +168,7 @@ export async function createTurntable(container, {base, building, published = {}
     }
     if (e.pointerType === 'touch') return;
     const a = pickAt(e.clientX, e.clientY);
-    if (a !== hover) { hover = a; redraw(); }
+    if (a !== hover) { hover = a; redraw(); onHover?.(a); }
     ui.tip(a ? tipHTML(a, info, published) + '<br><small>Pulsa para ver la vivienda</small>' : null, e);
     cv.style.cursor = a ? 'pointer' : 'grab';
   });
@@ -178,7 +180,7 @@ export async function createTurntable(container, {base, building, published = {}
       const a = pickAt(e.clientX, e.clientY);
       if (e.pointerType === 'touch') {
         if (a && touchTap && touchTap.code === a.code && touchTap.portal === a.portal) { touchTap = null; hover = null; ui.tip(null); redraw(); onApartment(a); return; }
-        touchTap = a; hover = a; redraw(); ui.tip(a ? tipHTML(a, info, published) + '<br><small>Toca de nuevo para abrirla</small>' : null, e); return;
+        touchTap = a; hover = a; redraw(); onHover?.(a); ui.tip(a ? tipHTML(a, info, published) + '<br><small>Toca de nuevo para abrirla</small>' : null, e); return;
       }
       if (a) { hover = null; ui.tip(null); redraw(); onApartment(a); }
       return;
@@ -203,11 +205,14 @@ export async function createTurntable(container, {base, building, published = {}
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); setFrame(frame + (e.key === 'ArrowLeft' ? -1 : 1)); }
   });
 
+  for (const ev of ['pointerenter', 'pointerdown', 'keydown', 'focus']) cv.addEventListener(ev, unlock, {once: true, passive: true});
+  setTimeout(() => { if (!layer.hidden) unlock(); }, 6000);
   await first; resize(); hint?.('Arrastra para girar · pasa el cursor por una vivienda o elige una planta');
   return {
     show(on) { layer.hidden = !on; container.classList.toggle('tt-on', on); if (on) { resize(); } else { hover = null; floorHi = null; } },
     highlightFloor(lv) { floorHi = lv; redraw(); },
     camera(action) {
+      unlock();
       if (action === 'left' || action === 'right') setFrame(frame + (action === 'left' ? -3 : 3));
       else if (action === 'in' || action === 'out') { const r = cv.getBoundingClientRect(); zoomAt(action === 'in' ? 1.25 : .8, r.left + r.width / 2, r.top + r.height / 2); }
       else { zoom = 1; center = [W / 2, H / 2]; setFrame(0); }
