@@ -79,6 +79,14 @@ Dwellings now in 3D (traced from their own PDF, fitted to the printed m², furni
 - **Compared shot for shot.** The model is rendered with the camera calibrated on render 03 (`turntable.py --cam r03`); the viewer's *Comparar con los renders* slider shows both images. Render 01's earlier camera solve (FOV 20°) puts the camera too low for a pixel comparison (the published aerial looks down more steeply), so it is not offered until that camera is recalibrated. Outline, bays, balcony rows and window columns coincide; differences that remain are the planting, cars and people of the renders and the surroundings (OpenStreetMap, orientative).
 - **Look.** Physical sky with soft cloud and a pale horizon, warm sun from the street side (end wall in soft shade as in render 03), greener plots like the renders' lawns, clustered tree crowns.
 
+## 3e. Revision 6 (8 November 2026) — photoreal dwellings, pool and garage ramp, "Reservada"
+
+- **Photoreal dwellings.** Every traced dwelling (32) is rendered with Blender Cycles as a cut-away 3D floor plan (`scripts/export-units.mjs` → `scripts/blender/dwelling.py` → `scripts/plans/dwelling_pack.py`): the same geometry the web builds from the plan, walls cut at door-head height (2,10 m) with dark section caps, wood-look SPC flooring and porcelain tiles as in the memoria, white PVC windows, furniture with rounded edges and fabric/wood materials (layout orientative), physical sky and soft sun. The dwelling opens on that picture with a "+" pin per room (name and printed m² on hover/tap; "Ver a la altura de los ojos" starts the 3D walkthrough there); Portal 2 shows it mirrored. 1600×1200 / 1000×750 WebP, loaded only for the dwelling opened (and prefetched on hover).
+- **Labels as pins.** Rooms (and the dwellings of a floor plan) show a small "+" instead of permanent labels; the viewer's **m²** button shows them all.
+- **Headers over traced 'openings' deeper than a wall** (e.g. the 1,6 × 2,9 m entrance area of 5A) are no longer built: they read as a ceiling over the hall in both the 3D and the renders.
+- **Pool and garage ramp.** The pool was hidden under the raised courtyard paving (paving at +0,70 m over water at +0,64 m); the courtyard is now cut around a 4,4 × 16 m pool with coping, tiled basin, glass fence and an artificial-grass solarium with loungers (render 02; sótano "Foso piscina"). The garage ramp runs along the Portal 1 end between the ground-floor patios and the pedestrian street, from the María de Molina side down to the basement under a deck with a planter (render 01; sótano "Rampa acceso a garaje"), so the plot now extends 7,5 m past that end (OSM: pedestrian street ≈ 8,5 m away). Pool size and ramp slope are read from the renders (orientative).
+- **"Reservada".** The red line of the bamaire.es plan list now reads *Reservada* instead of *Vendida* (client, 08.11.2026); Portal 2 stays *Próximamente*.
+
 ## 4. Remaining gaps
 
 | Gap | What would close it |

@@ -1,7 +1,7 @@
 // Mykonos viewer: photoreal turntable for the building (turntable.js, no WebGL) and the traced 3D model for
 // floors and dwellings (explorer.js, Three.js), loaded only when a floor or dwelling is opened or the user
 // asks for the interactive model. Exposes the same API the page used with the explorer alone.
-import {getJSON, fileURL, navUI, levelName, RENDER_VIEWS} from './shared.js';
+import {getJSON, fileURL, navUI, levelName, fmt, RENDER_VIEWS} from './shared.js';
 import {createTurntable} from './turntable.js';
 export {getJSON, RENDER_VIEWS};
 
@@ -49,9 +49,11 @@ export function createViewer(container, callbacks, opts) {
       const mod = await import('./explorer.js');
       const e = mod.createExplorer(container, {
         ...callbacks,
-        building: () => { if (!want3D && tt) { setMode('photo'); photoNav(); } callbacks.building?.(); },
-        floor: (n, fromViewer) => { setMode('inside'); callbacks.floor?.(n, fromViewer); },
-        home: (code, fromViewer, portal) => { setMode('inside'); callbacks.home?.(code, fromViewer, portal); },
+        building: () => { dwHide(); if (!want3D && tt) { setMode('photo'); photoNav(); } callbacks.building?.(); },
+        floor: (n, fromViewer) => { dwHide(); setMode('inside'); callbacks.floor?.(n, fromViewer); },
+        home: (code, fromViewer, portal) => { setMode('inside'); dwShow(code, portal || 1); callbacks.home?.(code, fromViewer, portal); },
+        room: r => { dwHide(); callbacks.room?.(r); },
+        overview: () => dwShow(dwCode, dwPortal),
       }, opts);
       await e.ready;
       for (const [k, a, b] of queued) e[k](a, b);
@@ -93,13 +95,18 @@ export function createViewer(container, callbacks, opts) {
   let pf = 0;
   function prefetch(a) {
     clearTimeout(pf); if (!a) return;
-    pf = setTimeout(() => load3D(true).then(e => e.prefetch?.(a.code)).catch(() => {}), ex ? 60 : 250);
+    pf = setTimeout(() => { load3D(true).then(e => e.prefetch?.(a.code)).catch(() => {}); dwIdx().then(i => { if (i[a.code]) new Image().src = dwURL(a.code); }); }, ex ? 60 : 250);
   }
   // fullscreen: the viewer (turntable, floors, dwellings) fills the screen
   const fsBtn = document.createElement('button'); fsBtn.className = 'v-fullscreen'; fsBtn.setAttribute('aria-label', 'Pantalla completa'); fsBtn.title = 'Pantalla completa';
   fsBtn.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
   fsBtn.onclick = () => document.fullscreenElement ? document.exitFullscreen() : (container.requestFullscreen?.() || container.webkitRequestFullscreen?.());
   if (container.requestFullscreen || container.webkitRequestFullscreen) container.querySelector('.viewer-bottom > div')?.append(fsBtn);
+  // "Medidas": show every room / dwelling label at once (otherwise each is a small "+" pin)
+  const msBtn = document.createElement('button'); msBtn.className = 'v-measures'; msBtn.type = 'button'; msBtn.textContent = 'm²';
+  msBtn.title = 'Mostrar todas las medidas'; msBtn.setAttribute('aria-pressed', 'false');
+  msBtn.onclick = () => { const on = container.classList.toggle('measures-all'); msBtn.setAttribute('aria-pressed', on); msBtn.classList.toggle('active', on); };
+  container.querySelector('.viewer-bottom > div')?.prepend(msBtn);
   function compare(views) {
     const dlg = document.createElement('dialog'); dlg.className = 'compare-dialog';
     dlg.innerHTML = `<button class="close" aria-label="Cerrar">×</button><h2>Modelo frente a render publicado</h2>
@@ -116,6 +123,39 @@ export function createViewer(container, callbacks, opts) {
     dlg.querySelector('.close').onclick = () => dlg.close(); dlg.onclose = () => dlg.remove();
     dlg.showModal();
   }
+  // photoreal dwelling (scripts/blender/dwelling.py): shown when a dwelling opens, with a "+" pin per room;
+  // a room (pin body, room bar, sidebar) or "Recorrer en 3D" opens the interactive walkthrough
+  let dwIndexP = null, dwLayer = null, dwCode = null, dwPortal = 1;
+  const dwIdx = () => dwIndexP ||= getJSON(`${base}/dwellings/index.json`).then(j => j.units || {}).catch(() => ({}));
+  const dwURL = code => fileURL(`${base}/dwellings/${container.clientWidth * Math.min(devicePixelRatio, 2) > 1100 ? 'lg' : 'sm'}/${code}.webp`);
+  function dwLayout() {
+    if (!dwLayer || dwLayer.hidden) return;
+    const img = dwLayer.querySelector('img'), box = dwLayer.querySelector('.dw-box'), W = 1600, H = 1200;
+    const cw = container.clientWidth, ch = container.clientHeight, k = Math.min(cw / W, ch / H) * 1.04, w = W * k, h = H * k;
+    Object.assign(box.style, {width: w + 'px', height: h + 'px', left: (cw - w) / 2 + 'px', top: (ch - h) / 2 + 'px'});
+    img.style.transform = dwPortal === 2 ? 'scaleX(-1)' : '';
+  }
+  async function dwShow(code, portal) {
+    const idx = await dwIdx(), d = idx[code];
+    if (!d) { dwHide(); return; }
+    dwCode = code; dwPortal = portal;
+    if (!dwLayer) {
+      dwLayer = document.createElement('div'); dwLayer.className = 'dw';
+      dwLayer.innerHTML = '<div class="dw-box"><img alt=""><div class="dw-pins"></div></div><div class="dw-bar"><button type="button" class="dw-3d">Recorrer en 3D</button><span class="dw-note">Render fotorrealista del modelo trazado del plano · mobiliario orientativo</span></div>';
+      container.append(dwLayer);
+      dwLayer.querySelector('.dw-3d').onclick = () => dwHide();
+      new ResizeObserver(dwLayout).observe(container);
+    }
+    const img = dwLayer.querySelector('img');
+    img.alt = `Render fotorrealista de la vivienda ${portal === 2 ? 'Portal 2 · ' : ''}${code}`;
+    if (!img.src.endsWith(dwURL(code))) img.src = dwURL(code);
+    const pins = dwLayer.querySelector('.dw-pins');
+    pins.innerHTML = d.pins.map(p => `<span class="scene-label pin" style="left:${(portal === 2 ? 1 - p.x : p.x) * 100}%;top:${p.y * 100}%"><button class="pin-dot" type="button" aria-expanded="false" aria-label="${p.name}${p.area ? ' · ' + fmt(p.area) + ' m²' : ''}">+</button><span class="pin-body"><b>${p.name}</b>${p.area ? `<small>${fmt(p.area)} m²</small>` : ''}<button type="button" class="pin-go" data-room="${p.index}">Ver a la altura de los ojos</button></span></span>`).join('');
+    pins.querySelectorAll('.pin-dot').forEach(b => b.onclick = e => { e.stopPropagation(); const p = b.parentElement, on = !p.classList.contains('open'); pins.querySelectorAll('.pin.open').forEach(o => { if (o !== p) { o.classList.remove('open'); o.firstChild.textContent = '+'; } }); p.classList.toggle('open', on); b.setAttribute('aria-expanded', on); b.textContent = on ? '−' : '+'; });
+    pins.querySelectorAll('.pin-go').forEach(b => b.onclick = () => { dwHide(); ex?.enterRoom(Number(b.dataset.room)); });
+    dwLayer.hidden = false; container.classList.add('dw-on'); dwLayout();
+  }
+  function dwHide() { if (dwLayer) dwLayer.hidden = true; container.classList.remove('dw-on'); }
   const fwd = (k, ...a) => ex ? ex[k](...a) : undefined;
   const api = {
     ready,
@@ -128,15 +168,15 @@ export function createViewer(container, callbacks, opts) {
       want3D = true; load3D().then(e => { setMode('model'); e.renderView(id); });
       return v;
     },
-    enterRoom: i => fwd('enterRoom', i), setFurniture: (i, on) => fwd('setFurniture', i, on), setAllFurniture: on => fwd('setAllFurniture', on),
+    enterRoom: i => { dwHide(); return fwd('enterRoom', i); }, setFurniture: (i, on) => fwd('setFurniture', i, on), setAllFurniture: on => fwd('setAllFurniture', on),
     furnitureRooms: () => fwd('furnitureRooms') || [], toggleOverlay: on => fwd('toggleOverlay', on), toggleCut: on => fwd('toggleCut', on),
     setFinish(slot, o) { if (ex) ex.setFinish(slot, o); else queued.push(['setFinish', slot, o]); },
     setConcept(k, o) { if (ex) ex.setConcept(k, o); else queued.push(['setConcept', k, o]); },
-    view(v) { if (mode === 'photo') { if (v === 'top') showModel().then(() => ex.view('top')); else tt.camera('reset'); } else fwd('view', v); },
+    view(v) { if (mode === 'inside' && dwCode && v === 'perspective') { dwShow(dwCode, dwPortal); } if (mode === 'photo') { if (v === 'top') showModel().then(() => ex.view('top')); else tt.camera('reset'); } else fwd('view', v); },
     camera(action) { if (mode === 'photo') tt.camera(action); else fwd('camera', action); },
     resize() { tt?.resize(); fwd('resize'); },
     get mode() { return mode; },
-    dispose() { clearTimeout(pf); tt?.dispose(); ex?.dispose(); ui.dispose(); modeBar.remove(); lightBar?.remove(); compareBtn?.remove(); fsBtn.remove(); },
+    dispose() { clearTimeout(pf); tt?.dispose(); ex?.dispose(); ui.dispose(); modeBar.remove(); lightBar?.remove(); compareBtn?.remove(); fsBtn.remove(); msBtn.remove(); },
   };
   return api;
 }

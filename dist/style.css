@@ -265,3 +265,32 @@
 @media(max-width:700px){.tt-compare{height:30px;padding:0 8px;font-size:10px;margin-left:0}}
 .viewer.v-inside #render-view{display:none}
 @media(max-width:700px){.viewer.v-inside .v-floors{display:none}}
+
+/* label pins: "+" per room/dwelling, details on hover/tap or all at once with the m² button */
+.scene-label.pin{background:none;box-shadow:none;padding:0}
+.pin-dot{pointer-events:auto;width:24px;height:24px;border-radius:50%;border:1.5px solid #fff;background:#3b5968e6;color:#fff;font:600 15px/1 var(--font);display:grid;place-items:center;cursor:pointer;box-shadow:0 1px 5px #0004;padding:0}
+.pin-dot:hover,.pin.open .pin-dot{background:var(--ink)}
+.pin-body{display:none;position:absolute;left:50%;bottom:30px;transform:translateX(-50%);background:#f4f2edf2;padding:4px 8px;white-space:nowrap;box-shadow:0 1px 4px #0002;font-size:11px;line-height:1.3;pointer-events:none}
+.pin-body small{display:block;color:var(--muted);font-size:10px}
+.pin:hover .pin-body,.pin.open .pin-body,.viewer.measures-all .pin-body,.finish-scene.measures-all .pin-body{display:block}
+.viewer.measures-all .pin-dot{width:12px;height:12px;font-size:0;border-width:1px}
+.viewer-bottom .v-measures{font-weight:600}
+.viewer-bottom .v-measures.active{background:var(--ink);color:#fff}
+.viewer.tt-on .v-measures{display:none}
+@media(max-width:700px){.pin-dot{width:26px;height:26px}.pin-body small{display:block}}
+
+/* photoreal dwelling (pre-rendered) with room pins */
+.dw{position:absolute;inset:0;z-index:1;background:#e7e5df;overflow:hidden}
+.dw[hidden]{display:none}
+.dw-box{position:absolute}
+.dw-box img{width:100%;height:100%;display:block;max-width:none}
+.dw-pins{position:absolute;inset:0;pointer-events:none}
+.dw-pins .pin{position:absolute;transform:translate(-50%,-50%)}
+.dw-pins .pin-body{pointer-events:auto}
+.pin-go{display:block;margin-top:5px;border:0;background:none;padding:0;color:var(--blue);text-decoration:underline;font-size:10px;cursor:pointer;text-align:left}
+.dw-bar{position:absolute;left:76px;top:118px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:3}
+.dw-3d{background:var(--ink);color:#fff;border:0;height:32px;padding:0 14px;font-size:11px;cursor:pointer}
+.dw-note{font-size:9px;letter-spacing:.04em;background:#f4f2ede0;padding:5px 8px;color:var(--muted)}
+.viewer.dw-on .v-minimap,.viewer.dw-on .scene-labels{display:none}
+@media(max-width:700px){.dw-bar{left:10px;top:auto;bottom:156px}.dw-note{display:none}}
+.viewer.measures-all .pin:not(.open) .pin-go{display:none}

@@ -99,6 +99,9 @@ function materialSet() {
     cap: new T.MeshLambertMaterial({color: '#fbfaf8'}), pavement: new T.MeshLambertMaterial({color: '#cfcac1'}), lineWhite: new T.MeshBasicMaterial({color: '#e8e8e4'}),
     lawn: new T.MeshLambertMaterial({color: '#7fa24a'}), paving: new T.MeshLambertMaterial({color: '#d6d2ca'}), poolEdge: new T.MeshLambertMaterial({color: '#e8e4dc'}),
     water: new T.MeshBasicMaterial({color: '#59b9d2', transparent: true, opacity: .9}), fenceWall: new T.MeshLambertMaterial({color: '#eceae5'}),
+    poolWall: new T.MeshLambertMaterial({color: '#7fc2d4'}), grass: new T.MeshLambertMaterial({color: '#6f9a3f'}), lounger: new T.MeshLambertMaterial({color: '#f1efea'}),
+    glassFence: new T.MeshStandardMaterial({color: '#cfe0e2', roughness: .05, transparent: true, opacity: .3, depthWrite: false}), ramp: new T.MeshLambertMaterial({color: '#7d7f80'}),
+    tunnel: new T.MeshBasicMaterial({color: '#1d1f21'}), planter: new T.MeshLambertMaterial({color: '#e9e6df'}),
     slats: new T.MeshLambertMaterial({map: slatTexture(), color: '#ffffff'}), trunk: new T.MeshLambertMaterial({color: '#7b6a55'}), canopy: new T.MeshLambertMaterial({color: '#89a85a', flatShading: true}),
     plan: new T.MeshBasicMaterial({transparent: true, opacity: .92, depthWrite: false, toneMapped: false}),
     hit: new T.MeshBasicMaterial({color: '#7f9c86', transparent: true, opacity: 0, depthWrite: false}),
@@ -170,7 +173,9 @@ export function buildUnit(u, {kitchenTile = 'wall', notes = {}} = {}) {
   // openings
   for (const o of u.openings) {
     const x0 = X(o.x), x1 = X(o.x + o.w), z0 = Z(o.y), z1 = Z(o.y + o.h), horiz = o.w >= o.h;
-    const lintel = y => B.box('paint', x0, x1, y, HGT, z0, z1);
+    // header over the opening, only across a wall's thickness (a traced 'opening' region deeper than 0,45 m is a
+    // passage area, and a slab over it reads as a ceiling in the cut-away views)
+    const lintel = y => { if (Math.min(x1 - x0, z1 - z0) <= .45) B.box('paint', x0, x1, y, HGT, z0, z1); };
     if (o.kind === 'door' || o.kind === 'entrance') {
       lintel(Math.max(2.1, (notes.doorHeight || 2.03) + .07));
       const len = horiz ? x1 - x0 : z1 - z0, th = .04, leafH = (notes.doorHeight || 2.03) - .02;
@@ -512,7 +517,12 @@ function planOverlay(u, mats) {
 }
 
 function placeLabels(s, items) {
-  s.labels.innerHTML = items.map((r, i) => `<span class="scene-label" data-i="${i}"><b>${r.name}</b>${r.text ? `<small>${r.text}</small>` : ''}</span>`).join('');
+  // compact pins: a small "+" per room/dwelling; hover or tap shows its name and m², the viewer's "Medidas" button shows all
+  s.labels.innerHTML = items.map((r, i) => `<span class="scene-label pin" data-i="${i}"><button class="pin-dot" type="button" aria-expanded="false" aria-label="${r.name}${r.text ? ' · ' + r.text : ''}">+</button><span class="pin-body"><b>${r.name}</b>${r.text ? `<small>${r.text}</small>` : ''}</span></span>`).join('');
+  s.labels.querySelectorAll('.pin-dot').forEach(b => b.onclick = e => {
+    e.stopPropagation(); const p = b.parentElement, on = !p.classList.contains('open');
+    p.classList.toggle('open', on); b.setAttribute('aria-expanded', on); b.textContent = on ? '−' : '+';
+  });
   const nodes = [...s.labels.children], v = new T.Vector3();
   s.onFrame = () => {
     const w = s.renderer.domElement.clientWidth, h = s.renderer.domElement.clientHeight;
@@ -601,24 +611,63 @@ export function buildExterior(ex, mats) {
 }
 
 // surroundings measured from the renders/plans: street with parking on Calle María de Molina, slatted plot
-// fence, patios of the ground floor, courtyard with lawn and pool, pedestrian street at the Portal 1 end
+// fence, ground-floor patios, raised courtyard with the pool (render 02, sótano "Foso piscina"), the garage ramp
+// along the Portal 1 end (render 01, sótano "Rampa acceso a garaje") and the pedestrian street beyond it
+const rectMinus = (r, holes) => {                    // axis-aligned rectangle minus holes → rectangles [x0, x1, z0, z1]
+  const xs = [...new Set([r[0], r[1], ...holes.flatMap(h => [h[0], h[1]]).filter(v => v > r[0] && v < r[1])])].sort((a, b) => a - b);
+  const zs = [...new Set([r[2], r[3], ...holes.flatMap(h => [h[2], h[3]]).filter(v => v > r[2] && v < r[3])])].sort((a, b) => a - b);
+  const out = [];
+  for (let a = 0; a < xs.length - 1; a++) for (let b = 0; b < zs.length - 1; b++) {
+    const cx = (xs[a] + xs[a + 1]) / 2, cz = (zs[b] + zs[b + 1]) / 2;
+    if (!holes.some(h => cx > h[0] && cx < h[1] && cz > h[2] && cz < h[3])) out.push([xs[a], xs[a + 1], zs[b], zs[b + 1]]);
+  }
+  return out;
+};
 export function buildSite(ex, b, mats) {
-  const S = new Builder(), half = ex.length / 2, pz = Math.max(half + 2, ex.site?.patioZ?.[1] ?? half + 2);
-  const px = ex.site?.patioX?.[1] ?? ex.depth + 6.5, cx = -8;
-  S.box('pavement', -40, 70, -.32, -.3, -pz - 30, pz + 30, 1);
-  S.box('street', px + 4, px + 14, -.31, -.295, -pz - 30, pz + 30, 1);
-  for (let z = -pz; z < pz; z += 5) S.box('lineWhite', px + 4.1, px + 6.2, -.294, -.29, z, z + .12, 1);        // parking bays
-  S.box('lineWhite', px + 8.95, px + 9.05, -.294, -.29, -pz - 30, pz + 30, 1);
-  S.box('lawn', -40, cx - 1, -.3, -.28, -pz - 30, pz + 30, 1);
-  S.box('paving', cx, 0, -.3, .7, -pz, pz, 1);                                                              // raised courtyard
-  S.box('paving', ex.depth, px, -.3, .7, -pz, pz, 1);                                                       // street-side patios
-  S.box('paving', cx, px, -.3, .7, half, pz, 1); S.box('paving', cx, px, -.3, .7, -pz, -half, 1);
-  // pool in the courtyard near the far end (sótano plan: "Foso piscina")
-  S.box('poolEdge', cx + 1.2, -1.6, .7, .74, -half + 3, -half + 15, 1);
-  S.box('water', cx + 1.6, -2, .62, .66, -half + 3.4, -half + 14.6, 1);
-  // plot fences: white base wall + grey slats
+  const S = new Builder(), half = ex.length / 2, st = ex.site || {};
+  const [zN, zP] = st.plotZ || [-half - 2, half + 7.5];
+  const px = st.patioX?.[1] ?? ex.depth + 6.5, cx = -8, top = .7;
+  const pool = st.pool || {x: [-6.4, -2.0], z: [-32.0, -16.0]}, coping = .4;
+  const sol = st.solarium || {x: [-7.6, -.9], z: [-15.0, -9.0]};
+  const ramp = st.ramp || {z: [38.1, 41.7], x: [2.0, px], top: 24.5, bottom: 4.0, depth: -3.2};
+  S.box('pavement', -40, 70, -.32, -.3, zN - 30, zP + 30, 1);
+  S.box('street', px + 4, px + 14, -.31, -.295, zN - 30, zP + 30, 1);
+  for (let z = zN; z < zP; z += 5) S.box('lineWhite', px + 4.1, px + 6.2, -.294, -.29, z, z + .12, 1);        // parking bays
+  S.box('lineWhite', px + 8.95, px + 9.05, -.294, -.29, zN - 30, zP + 30, 1);
+  S.box('lawn', -40, cx - 1, -.3, -.28, zN - 30, zP + 30, 1);
+  // raised paving: courtyard (minus pool and solarium), street-side patios, both end strips, deck over the ramp tunnel
+  const P = (x0, x1, z0, z1) => S.box('paving', x0, x1, -.3, top, z0, z1, 1);
+  const poolOut = [pool.x[0] - coping, pool.x[1] + coping, pool.z[0] - coping, pool.z[1] + coping];
+  for (const r of rectMinus([cx, 0, zN, half], [poolOut, [sol.x[0], sol.x[1], sol.z[0], sol.z[1]]])) P(...r);
+  P(ex.depth, px, zN, half); P(cx, px, zN, -half); P(cx, px, half, ramp.z[0] - .2); P(cx, ramp.x[0], ramp.z[0] - .2, zP);
+  S.box('paving', cx, ramp.x[0], -.3, top, ramp.z[0], ramp.z[1], 16);                                        // deck edge over the tunnel
+  // pool: coping ring, tiled basin, water 12 cm below the coping; solarium of artificial grass with loungers; glass fence
+  for (const r of rectMinus(poolOut, [[pool.x[0], pool.x[1], pool.z[0], pool.z[1]]])) S.box('poolEdge', r[0], r[1], top, top + .04, r[2], r[3], 1);
+  S.box('poolWall', pool.x[0], pool.x[1], top - 1.4, top + .02, pool.z[0], pool.z[1], 2 | 4 | 8 | 16 | 32);
+  S.box('water', pool.x[0], pool.x[1], top - .3, top - .12, pool.z[0], pool.z[1], 1);
+  S.box('grass', sol.x[0], sol.x[1], top, top + .03, sol.z[0], sol.z[1], 1);
+  for (let k = 0; k < 4; k++) { const z = sol.z[0] + 1 + k * 1.3; S.box('lounger', sol.x[0] + .6, sol.x[0] + 2.5, top + .03, top + .38, z, z + .7); }
+  for (const [x0, x1, z0, z1] of [[poolOut[1] + .05, poolOut[1] + .09, poolOut[2], sol.z[1]], [poolOut[0], poolOut[1] + .09, poolOut[2] - .04, poolOut[2]]])
+    S.box('glassFence', x0, x1, top, top + 1.1, z0, z1);
+  // garage ramp: street level at the María de Molina side down to the basement under the courtyard deck
+  const [rz0, rz1] = ramp.z, yT = -.3, yB = ramp.depth;
+  S.quad('ramp', [ramp.x[1], yT, rz0], [ramp.x[1], yT, rz1], [ramp.top, yT, rz1], [ramp.top, yT, rz0], [0, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0]);
+  S.quad('ramp', [ramp.top, yT, rz0], [ramp.top, yT, rz1], [ramp.bottom, yB, rz1], [ramp.bottom, yB, rz0], [.14, .99, 0], [0, 0, 0, 1, 1, 1, 1, 0]);
+  S.quad('ramp', [ramp.bottom, yB, rz0], [ramp.bottom, yB, rz1], [cx, yB, rz1], [cx, yB, rz0], [0, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0]);
+  for (const [z, n] of [[rz0, 1], [rz1, -1]]) {                                                              // ramp side walls (inner faces + top)
+    const prof = [[ramp.x[1], yT], [ramp.top, yT], [ramp.bottom, yB], [ramp.x[0] - .2, yB]];
+    for (let k = 0; k < prof.length - 1; k++) {
+      const [xa, ya] = prof[k], [xb, yb] = prof[k + 1];
+      S.quad('fenceWall', [xa, ya, z], [xb, yb, z], [xb, 1.0, z], [xa, 1.0, z], [0, 0, n], [xa, ya, xb, yb, xb, 1, xa, 1]);
+    }
+    S.box('fenceWall', ramp.x[0], ramp.x[1], 1.0, 1.06, z - (n > 0 ? .2 : 0), z + (n < 0 ? .2 : 0), 1);
+  }
+  S.quad('tunnel', [ramp.x[0], yB, rz1], [ramp.x[0], yB, rz0], [ramp.x[0], top - .3, rz0], [ramp.x[0], top - .3, rz1], [1, 0, 0], [0, 0, 1, 0, 1, 1, 0, 1]);
+  S.box('fenceWall', ramp.x[0] - .3, ramp.x[0], top - .3, top, rz0, rz1, 16);                                   // lintel over the tunnel mouth
+  S.box('planter', cx + .6, cx + 3.2, top, top + .6, rz0 + .5, rz1 - .5);
+  // plot fences: white base wall + grey slats (open at the ramp entrance)
   const fence = (x0, x1, z0, z1) => { S.box('fenceWall', x0, x1, -.3, 1.0, z0, z1); S.box('slats', x0 + (x1 - x0) * .25, x1 - (x1 - x0) * .25, 1.0, 1.95, z0 + (z1 - z0 > 1 ? 0 : .07), z1 - (z1 - z0 > 1 ? 0 : .07)); };
-  fence(px - .15, px + .15, -pz, pz); fence(cx - .15, cx + .15, -pz, pz); fence(cx, px, pz - .15, pz + .15); fence(cx, px, -pz - .15, -pz + .15);
+  fence(px - .15, px + .15, zN, rz0); fence(px - .15, px + .15, rz1, zP); fence(cx - .15, cx + .15, zN, zP); fence(cx, px, zP - .15, zP + .15); fence(cx, px, zN - .15, zN + .15);
   // patio dividers of the ground-floor dwellings (traced rails), Portal 1 and mirrored Portal 2
   const B = b.levels.B;
   for (const pu of B?.units || []) {
@@ -633,7 +682,7 @@ export function buildSite(ex, b, mats) {
   }
   // trees along the street and in the courtyard (as in the renders)
   const trees = [];
-  for (let z = -pz + 4; z < pz; z += 9) trees.push([px + 2, z]);
+  for (let z = zN + 4; z < zP; z += 9) trees.push([px + 2, z]);
   for (let z = -half + 20; z < half; z += 12) trees.push([cx - 3, z]);
   S.trees = trees;
   return S;
@@ -832,7 +881,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   }
   function walkOff() { eye = false; keys.clear(); curRoom = null; roomBar.hidden = true; mini.hidden = true; }
   function markRoom() { roomBar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.r === (eye && curRoom ? String(curRoom.index) : eye ? '' : 'all'))); }
-  function overviewHome() { eye = false; curRoom = null; markRoom(); fitHome(); hint(`${unit.code} · pulsa una estancia o un punto del plano para recorrerla`); }
+  function overviewHome() { eye = false; curRoom = null; markRoom(); fitHome(); hint(`${unit.code} · pulsa una estancia o un punto del plano para recorrerla`); callbacks.overview?.(); }
   function eyeAt(x, z, dir, room) {
     wallsCut = false; applyCut(); eye = true;
     Object.assign(s.controls, {minDistance: .05, maxDistance: .15, rotateSpeed: -.45, enablePan: false, maxPolarAngle: Math.PI * .8, minPolarAngle: Math.PI * .2});

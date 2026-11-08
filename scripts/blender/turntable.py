@@ -196,6 +196,9 @@ MATS = {
     'poolEdge': plain('poolEdge', srgb('#ebe6dc'), .7, bump=.05),
     'poolWall': plain('poolWall', srgb('#7fc2d4'), .3),
     'lampHead': plain('lampHead', srgb('#f6f1e4'), .4),
+    'grass': plain('grass', srgb('#5f8d34'), .9, bump=.4, bump_scale=300), 'lounger': plain('lounger', srgb('#f2f0eb'), .5),
+    'ramp': plain('ramp', srgb('#6f7173'), .8, bump=.15, bump_scale=40), 'tunnel': plain('tunnel', srgb('#141516'), .9),
+    'planter': plain('planter', srgb('#ece9e2'), .8),
     'trunk': plain('trunk', srgb('#5a4a3b'), .9, bump=.2, bump_scale=15),
     'leaf1': leaf_mat('leaf1', ('#56762a', '#93ad45')), 'leaf2': leaf_mat('leaf2', ('#62802f', '#a6b851')),
     'shrub': leaf_mat('shrub', ('#4a5a2a', '#7a8740')),
@@ -277,6 +280,7 @@ MATS.update({
     'fac_slabEdge': plain('fac_slabEdge', srgb('#8d9193'), .5, spec=.55),
     'fac_railGlass': thin_glass('fac_railGlass', (.84, .9, .89), .18, frost=.74, body=(.80, .87, .86), refl=.1),
     'fac_railCap': plain('fac_railCap', srgb('#b8bcbf'), .3, metal=.9),
+    'glassFence': thin_glass('glassFence', (.9, .95, .95), .02, refl=.08),
 })
 for k, f in list(ex['faces'].items()) + list(ex['ends'].items()):
     MATS['tex_' + k] = facade_mat('tex_' + k, os.path.join(tex_dir, f['texture']['file']))
@@ -307,7 +311,7 @@ if OPENINGS:
     _obs, n_open = facade_geo.build(data, ex, OPENINGS, MATS, sc.collection, dusk=DUSK)
     print('facade openings built', n_open, flush=True)
 for k, bk in data['site'].items():
-    if k in ('pavement', 'street', 'lineWhite', 'lawn', 'poolEdge', 'water'): continue      # replaced by the OSM ground / pool below
+    if k in ('pavement', 'street', 'lineWhite', 'lawn'): continue      # replaced by the OSM ground
     mesh_from_bucket('site_' + k, bk, MATS.get(k, MATS['plaster']))
 
 
@@ -320,13 +324,7 @@ def box(name, x0, x1, y0, y1, z0, z1, mat, coll=None):
     ob = bpy.data.objects.new(name, me); (coll or sc.collection).objects.link(ob); return ob
 
 
-# pool in the courtyard (sótano plan "Foso piscina"): coping, tiled basin, water 10 cm below the coping
-half = ex['length'] / 2; cx = -8
-px0, px1, pz0, pz1 = cx + 1.6, -2.0, -half + 3.4, -half + 14.6
-for a in ((cx + 1.2, px0, -half + 3, -half + 15), (px1, -1.6, -half + 3, -half + 15), (px0, px1, -half + 3, pz0), (px0, px1, pz1, -half + 15)):
-    box('pool_coping', a[0], a[1], .6, .74, a[2], a[3], MATS['poolEdge'])
-box('pool_basin', px0, px1, -.6, .6, pz0, pz1, MATS['poolWall'])
-box('pool_water', px0 + .01, px1 - .01, .5, .64, pz0 + .01, pz1 - .01, MATS['water'])
+# pool, solarium, glass fence and garage ramp come from the web site geometry (buildSite in src/explorer.js)
 if OPENINGS:
     # ático terraces at both ends (open to the sky inside the white frame), z from ±27,9 m to the end walls
     ry, half, D5 = ex['levels']['roof'] + .35, ex['length'] / 2, ex['levels']['5']

@@ -19,11 +19,11 @@ export const levelY = lv => lv === 'B' ? HEIGHTS.ground : HEIGHTS.l1 + (Number(l
 export const storeyH = lv => lv === 'B' ? HEIGHTS.l1 - HEIGHTS.ground : HEIGHTS.typical;
 export const levelName = lv => lv === 'B' ? 'Planta baja' : lv === '5' ? 'Ático (planta 5)' : 'Planta ' + lv;
 
-// Commercial status: Portal 1 as published on bamaire.es (green/red line per plan, captured 06.11.2026);
+// Commercial status: Portal 1 as published on bamaire.es (green/red line per plan, captured 06.11.2026; the red line reads "Reservada");
 // Portal 2 is not on sale yet (client, 07.11.2026), so every Portal 2 dwelling reads "Próximamente".
 export const STATUS = {
   disponible: {label: 'Disponible', color: '#3f8f5a'},
-  vendida: {label: 'Vendida', color: '#b4564b'},
+  vendida: {label: 'Reservada', color: '#b4564b'},   // red line on bamaire.es; shown as "Reservada" (client, 08.11.2026)
   proximamente: {label: 'Próximamente', color: '#c08a2d'},
 };
 export const statusOf = (published, code, portal = 1) => portal === 2 ? 'proximamente' : published?.[code] || null;
@@ -45,7 +45,7 @@ export function apartmentBoxes(b) {
 export function tipHTML(a, info, published) {
   const i = info[a.code] || {}, st = statusOf(published, a.code, a.portal);
   return `<b>${a.portal === 2 ? 'Portal 2 · ' : 'Portal 1 · '}${a.code}</b>${i.bedrooms != null ? ` · ${i.bedrooms} dorm.` : ''}${i.util ? ` · ${fmt(i.util)} m²` : ''}` +
-    (st ? `<br><span class="st ${st}">${STATUS[st].label}</span>` : '') + (a.portal === 2 ? '<br><small>Misma distribución que Portal 1, en simetría</small>' : '');
+    (st ? `<br><span class="st ${st}">${STATUS[st].label}</span>` : '');
 }
 
 // in-viewer navigation: breadcrumbs + back, floor stack, hover tooltip (one instance per viewer container)

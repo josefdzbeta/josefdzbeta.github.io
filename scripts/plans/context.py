@@ -105,8 +105,8 @@ def main(osm_path, ex_path, out):
         if k in PATHS:
             dc.line([P(*q) for q in e['_m']], fill=K['promenade' if k == 'pedestrian' else 'cycle' if k == 'cycleway' else 'track' if k == 'track' else 'paving'], width=width(PATHS[k]), joint='curve')
     # the Mykonos plot (fenced, raised courtyard and patios are modelled geometry) sits on paving
-    px = ex['site']['patioX'][1]; pz = max(ex['length'] / 2 + 2, ex['site']['patioZ'][1])
-    dc.rectangle([P(-8.5, -pz - .5), P(px + .5, pz + .5)], fill=K['plot'])
+    px = ex['site']['patioX'][1]; zN, zP = ex['site'].get('plotZ', [-ex['length'] / 2 - 2, ex['length'] / 2 + 2]); pz = max(-zN, zP)
+    dc.rectangle([P(-8.5, zN - .5), P(px + .5, zP + .5)], fill=K['plot'])
     # markings: lane/parking lines and zebra crossings near the building
     marks = ImageDraw.Draw(cls)
     near = lambda q: abs(q[0] - 10) < 170 and abs(q[1]) < 170

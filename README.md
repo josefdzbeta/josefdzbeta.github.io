@@ -66,4 +66,12 @@ python scripts/plans/turntable_pack.py ../research/turntable/dusk2 dist/models/m
 python scripts/optimize_images.py dist
 ```
 
+Viviendas fotorrealistas (planta 3D de cada vivienda trazada):
+
+```sh
+node scripts/export-units.mjs dist/models/mykonos dist/data.json ../research/dwellings
+blender -b -P scripts/blender/dwelling.py -- ../research/dwellings ../research/dwellings-render --res 1600x1200 --samples 96
+python scripts/plans/dwelling_pack.py ../research/dwellings-render dist/models/mykonos/dwellings
+```
+
 Detalle, resultados y lagunas: `dist/docs/fidelity-audit.md`.

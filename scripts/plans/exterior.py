@@ -110,7 +110,12 @@ def main(src, bjson, out):
         ox, oy = B['offset']; sc = B['slabCell']
         xs = [ox + x * sc for x, y, w, h in B['slab']] + [ox + (x + w) * sc for x, y, w, h in B['slab']]
         zs = [oy + y * sc for x, y, w, h in B['slab']] + [oy + (y + h) * sc for x, y, w, h in B['slab']]
-        spec['site'] = {'patioX': [round(min(xs), 2), round(max(xs), 2)], 'patioZ': [round(min(zs), 2), round(max(zs), 2)]}
+        spec['site'] = {'patioX': [round(min(xs), 2), round(max(xs), 2)], 'patioZ': [round(min(zs), 2), round(max(zs), 2)],
+                        # plot to 2 m past the Portal 2 end and 7,5 m past the Portal 1 end (patios + garage ramp, render 01;
+                        # pedestrian street ≈ 8,5 m from the end on OSM); pool 4,4 × 16 m and solarium (render 02, sótano)
+                        'plotZ': [-(LENGTH / 2 + 2), LENGTH / 2 + 7.5],
+                        'pool': {'x': [-6.4, -2.0], 'z': [-32.0, -16.0]}, 'solarium': {'x': [-7.6, -.9], 'z': [-15.0, -9.0]},
+                        'ramp': {'z': [38.1, 41.7], 'x': [2.0, round(max(xs), 2)], 'top': 24.5, 'bottom': 4.0, 'depth': -3.2}}
     json.dump(spec, open(os.path.join(out, 'exterior.json'), 'w'), indent=1)
     for k, f in spec['faces'].items(): print(k, 'balconies', len(f['balconies']), f['balconies'][:6])
     print('ends', {k: v['texture'] for k, v in spec['ends'].items()})
