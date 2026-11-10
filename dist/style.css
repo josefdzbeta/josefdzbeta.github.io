@@ -282,9 +282,10 @@
 /* photoreal dwelling (pre-rendered) with room pins */
 .dw{position:absolute;inset:0;z-index:1;background:#e7e5df;overflow:hidden}
 .dw[hidden]{display:none}
-.dw-box{position:absolute}
-.dw-box img{width:100%;height:100%;display:block;max-width:none}
-.dw-pins{position:absolute;inset:0;pointer-events:none}
+.dw-cv{position:absolute;inset:0;display:block;cursor:grab;touch-action:none;outline:none}
+.dw.dragging .dw-cv{cursor:grabbing}
+.dw.dragging .dw-pins{opacity:.35}
+.dw-pins{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .dw-pins .pin{position:absolute;transform:translate(-50%,-50%)}
 .dw-pins .pin-body{pointer-events:auto}
 .pin-go{display:block;margin-top:5px;border:0;background:none;padding:0;color:var(--blue);text-decoration:underline;font-size:10px;cursor:pointer;text-align:left}
@@ -294,3 +295,30 @@
 .viewer.dw-on .v-minimap,.viewer.dw-on .scene-labels{display:none}
 @media(max-width:700px){.dw-bar{left:10px;top:auto;bottom:156px}.dw-note{display:none}}
 .viewer.measures-all .pin:not(.open) .pin-go{display:none}
+/* the viewer keeps the height of the screen (never stretched by a long sidebar) and stays in view while the sidebar scrolls */
+@media(min-width:701px){.explorer-shell{align-items:start}.explorer-shell>.viewer{height:min(calc(100svh - 90px),900px);min-height:540px;position:sticky;top:70px}.explorer-shell>.viewer:fullscreen{height:100vh}}
+
+/* ---- dwelling viewer (src/apartment/): debug bar, shot caption and walk hint, after the reference video ---- */
+.ap{position:relative;overflow:hidden;background:#1a1c1f;user-select:none}
+.ap-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none}
+.ap-bar{position:absolute;top:14px;right:14px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:calc(100% - 28px);z-index:3}
+.ap-group{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(28,30,33,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 8px rgba(0,0,0,.18)}
+.ap-group button{border:0;background:none;color:rgba(255,255,255,.82);font:500 12px/1 system-ui,-apple-system,sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.ap-group button:hover{color:#fff;background:rgba(255,255,255,.1)}
+.ap-group button.on{background:#f4f3f0;color:#1d1f22}
+.ap-shot{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:rgba(28,30,33,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font:500 13px/1 system-ui,sans-serif;z-index:3}
+.ap-shot span{padding:0 10px;min-width:150px;text-align:center}
+.ap-shot button{border:0;background:rgba(255,255,255,.12);color:#fff;width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
+.ap-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);padding:9px 14px;border-radius:999px;background:rgba(28,30,33,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:rgba(255,255,255,.88);font:12px/1.2 system-ui,sans-serif;white-space:nowrap;display:none;z-index:3}
+.ap.ap-walk .ap-hint{display:block}
+@media(max-width:700px){.ap-bar{top:8px;right:8px;left:8px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.ap-bar::-webkit-scrollbar{display:none}.ap-group{flex:none}.ap-group button{padding:7px 8px;font-size:11px}.ap-hint{white-space:normal;text-align:center;width:max-content;max-width:calc(100% - 32px)}}
+/* the dwelling viewer inside the Mykonos explorer */
+.viewer .ap-in-viewer{position:absolute;inset:0;z-index:2}
+.viewer.ap-on>canvas,.viewer.ap-on .scene-labels,.viewer.ap-on .v-rooms,.viewer.ap-on .v-minimap,.viewer.ap-on .viewer-top,.viewer.ap-on .viewer-bottom,.viewer.ap-on .v-floors{visibility:hidden}
+.viewer.ap-on .v-fullscreen{visibility:visible}
+.viewer.ap-on .v-nav{z-index:4}
+.ap-mirror .ap-canvas{transform:scaleX(-1)}
+.ap-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:10px 16px;border-radius:999px;background:rgba(28,30,33,.7);color:#fff;font:13px/1.2 system-ui,sans-serif;z-index:5;pointer-events:none}
+.ap-status[hidden]{display:none}
+@media(max-width:700px){.ap-in-viewer .ap-bar{top:56px}}
+.ap-shot[hidden]{display:none}

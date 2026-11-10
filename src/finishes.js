@@ -126,6 +126,7 @@ export function surfaceTexture(kind, v, cache = defaultCache) {
 
 // Apply a variant to a MeshStandardMaterial in place (no shader recompile: maps keep the same slots).
 export function applyVariant(mat, kind, v, cache = defaultCache) {
+  if (kind === 'floorWood') kind = 'wood';
   if (kind === 'paint') { mat.map = null; mat.normalMap = null; mat.color.set(v.base); mat.roughness = .9; mat.metalness = 0; }
   else if (kind === 'metal') { mat.map = null; mat.normalMap = null; mat.color.set(v.metal); mat.metalness = 1; mat.roughness = v.rough; }
   else if (kind === 'carpentry' && v.lacquer) { mat.map = null; mat.normalMap = null; mat.color.set(v.base); mat.roughness = .35; mat.metalness = 0; }

@@ -40,7 +40,7 @@ El 5 de noviembre de 2026 se sustituyó la redacción promocional nueva por el t
 
 Planos sin texto (OCR): requiere `tesseract`. Modo rápido de ajuste: `TRACE_FAST=1`. Viviendas de dos plantas en una hoja: `scripts/plans/duplex.py` (experimental).
 
-Requisitos: Python 3 con `pymupdf numpy scipy scikit-image pillow`; Blender 4.4 opcional para validación/GLB.
+Requisitos: Python 3 con `pymupdf numpy scipy scikit-image pillow`; Blender 4.4 opcional para la validación de planos y GLB.
 
 ```sh
 python scripts/plans/batch.py ../research/source-pdfs/mykonos 'mykonos-p1-*.pdf' 'p1-(\w+)\.pdf' ../research/traced/mykonos ../research/qa/mykonos
@@ -52,27 +52,20 @@ python scripts/plans/exterior.py ../research/source-images/mykonos dist/models/m
 blender -b -P scripts/blender/validate_and_export.py -- dist/models/mykonos ../research/qa/blender/mykonos
 ```
 
-Vista fotorrealista del edificio (Mykonos): entorno de OpenStreetMap, geometría exacta de la web, huecos vectorizados de los alzados, render Cycles de 36 vistas (día y atardecer) más las vistas con la cámara de los renders 03 y 01, y empaquetado WebP (`bash scripts/blender/render_all.sh` lanza todos los renders, también las viviendas). Cielo HDRI, texturas escaneadas, árboles, farolas y mobiliario son recursos CC0 de Poly Haven que se descargan aparte (≈610 MB, fuera de la web; sin ellos los renders usan los materiales procedurales):
+Viviendas en three.js (`src/apartment/`, desde el 10 de noviembre de 2026; los renders de Blender anteriores están archivados en `../archive/renders-2026-11-10/`, fuera de la web): cada vivienda se construye en el navegador a partir de su plano trazado, todo como BufferGeometry con materiales PBR y texturas procedurales a escala real:
+
+- `plan.js` lee la rejilla trazada (celdas de 5 cm) como vóxeles en bandas de altura (alféizar, antepecho, dintel de puerta y de ventana, techo, forjado) y clasifica cada hueco (ventana, puerta balconera, puerta interior, marco de terraza).
+- `architecture.js` saca de un único paso muros, mochetas, alféizares, dinteles, techos y suelos (cada cara con su propia carta de lightmap), y construye carpinterías de PVC, puertas lacadas y persianas de lamas de aluminio.
+- `bake.js` hornea en la GPU, en un atlas: el cielo desde unas 200 direcciones (entra solo por los huecos, con las persianas como están), las lámparas de techo, el sol directo y dos rebotes de luz con luces puntuales virtuales; tarda ≈0,2–0,8 s por preset y se repite al cambiar la hora.
+- `lighting.js` define los presets Low sun / Morning / Day / Evening / Night (orientativos: la orientación real no está publicada); el sol es una luz en tiempo real cuyo mapa de sombras dibuja las rayas de las persianas.
+- `layouts.js` transcribe el mobiliario del plano publicado (5B) y las fotos de cada estancia; `autolayout.js` amuebla el resto desde el plano trazado (camas donde las dibuja el plano, cocina junto a la placa, sofá y TV, comedor, baños, terrazas).
+- `cameras.js`: Tour (recorrido por las puertas de foto en foto), Photo (encuadres de fotógrafo inmobiliario y vista en planta con el plano publicado superpuesto) y Walk (pointer lock, WASD, Shift para correr, C para agacharse, Esc para soltar).
+- `index.js`: exposición automática por estancia, balance de blancos, entorno capturado en cada estancia, AO, bloom y barra de depuración (Matcap / Lighting only / Wireframe).
+
+Página de desarrollo (no enlazada, `dist/dev/` está en `.gitignore`):
 
 ```sh
-python scripts/fetch_assets.py ../research/assets/polyhaven
-python scripts/plans/context.py ../research/osm/mykonos-osm.json dist/models/mykonos/exterior.json ../research/turntable/context
-node scripts/export-scene.mjs dist/models/mykonos ../research/turntable/scene.json
-python scripts/plans/glow_masks.py dist/models/mykonos/tex ../research/turntable/glow
-python scripts/plans/facade_vector.py ../research/source-images/mykonos dist/models/mykonos/exterior.json dist/models/mykonos/tex ../research/turntable/facade-openings.json
-blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/day --res 1600x1200 --samples 64 --assets ../research/assets/polyhaven
-blender -b -P scripts/blender/turntable.py -- ../research/turntable/scene.json ../research/turntable/context dist/models/mykonos/tex ../research/turntable/dusk --res 1600x1200 --samples 64 --mode dusk --glow ../research/turntable/glow --assets ../research/assets/polyhaven
-python scripts/plans/turntable_pack.py ../research/turntable/day2 dist/models/mykonos/turntable day Día ../research/turntable/views
-python scripts/plans/turntable_pack.py ../research/turntable/dusk2 dist/models/mykonos/turntable dusk Atardecer
-python scripts/optimize_images.py dist
-```
-
-Viviendas fotorrealistas (planta 3D de cada vivienda trazada):
-
-```sh
-node scripts/export-units.mjs dist/models/mykonos dist/data.json ../research/dwellings
-blender -b -P scripts/blender/dwelling.py -- ../research/dwellings ../research/dwellings-render --res 1600x1200 --samples 96 --assets ../research/assets/polyhaven
-python scripts/plans/dwelling_pack.py ../research/dwellings-render dist/models/mykonos/dwellings
+node scripts/apartment-dev.mjs   # → http://localhost:4173/dev/apartment.html?u=5B
 ```
 
 Detalle, resultados y lagunas: `dist/docs/fidelity-audit.md`.

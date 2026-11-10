@@ -26,8 +26,6 @@ async function walk(dir) {
     const full = path.join(dir, name);
     if ((await stat(full)).isDirectory()) { await walk(full); continue; }
     const url = '/' + path.relative(dist, full).split(path.sep).join('/'), ext = path.extname(name);
-    // photoreal turntable: one size per light keeps the file manageable (day: desktop frames, dusk: phone frames)
-    if (/\/turntable\/(day\/sm|dusk\/lg)\//.test(url)) continue;
     if (ext === '.json') files[url] = JSON.parse(await readFile(full, 'utf8'));
     else files[url] = 'data:' + (types[ext] || 'application/octet-stream') + ';base64,' + (await readFile(full)).toString('base64');
   }

@@ -4,6 +4,10 @@
 import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {programmeSlots, memoriaNotes, CONCEPTS, applyVariant as applyShared, setAnisotropy, textureCache} from './finishes.js';
 import {getJSON, fileURL, HEIGHTS, levelY, storeyH, levelName, STATUS, statusOf, fmt, tipHTML, navUI, apartmentBoxes as boxesOf, RENDER_VIEWS} from './shared.js';
 export {getJSON, fileURL, HEIGHTS, RENDER_VIEWS};
@@ -422,7 +426,19 @@ function setup(container, {shadows = true} = {}) {
   sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048); sun.shadow.normalBias = .03; sun.shadow.bias = -.0003;
   scene.add(sun, sun.target);
   const labels = document.createElement('div'); labels.className = 'scene-labels'; container.append(labels);
-  let alive = true, visible = true, frame = null, tween = null, dirty = 0, onFrame = null;
+  let alive = true, visible = true, frame = null, tween = null, dirty = 0, onFrame = null, composer = null, aoOn = false;
+  // soft contact shadows in corners and under furniture (GTAO), only at eye level on desktop
+  const setAO = on => {
+    aoOn = !!on && !small;
+    if (aoOn && !composer) {
+      const w = container.clientWidth || 1, h = container.clientHeight || 1;
+      composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
+      const ao = new GTAOPass(scene, camera, w, h); ao.updateGtaoMaterial({radius: .45, distanceExponent: 1.4, thickness: 1, scale: 1.1, samples: 12});
+      ao.updatePdMaterial({lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12}); ao.blendIntensity = .9;
+      composer.addPass(ao); composer.addPass(new OutputPass()); composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
+    }
+    invalidate();
+  };
   const invalidate = () => { dirty = 30; if (!frame && visible && alive) frame = requestAnimationFrame(tick); };
   function tick(time) {
     frame = null; if (!alive || !visible) return;
@@ -432,11 +448,11 @@ function setup(container, {shadows = true} = {}) {
       if (tween.fov) { camera.fov = tween.fov[0] + (tween.fov[1] - tween.fov[0]) * k; camera.updateProjectionMatrix(); }
       dirty = 20; if (t === 1) tween = null;
     }
-    controls.update(); renderer.render(scene, camera); onFrame?.();
+    controls.update(); if (aoOn) composer.render(); else renderer.render(scene, camera); onFrame?.();
     if (dirty-- > 0 || tween) frame = requestAnimationFrame(tick);
   }
   controls.addEventListener('change', invalidate); controls.addEventListener('start', () => { tween = null; invalidate(); });
-  const resize = () => { const w = container.clientWidth, h = container.clientHeight; if (w && h) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); invalidate(); } };
+  const resize = () => { const w = container.clientWidth, h = container.clientHeight; if (w && h) { renderer.setSize(w, h, false); composer?.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); invalidate(); } };
   const ro = new ResizeObserver(resize); ro.observe(container);
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) invalidate(); }, {rootMargin: '100px'}); io.observe(container);
   const move = (pos, target, fov) => {
@@ -451,24 +467,37 @@ function setup(container, {shadows = true} = {}) {
     sun.target.position.copy(cxyz); sun.position.copy(cxyz).add(new T.Vector3(-22, 38, 16)); renderer.shadowMap.needsUpdate = true;
   };
   const dispose = () => {
-    alive = false; if (frame) cancelAnimationFrame(frame); ro.disconnect(); io.disconnect(); controls.dispose();
+    alive = false; if (frame) cancelAnimationFrame(frame); ro.disconnect(); io.disconnect(); controls.dispose(); composer?.dispose();
     scene.traverse(o => { o.geometry?.dispose(); }); scene.environment?.dispose(); renderer.dispose(); renderer.domElement.remove(); labels.remove();
   };
   resize();
   if (/[?&]debug/.test(location.search)) (globalThis.__bamaireViewers ||= []).push({scene, renderer, camera});
-  return {scene, renderer, camera, controls, move, invalidate, resize, dispose, labels, fitShadow, sun, set onFrame(f) { onFrame = f; }};
+  return {scene, renderer, camera, controls, move, invalidate, resize, dispose, labels, fitShadow, sun, setAO, set onFrame(f) { onFrame = f; }};
 }
 
+const eyeFov = s => Math.min(80, Math.max(58, 2 * Math.atan(Math.tan(47.5 * Math.PI / 180) / Math.max(.5, s.camera.aspect || 1.5)) * 180 / Math.PI));
 function eyeLevel(s, r) {
   const [x0, x1, z0, z1] = r.bbox, w = x1 - x0, d = z1 - z0, cx = r.center[0], cz = r.center[1];
   const dir = w > d ? [1, 0] : [0, 1];
   s.controls.minDistance = .05; s.controls.maxDistance = .15; s.controls.rotateSpeed = -.45; s.controls.enablePan = false;
   s.controls.maxPolarAngle = Math.PI * .8; s.controls.minPolarAngle = Math.PI * .2;
-  s.move([cx - dir[0] * .1, 1.5, cz - dir[1] * .1], [cx, 1.485, cz], small ? 70 : 62);
+  s.move([cx - dir[0] * .1, 1.5, cz - dir[1] * .1], [cx, 1.485, cz], eyeFov(s));
 }
 function orbitMode(s, minD = .3, maxD = 40, fov = 40) {
   Object.assign(s.controls, {minDistance: minD, maxDistance: maxD, rotateSpeed: 1, enablePan: true, minPolarAngle: 0, maxPolarAngle: Math.PI * .495});
   return fov;
+}
+function ceilingOf(u, mat) {
+  const c = u.cell, W = u.w, H = u.h, g = decodeGrid(u), ox = W * c / 2, oz = H * c / 2, y = HEIGHTS.clear, pos = [], idx = [];
+  const indoor = v => v === 1 || v === 2 || (v >= 3 && kindOf(u.rooms[v - 3]?.type) !== 'exterior');
+  for (let i = 0; i < H; i++) for (let j = 0; j < W;) {
+    if (!indoor(g[i * W + j])) { j++; continue; }
+    let k = j; while (k < W && indoor(g[i * W + k])) k++;
+    const x0 = j * c - ox - .02, x1 = k * c - ox + .02, z0 = i * c - oz - .02, z1 = (i + 1) * c - oz + .02, n = pos.length / 3;
+    pos.push(x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z1); idx.push(n, n + 1, n + 2, n, n + 2, n + 3); j = k;
+  }
+  const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+  const m = new T.Mesh(geo, mat); m.name = 'ceiling'; m.castShadow = true; m.receiveShadow = true; m.visible = false; return m;
 }
 function disposeGroup(g) { g.traverse(o => o.geometry?.dispose()); g.clear(); }
 
@@ -481,7 +510,7 @@ function finishState(project, mats) {
     for (const s of slots) {
       if (!s.surface || !s.variants) continue;
       const v = s.variants[(state.chosen[s.idx] ?? 0) % s.variants.length];
-      if (s.surface === 'floor') { applyVariant(mats.floor, 'wood', v); if (notes.floorWetKitchen) applyVariant(mats.kitchenFloor, 'wood', v); }
+      if (s.surface === 'floor') { applyVariant(mats.floor, 'floorWood', v); if (notes.floorWetKitchen) applyVariant(mats.kitchenFloor, 'floorWood', v); }
       if (s.surface === 'kitchenWall' || s.surface === 'kitchenAll') { applyVariant(mats.kitchenWall, 'tile', v); if (s.surface === 'kitchenAll') applyVariant(mats.kitchenFloor, 'tile', {...v, tile: [.6, .6], pattern: 'grid'}); }
       if (s.surface === 'bath') { applyVariant(mats.bathWall, 'tile', v.wall); applyVariant(mats.bathFloor, 'tile', v.floor); }
       if (s.surface === 'carpentry') applyVariant(mats.carpentry, 'carpentry', v);
@@ -489,7 +518,7 @@ function finishState(project, mats) {
       if (s.surface === 'cabinets') applyVariant(mats.cabinets, 'carpentry', v);
     }
     if (/PVC$/.test(notes.skirting?.finish || '')) applyVariant(mats.skirting, 'paint', {base: '#e9e5dc'});
-    if (!slots.some(s => s.surface === 'floor')) applyVariant(mats.floor, 'wood', notes.defaultFloor || {base: '#c9ad88', grain: '#9b7b55', var: .04});
+    if (!slots.some(s => s.surface === 'floor')) applyVariant(mats.floor, 'floorWood', notes.defaultFloor || {base: '#c9ad88', grain: '#9b7b55', var: .04});
     if (!slots.some(s => s.surface === 'bath')) { applyVariant(mats.bathWall, 'tile', {tile: [.6, .3], base: '#f0eee9', grout: '#dcd8cf', gloss: .18}); applyVariant(mats.bathFloor, 'tile', {tile: [.6, .6], base: '#a9a6a0', grout: '#94918b', gloss: .5, speck: .6}); }
     if (!slots.some(s => /kitchen/.test(s.surface || ''))) applyVariant(mats.kitchenWall, 'tile', {tile: [.6, .3], base: '#efede7', grout: '#d8d4cb', gloss: .2, pattern: 'grid'});
     if (!slots.some(s => s.surface === 'cabinets')) applyVariant(mats.cabinets, 'carpentry', CONCEPTS.cabinets.options[state.concept.cabinets]);
@@ -510,6 +539,7 @@ function unitMeshes(u, mats, opts) {
     const grp = new T.Group(); grp.name = 'furniture-' + ri;
     for (const m of f.builder.meshes(mats)) grp.add(m);
     for (const m of f.swap?.meshes(mats) || []) grp.add(m);
+    grp.userData.models = f.models || [];
     built.group.add(grp); fg[ri] = grp;
   }
   built.furnitureGroups = fg;
@@ -525,7 +555,7 @@ function planOverlay(u, mats) {
   return m;
 }
 
-function placeLabels(s, items) {
+function placeLabels(s, items, filter = null) {
   // compact pins: a small "+" per room/dwelling; hover or tap shows its name and m², the viewer's "Medidas" button shows all
   s.labels.innerHTML = items.map((r, i) => `<span class="scene-label pin" data-i="${i}"><button class="pin-dot" type="button" aria-expanded="false" aria-label="${r.name}${r.text ? ' · ' + r.text : ''}">+</button><span class="pin-body"><b>${r.name}</b>${r.text ? `<small>${r.text}</small>` : ''}</span></span>`).join('');
   s.labels.querySelectorAll('.pin-dot').forEach(b => b.onclick = e => {
@@ -536,9 +566,10 @@ function placeLabels(s, items) {
   s.onFrame = () => {
     const w = s.renderer.domElement.clientWidth, h = s.renderer.domElement.clientHeight;
     items.forEach((r, i) => {
-      v.set(r.pos[0], r.pos[1], r.pos[2]).applyMatrix4(r.obj.matrixWorld).project(s.camera);
+      v.set(r.pos[0], r.pos[1], r.pos[2]).applyMatrix4(r.obj.matrixWorld);
+      const seen = !filter || filter(i, v); v.project(s.camera);
       const n = nodes[i]; if (!n) return;
-      const show = v.z < 1 && Math.abs(v.x) < 1.05 && Math.abs(v.y) < 1.05;
+      const show = seen && v.z < 1 && Math.abs(v.x) < 1.05 && Math.abs(v.y) < 1.05;
       n.style.display = show ? '' : 'none';
       if (show) n.style.transform = `translate(-50%,-50%) translate(${(v.x * .5 + .5) * w}px,${(-v.y * .5 + .5) * h}px)`;
     });
@@ -823,7 +854,15 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     return {u, built: builtCache.get(key)};
   }
   function clearHome() { if (unitBuilt?.group.parent === homeG) homeG.remove(unitBuilt.group); disposeGroup(homeG); }
+  // eye level: ceiling on (the sun then only enters through the windows) and soft contact shadows; off for the overview
+  function eyeLook(on) {
+    if (unitBuilt?.ceiling && unitBuilt.ceiling.visible !== on) { unitBuilt.ceiling.visible = on; s.renderer.shadowMap.needsUpdate = true; }
+    // filmic AgX at eye level, as the Cycles renders (white walls keep their shading instead of clipping)
+    s.renderer.toneMapping = on ? T.AgXToneMapping : T.ACESFilmicToneMapping; s.renderer.toneMappingExposure = on ? 1.0 : .78;
+    s.setAO(on); s.invalidate();
+  }
   function fitHome(view = 'perspective') {
+    eyeLook(false);
     const [w, d] = unitBuilt.group.userData.size, r = Math.hypot(w, d) / 2 + .4;
     const vf = 40 * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * (s.camera.aspect || 1)), dist = r / Math.sin(Math.min(vf, hf) / 2) * .9;
     const dir = view === 'top' ? new T.Vector3(0, 1, .002) : new T.Vector3(.42, .86, .5).normalize();
@@ -839,22 +878,32 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     s.renderer.shadowMap.enabled = true;
     unitBuilt = (await prepare(code)).built;
     for (const g of Object.values(unitBuilt.furnitureGroups)) g.visible = true;
+    if (!unitBuilt.ceiling) { unitBuilt.ceiling = ceilingOf(unit, mats.ceiling); unitBuilt.group.add(unitBuilt.ceiling); }
     homeG.add(unitBuilt.group); overlay = planOverlay(unit, mats); homeG.add(overlay); mark('unitBuild ' + code + ' ' + Math.round(performance.now() - u0) + 'ms', t0);
     applyCut();
     unitBuilt.rooms.forEach(r => { const [x0, x1, z0, z1] = r.bbox, m = new T.Mesh(new T.BoxGeometry(x1 - x0, .02, z1 - z0), mats.hit); m.position.set((x0 + x1) / 2, .01, (z0 + z1) / 2); m.userData.room = r; homeG.add(m); });
-    placeLabels(s, unitBuilt.rooms.map(r => ({...roomLabel(r), pos: [r.labelAt[0], .2, r.labelAt[1]], obj: homeG})));
+    placeLabels(s, unitBuilt.rooms.map(r => ({...roomLabel(r), pos: [r.labelAt[0], .2, r.labelAt[1]], obj: homeG})), (i, p) => !eye || seenFromEye(unitBuilt.rooms[i], p));
     s.fitShadow(new T.Box3().setFromObject(unitBuilt.group));
     eye = false; fitHome();
     const lv = code.startsWith('B') ? 'B' : code[0]; level = lv;
     ui.setCrumbs([['Edificio', () => goBuilding()], [levelName(lv), () => goFloor(lv)], [(portal === 2 ? 'Portal 2 · ' : '') + code, null]]); ui.activeFloor(lv);
     hint(`${code} · pulsa una estancia o un punto del plano para recorrerla`);
     homeUI();
+    dress(unitBuilt);
     callbacks.unitLoaded?.(unit, unitBuilt);
   }
   function applyCut() { if (unitBuilt) clip(wallsCut ? 1.2 : null); }
+  // the renders' scanned surfaces and furniture models, loaded after the dwelling is on screen
+  function dress() {}                                   // dwellings open in the photographic viewer (apartment/)
+  // a room opens from its inner end (towards the middle of the dwelling, where the door usually is), looking across
+  // its whole length, like a real-estate photograph; L-shaped or tight rooms fall back to the centre
   function enterRoom(r) {
-    const m = unitPortal === 2 ? -1 : 1, [x0, x1, z0, z1] = r.bbox, dir = x1 - x0 > Math.abs(z1 - z0) ? [1, 0] : [0, m];
-    eyeAt(r.center[0], m * r.center[1], dir, r);
+    const m = unitPortal === 2 ? -1 : 1, [x0, x1, z0, z1] = r.bbox, alongX = x1 - x0 > Math.abs(z1 - z0);
+    const half = (alongX ? x1 - x0 : Math.abs(z1 - z0)) / 2, cx = r.center[0], cz = m * r.center[1];
+    const ends = [-1, 1].map(sg => { const back = Math.max(0, half - .75); return alongX ? [cx + sg * back, cz, [-sg, 0]] : [cx, cz + sg * back, [0, -sg]]; })
+      .sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+    for (const [x, z, dir] of ends) { const c = clearSpot(x, z); if (c && roomAt(c[0], c[1]) === r) { eyeAt(c[0], c[1], dir, r); return; } }
+    const c = clearSpot(cx, cz) || [cx, cz]; eyeAt(c[0], c[1], alongX ? [1, 0] : [0, m], r);
   }
 
   // ---- dwelling walkthrough: room bar, plan with your position, ↑↓/W S to walk, ←→/A D to turn, wheel to step,
@@ -871,6 +920,23 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
   const valAt = (x, z) => { const [i, j] = cellOf(x, z); return i < 0 || j < 0 || i >= unit.h || j >= unit.w ? 0 : grid[i * unit.w + j]; };
   const walkable = (x, z) => { const v = valAt(x, z); return v === 2 || v >= 3; };
   const roomAt = (x, z) => { const v = valAt(x, z); return v >= 3 ? unitBuilt.rooms.find(r => r.index === v - 3) || null : null; };
+  // keep the eye clear of walls (≥ 40 cm all round), so a wall never fills the screen
+  const CLEAR = .4, RING = [0, 1, 2, 3, 4, 5, 6, 7].map(k => [Math.cos(k * Math.PI / 4), Math.sin(k * Math.PI / 4)]);
+  const clear = (x, z, r = CLEAR) => walkable(x, z) && RING.every(([a, b]) => walkable(x + a * r, z + b * r));
+  function clearSpot(x, z) {                          // the nearest spot with room around it (within 1 m)
+    if (clear(x, z)) return [x, z];
+    for (let d = .1; d <= 1.001; d += .1) for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d; if (clear(px, pz) && roomAt(px, pz) === roomAt(x, z)) return [px, pz]; }
+    for (let d = .1; d <= 1.001; d += .1) for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d; if (clear(px, pz)) return [px, pz]; }
+    return walkable(x, z) ? [x, z] : null;
+  }
+  // a room's pin shows at eye level only when you can see into that room: not your own room, nothing but open floor
+  // (doorways included) on the traced plan between you and its label
+  function seenFromEye(r, p) {
+    const c = s.camera.position; if (roomAt(c.x, c.z) === r) return false;
+    const dx = p.x - c.x, dz = p.z - c.z, L = Math.hypot(dx, dz), n = Math.ceil(L / .08);
+    for (let k = 2; k < n - 2; k++) { const t = k / n; if (!walkable(c.x + dx * t, c.z + dz * t)) return false; }
+    return true;
+  }
   function homeUI() {
     grid = decodeGrid(unit);
     const rooms = unitBuilt.rooms.filter(r => r.area == null || r.area > .9);
@@ -888,13 +954,13 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     g.putImageData(img, 0, 0);
     roomBar.hidden = false; mini.hidden = false; markRoom(); drawMini();
   }
-  function walkOff() { eye = false; keys.clear(); curRoom = null; roomBar.hidden = true; mini.hidden = true; }
+  function walkOff() { eye = false; keys.clear(); curRoom = null; roomBar.hidden = true; mini.hidden = true; eyeLook(false); }
   function markRoom() { roomBar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.r === (eye && curRoom ? String(curRoom.index) : eye ? '' : 'all'))); }
   function overviewHome() { eye = false; curRoom = null; markRoom(); fitHome(); hint(`${unit.code} · pulsa una estancia o un punto del plano para recorrerla`); callbacks.overview?.(); }
   function eyeAt(x, z, dir, room) {
-    wallsCut = false; applyCut(); eye = true;
+    wallsCut = false; applyCut(); eye = true; eyeLook(true);
     Object.assign(s.controls, {minDistance: .05, maxDistance: .15, rotateSpeed: -.45, enablePan: false, maxPolarAngle: Math.PI * .8, minPolarAngle: Math.PI * .2});
-    s.move([x - dir[0] * .1, 1.5, z - dir[1] * .1], [x, 1.485, z], small ? 70 : 62);
+    s.move([x - dir[0] * .1, 1.5, z - dir[1] * .1], [x, 1.485, z], eyeFov(s));
     setRoom(room || roomAt(x, z));
   }
   function setRoom(r) {
@@ -902,11 +968,12 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     if (r) { hint(`${r.name} · ${fmt(r.area)} m² · arrastra para mirar · ↑ ↓ para avanzar`); callbacks.room?.(r); }
   }
   const lookDir = () => { const d = s.controls.target.clone().sub(s.camera.position); d.y = 0; return d.lengthSq() ? d.normalize() : new T.Vector3(1, 0, 0); };
-  function walkTo(x, z) { if (!walkable(x, z)) return false; const d = lookDir(); eyeAt(x, z, [d.x, d.z]); return true; }
+  function walkTo(x, z) { const c = walkable(x, z) && clearSpot(x, z); if (!c) return false; const d = lookDir(); eyeAt(c[0], c[1], [d.x, d.z]); return true; }
   function step(dist) {                              // move the eye along the view, sliding along walls
     const tg = s.controls.target, d = lookDir().multiplyScalar(dist), probe = Math.sign(dist) * .28;
     const dn = lookDir().multiplyScalar(probe);
-    const ok = (x, z) => walkable(x, z) && walkable(x + dn.x, z + dn.z);
+    const tight = !clear(tg.x, tg.z, CLEAR * .8);       // started in a tight spot: any walkable move is allowed
+    const ok = (x, z) => (tight ? walkable(x, z) : clear(x, z, CLEAR * .8)) && walkable(x + dn.x, z + dn.z);
     let mv = null;
     if (ok(tg.x + d.x, tg.z + d.z)) mv = d; else if (ok(tg.x + d.x, tg.z)) mv = new T.Vector3(d.x, 0, 0); else if (ok(tg.x, tg.z + d.z)) mv = new T.Vector3(0, 0, d.z);
     if (!mv) return;
@@ -956,7 +1023,7 @@ export function createExplorer(container, callbacks, {project, promotion = 'myko
     const r = mini.getBoundingClientRect(), dpr = mini.width / r.width, {k, ox, oy} = miniFit(), c = unit.cell;
     const x = ((e.clientX - r.left) * dpr - ox) / k * c - unit.w * c / 2, z = ((e.clientY - r.top) * dpr - oy) / k * c - unit.h * c / 2;
     if (!walkable(x, z)) return;
-    if (eye) walkTo(x, z); else { const d = new T.Vector3(-x, 0, -z); d.y = 0; d.lengthSq() < .01 ? d.set(1, 0, 0) : d.normalize(); eyeAt(x, z, [d.x, d.z]); }
+    if (eye) walkTo(x, z); else { const c = clearSpot(x, z) || [x, z], d = new T.Vector3(-c[0], 0, -c[1]); d.lengthSq() < .01 ? d.set(1, 0, 0) : d.normalize(); eyeAt(c[0], c[1], [d.x, d.z]); }
   });
 
   // ---- picking: façade apartments in the building view, plates on a floor, rooms in a dwelling
