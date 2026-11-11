@@ -65,24 +65,25 @@ export function buildCypresses(M, terraces, y, {seed = 31} = {}) {
 
 // patios and terraces furnished as in render 01 (wicker lounge, teak dining set or sunbeds, planters), and the
 // lights that come on at dusk: two wall lights per patio, downlights in the soffit over every balcony
-export function buildOutdoor({patios, terraces, balconies, lv5, D}, M, {seed = 41, lite = false} = {}) {        // lite: phones (no tall potted plants)
+export function buildOutdoor({patios, terraces, balconies, lv5}, M, {seed = 41, lite = false} = {}) {        // lite: phones (no tall potted plants)
   const r = rng(seed), items = [], lights = [], glows = [], H = Math.PI / 2;
   const lounge = (cx, cz, y, along) => {                       // crescent sofa facing a low table and an armchair
     const yaw = along ? 0 : -H, dx = along ? 0 : 1, dz = along ? 1 : 0;
     items.push({k: 'wickerSofa', x: cx + dx * 1.1, y, z: cz + dz * 1.1, yaw: yaw + Math.PI}, {k: 'wickerTable', x: cx, y, z: cz, yaw},
       {k: 'wickerChair', x: cx - dx * 1.25, y, z: cz - dz * 1.25, yaw});
   };
-  for (const p of patios) {
-    const [x0, x1] = p.x, [z0, z1] = p.z, y = p.y, zc = (z0 + z1) / 2, len = z1 - z0, xc = (x0 + x1) / 2 + .3, pick = r();
+  for (const p of patios) {                                     // p.facade: the façade's x; p.out: +1 street side, −1 courtyard
+    const [x0, x1] = p.x, [z0, z1] = p.z, y = p.y, zc = (z0 + z1) / 2, len = z1 - z0, xc = (x0 + x1) / 2 + .3 * p.out, pick = r();
+    const edge = p.out > 0 ? x1 - .4 : x0 + .4, near = p.facade + p.out * .55;
     if (len > 5.5 && pick < .4) lounge(xc + .2, zc, y, false);
     else if (len > 4 && pick < .75) {
       items.push({k: 'teakTable', x: xc, y, z: zc, w: 1.6, d: .9, yaw: H});
       for (const [ox, oz, yaw] of [[-.68, -.42, H], [-.68, .42, H], [.68, -.42, -H], [.68, .42, -H]]) items.push({k: 'teakChair', x: xc + ox, y, z: zc + oz, yaw});
     } else for (const oz of [-.45, .45]) items.push({k: 'sunbed', x: xc, y, z: zc + oz * Math.min(1, len / 3), w: .68, d: 1.95, yaw: -H});
     // a planted bed along the fence, a tall plant by the façade
-    items.push({k: 'planter', bed: true, r: .22, d: Math.min(len - 1.4, 2.6), h: .45, flowers: r() < .5, x: x1 - .4, y, z: zc + (r() - .5) * .6});
-    if (r() < .7 && !lite) items.push({k: 'plantTall', x: x0 + .55, y, z: r() < .5 ? z0 + .6 : z1 - .6});
-    for (const t of [.25, .75]) { const z = z0 + t * len; lights.push({x: D + .3, y: y + 2.2, z, intensity: 5}); glows.push([D + .04, y + 2.3, z, .08, .2, .12]); }
+    items.push({k: 'planter', bed: true, r: .22, d: Math.min(len - 1.4, 2.6), h: .45, flowers: r() < .5, x: edge, y, z: zc + (r() - .5) * .6});
+    if (r() < .7 && !lite) items.push({k: 'plantTall', x: near, y, z: r() < .5 ? z0 + .6 : z1 - .6});
+    for (const t of [.25, .75]) { const z = z0 + t * len; lights.push({x: p.facade + p.out * .3, y: y + 2.2, z, intensity: 5}); glows.push([p.facade + p.out * .04, y + 2.3, z, .08, .2, .12]); }
   }
   for (const [x0, x1, z0, z1] of terraces) {
     if (x1 - x0 < 3 || z1 - z0 < 3) continue;

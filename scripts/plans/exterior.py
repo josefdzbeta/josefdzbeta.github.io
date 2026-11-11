@@ -53,6 +53,14 @@ def face_texture(img, key, out):
     return {'file': os.path.basename(out), 'w': W, 'h': H, 'widthM': LENGTH, 'heightM': TOP}
 
 
+# courtyard balconies read on fachada1 (and mykonos06, giro-1/8): their grey glass is too close to the cladding
+# for the colour test, so the regular pattern is written out. Outer bays: full width on floors 5 and 3, a left and
+# a right front on floors 4 and 2; the narrow middle bay: full width on every floor (u in metres from the left end)
+COURTYARD_BALCONIES = [[a, b, lv] for lv in ('2', '3', '4', '5') for a, b in (
+    [(7.81, 24.18), (30.44, 38.56), (44.82, 61.19)] if lv in ('3', '5') else
+    [(7.81, 14.1), (18.65, 24.18), (30.44, 38.56), (44.82, 51.2), (55.7, 61.19)])]
+
+
 def balconies(img, key):
     """Tinted-glass balcony fronts per floor: teal columns in the railing band of each floor."""
     a = np.asarray(Image.open(img).convert('RGB')).astype(int)
@@ -99,7 +107,7 @@ def main(src, bjson, out):
     for name, f in faces.items():
         img = os.path.join(src, f['image'])
         tex = face_texture(img, f['key'], os.path.join(out, 'tex', f'{name}.jpg'))
-        spec['faces'][name] = {k: v for k, v in f.items() if k not in ('image', 'key')} | {'texture': tex, 'balconies': balconies(img, f['key'])}
+        spec['faces'][name] = {k: v for k, v in f.items() if k not in ('image', 'key')} | {'texture': tex, 'balconies': COURTYARD_BALCONIES if name == 'courtyard' else balconies(img, f['key'])}
     spec['ends']['peatonal'] = {'z': LENGTH / 2, 'normal': 1, 'texture': end_texture(os.path.join(src, 'mikonos-giro-7.png'), os.path.join(out, 'tex', 'peatonal.jpg'), (316, 521, 26))}
     spec['ends']['far'] = {'z': -LENGTH / 2, 'normal': -1, 'texture': end_texture(os.path.join(src, 'mikonos-giro-3.png'), os.path.join(out, 'tex', 'far.jpg'), (316, 521, 25))}
     # roof overruns (lift/stair) measured on fachada1 (u) and giro-3 (x span)
@@ -112,9 +120,11 @@ def main(src, bjson, out):
         zs = [oy + y * sc for x, y, w, h in B['slab']] + [oy + (y + h) * sc for x, y, w, h in B['slab']]
         spec['site'] = {'patioX': [round(min(xs), 2), round(max(xs), 2)], 'patioZ': [round(min(zs), 2), round(max(zs), 2)],
                         # plot to 2 m past the Portal 2 end and 7,5 m past the Portal 1 end (patios + garage ramp, render 01;
-                        # pedestrian street ≈ 8,5 m from the end on OSM); pool 4,4 × 16 m and solarium (render 02, sótano)
-                        'plotZ': [-(LENGTH / 2 + 2), LENGTH / 2 + 7.5],
-                        'pool': {'x': [-6.4, -2.0], 'z': [-32.0, -16.0]}, 'solarium': {'x': [-7.6, -.9], 'z': [-15.0, -9.0]},
+                        # pedestrian street ≈ 8,5 m from the end on OSM). Courtyard side (render 02, giro-3/7/8, sótano):
+                        # patios 4 m deep, a walk, the pool (the sótano's "foso piscina" at ≈21 px/m: x −10,1…−5,2,
+                        # z 6,2…20,4 — Portal 1's half), the solarium beyond it towards the pedestrian street, the fence
+                        'plotZ': [-(LENGTH / 2 + 2), LENGTH / 2 + 7.5], 'courtyardX': -10.6, 'courtyardPatio': 4.0,
+                        'pool': {'x': [-9.9, -5.4], 'z': [6.4, 20.2]}, 'solarium': {'x': [-10.1, -4.6], 'z': [21.4, 30.6]},
                         'ramp': {'z': [38.1, 41.7], 'x': [2.0, round(max(xs), 2)], 'top': 24.5, 'bottom': 4.0, 'depth': -3.2}}
     json.dump(spec, open(os.path.join(out, 'exterior.json'), 'w'), indent=1)
     for k, f in spec['faces'].items(): print(k, 'balconies', len(f['balconies']), f['balconies'][:6])

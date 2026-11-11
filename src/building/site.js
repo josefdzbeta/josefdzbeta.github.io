@@ -13,7 +13,7 @@ export const STREET = -.31;                                                // st
 
 export function buildPlot(ex, building) {
   const M = new Mesher(), parts = new Parts(), half = ex.length / 2, st = ex.site || {};
-  const [zN, zP] = st.plotZ || [-half - 2, half + 7.5], px = st.patioX?.[1] ?? ex.depth + 6.5, cx = -8, top = .7, D = ex.depth;
+  const [zN, zP] = st.plotZ || [-half - 2, half + 7.5], px = st.patioX?.[1] ?? ex.depth + 6.5, cx = st.courtyardX ?? -8, cp = st.courtyardPatio ?? 0, top = .7, D = ex.depth;
   const pool = st.pool, sol = st.solarium, ramp = st.ramp, coping = .4;
   // a box whose visible faces are lightmapped quads (top, and the sides that are not against the ground)
   const slab = (mat, x0, x1, y0, y1, z0, z1, sides = true) => {
@@ -35,14 +35,18 @@ export function buildPlot(ex, building) {
   const water = new T.Mesh(new T.PlaneGeometry(pool.x[1] - pool.x[0], pool.z[1] - pool.z[0]).rotateX(-Math.PI / 2), null);
   water.position.set((pool.x[0] + pool.x[1]) / 2, top - .12, (pool.z[0] + pool.z[1]) / 2); water.name = 'water';
   slab('grass', sol.x[0], sol.x[1], top, top + .03, sol.z[0], sol.z[1], false);
-  for (let k = 0; k < 4; k++) {
-    const z = sol.z[0] + 1 + k * 1.3;
-    box('lounger', sol.x[0] + .6, sol.x[0] + 2.5, top + .3, top + .38, z, z + .7); box('lounger', sol.x[0] + .6, sol.x[0] + 1.2, top + .38, top + .7, z, z + .7);
-    for (const lx of [sol.x[0] + .7, sol.x[0] + 2.4]) box('alu', lx - .02, lx + .02, top + .03, top + .3, z + .05, z + .65);
+  // loungers along the solarium, two rows (render 02 and giro-7)
+  for (let k = 0; k < Math.floor((sol.z[1] - sol.z[0] - 1) / 1.3) * 2; k++) {
+    const z = sol.z[0] + .8 + (k >> 1) * 1.3, ox = k & 1 ? sol.x[1] - sol.x[0] - 3.2 : 0;
+    const x0 = sol.x[0] + .6 + ox;
+    box('lounger', x0, x0 + 1.9, top + .3, top + .38, z, z + .7); box('lounger', x0, x0 + .6, top + .38, top + .7, z, z + .7);
+    for (const lx of [x0 + .1, x0 + 1.8]) box('alu', lx - .02, lx + .02, top + .03, top + .3, z + .05, z + .65);
   }
-  for (const [x0, x1, z0, z1] of [[poolOut[1] + .05, poolOut[1] + .09, poolOut[2], sol.z[1]], [poolOut[0], poolOut[1] + .09, poolOut[2] - .04, poolOut[2]]]) box('glassFence', x0, x1, top, top + 1.1, z0, z1);
+  // a glass pool fence across the walk at the solarium end (render 02)
+  box('glassFence', poolOut[1], -cp, top, top + 1.1, sol.z[0] - .05, sol.z[0] - .01);
   // garage ramp from Calle María de Molina down under the courtyard deck
-  const [rz0, rz1] = ramp.z, yB = ramp.depth;
+  // the ramp runs between tall plain white walls (render 01): towards the end patio and along the pedestrian street
+  const [rz0, rz1] = ramp.z, yB = ramp.depth, RW = 2.3;
   const rq = (a, b, c, d, n) => M.quad('ramp', a, b, c, d, n, [a[0], a[2], b[0], b[2], c[0], c[2], d[0], d[2]]);
   rq([ramp.top, STREET, rz1], [ramp.x[1], STREET, rz1], [ramp.x[1], STREET, rz0], [ramp.top, STREET, rz0], [0, 1, 0]);
   rq([ramp.bottom, yB, rz1], [ramp.top, STREET, rz1], [ramp.top, STREET, rz0], [ramp.bottom, yB, rz0], [.12, .99, 0]);
@@ -51,8 +55,8 @@ export function buildPlot(ex, building) {
     const prof = [[ramp.x[1], STREET], [ramp.top, STREET], [ramp.bottom, yB], [ramp.x[0] - .2, yB]];
     for (let k = 0; k < prof.length - 1; k++) {
       const [xa, ya] = prof[k], [xb, yb] = prof[k + 1];
-      if (n > 0) M.quad('wallWhite', [xb, yb, z], [xa, ya, z], [xa, 1.0, z], [xb, 1.0, z], [0, 0, 1], [xb, yb, xa, ya, xa, 1, xb, 1]);
-      else M.quad('wallWhite', [xa, ya, z], [xb, yb, z], [xb, 1.0, z], [xa, 1.0, z], [0, 0, -1], [xa, ya, xb, yb, xb, 1, xa, 1]);
+      if (n > 0) M.quad('wallWhite', [xb, yb, z], [xa, ya, z], [xa, RW, z], [xb, RW, z], [0, 0, 1], [xb, yb, xa, ya, xa, RW, xb, RW]);
+      else M.quad('wallWhite', [xa, ya, z], [xb, yb, z], [xb, RW, z], [xa, RW, z], [0, 0, -1], [xa, ya, xb, yb, xb, RW, xa, RW]);
     }
   }
   M.quad('dark', [ramp.x[0], yB, rz1], [ramp.x[0], yB, rz0], [ramp.x[0], top - .3, rz0], [ramp.x[0], top - .3, rz1], [1, 0, 0], [0, 0, 1, 0, 1, 1, 0, 1], {lm: false});
@@ -73,17 +77,30 @@ export function buildPlot(ex, building) {
   slab('wallWhite', px - .15, px + .15, STREET, TOPF, rz0 - 1.2, rz0); slab('wallWhite', px - .15, px + .15, STREET, TOPF, rz1, rz1 + 1.2);
   slab('wallWhite', px - .15, px + .15, 2.25, TOPF, rz0, rz1);
   for (let k = 0; k < 6; k++) box('garageDoor', px - .05, px + .05, STREET + k * .425 + .01, STREET + (k + 1) * .425 - .01, rz0, rz1);
-  fence(px - .15, px + .15, zN, rz0 - 1.2); fence(px - .15, px + .15, rz1 + 1.2, zP); fence(cx - .15, cx + .15, zN, zP); fence(cx, px, zP - .15, zP + .15); fence(cx, px, zN - .15, zN + .15);
+  // courtyard patios behind a white wall topped by dark lattice screens between posts (render 02, giro-8)
+  if (cp > 0) {
+    const wx = -cp, lat = new T.PlaneGeometry(3.2, .82).rotateY(Math.PI / 2);         // real size: texture in metres
+    slab('wallWhite', wx - .1, wx + .1, top, 1.75, -half, half);
+    for (let z = -half; z < half - .1; z += 3.45) {
+      slab('wallWhite', wx - .12, wx + .12, 1.75, 2.6, z, z + .2);
+      parts.add('lattice', lat, new T.Matrix4().makeTranslation(wx, 2.17, z + 1.82), {boxUV: true});
+    }
+    slab('wallWhite', wx - .12, wx + .12, 1.75, 2.6, half - .2, half);
+    fences.push([wx - .1, wx + .1, -half, half]);
+  }
+  slab('wallWhite', ramp.x[0], px - .15, top, RW, rz0 - .2, rz0);
+  slab('wallWhite', ramp.x[0], px + .15, STREET, RW, rz1, zP + .15); fences.push([ramp.x[0], px, rz1, zP + .15]);
+  fence(px - .15, px + .15, zN, rz0 - 1.2); fence(px - .15, px + .15, rz1 + 1.2, zP); fence(cx - .15, cx + .15, zN, zP); fence(cx, ramp.x[0], zP - .15, zP + .15); fence(cx, px, zN - .15, zN + .15);
   // walls between the ground-floor patios: the traced rails that run out from the façades (Portal 2 mirrored)
-  const dividers = [];
+  const dividers = [], courtDividers = [];
   for (const pu of building?.levels?.B?.units || []) {
     const c = pu.cell || building.cell;
     for (const [x0, y0, x1, y1] of pu.rail || []) {
       if (y0 !== y1) continue;
       let X0 = pu.x + Math.min(x0, x1) * c, X1 = pu.x + Math.max(x0, x1) * c, Z0 = pu.y + y0 * c;
-      if (X1 > D) X0 = Math.max(X0, D); else if (X0 < 0) X1 = Math.min(X1, 0); else continue;
+      if (X1 > D) X0 = Math.max(X0, D); else if (X0 < 0) { X1 = Math.min(X1, 0); X0 = Math.min(X0, -cp); } else continue;
       if (X1 - X0 < 1) continue;
-      for (const m of [1, -1]) { const r = [X0, X1, m * Z0 - .1, m * Z0 + .1]; slab('wallWhite', r[0], r[1], top, 1.75, r[2], r[3]); fences.push(r); if (X0 >= D) dividers.push(m * Z0); }
+      for (const m of [1, -1]) { const r = [X0, X1, m * Z0 - .1, m * Z0 + .1]; slab('wallWhite', r[0], r[1], top, 1.75, r[2], r[3]); fences.push(r); if (X0 >= D) dividers.push(m * Z0); else courtDividers.push(m * Z0); }
     }
   }
   // trees along the street and in the courtyard, as in the renders
@@ -93,12 +110,16 @@ export function buildPlot(ex, building) {
   const inside = (x, z) => x > cx && x < px && z > zN && z < zP;
   // the street-side patios between their dividing walls (for furniture and lights)
   const cuts = [...new Set([zN + .2, ...dividers.sort((a, b) => a - b), ramp.z[0] - .2])].sort((a, b) => a - b), patios = [];
-  for (let k = 0; k < cuts.length - 1; k++) if (cuts[k + 1] - cuts[k] > 2.6) patios.push({x: [D, px - .15], z: [cuts[k] + .1, cuts[k + 1] - .1], y: top});
+  for (let k = 0; k < cuts.length - 1; k++) if (cuts[k + 1] - cuts[k] > 2.6) patios.push({x: [D, px - .15], z: [cuts[k] + .1, cuts[k + 1] - .1], y: top, facade: D, out: 1});
+  if (cp > 0) {
+    const cc = [...new Set([-half, ...courtDividers.filter(z => Math.abs(z) < half).sort((a, b) => a - b), half])].sort((a, b) => a - b);
+    for (let k = 0; k < cc.length - 1; k++) if (cc[k + 1] - cc[k] > 2.6) patios.push({x: [-cp + .1, 0], z: [cc[k] + .1, cc[k + 1] - .1], y: top, facade: 0, out: -1});
+  }
   return {mesher: M, parts, water, trees, fences, inside, patios, lamps: Array.from({length: Math.floor((zP - zN + 20) / 24)}, (_, k) => [px + 2.6, zN - 8 + k * 24])};
 }
 
 // ---- the ground: land-use classes of the OpenStreetMap raster, each with its colour, roughness and detail
-const CLASS_COLOR = ['#77904f', '#6c9849', '#9a8366', '#5d5f60', '#b9b3aa', '#cfaaa2', '#9b5a4e', '#b8a585', '#e8e6df', '#b9b3aa'];
+const CLASS_COLOR = ['#667f43', '#5e8840', '#9a8366', '#5d5f60', '#b9b3aa', '#cfaaa2', '#9b5a4e', '#b8a585', '#e8e6df', '#b9b3aa'];
 const CLASS_ROUGH = [1, .95, 1, .9, .85, .8, .85, .95, .7, .85];
 export function groundMaterial(classTex, extent, hook) {
   const detail = noiseTexture();

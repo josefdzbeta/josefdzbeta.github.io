@@ -4,6 +4,7 @@ import {createBuilding} from './index.js';
 
 window.THREE = THREE;
 const status = document.getElementById('status');
-const b = await createBuilding(document.getElementById('bd'), {onStatus: t => { status.textContent = t; status.hidden = !t; }});
+const v = Date.now();                                             // never a cached data file while developing
+const b = await createBuilding(document.getElementById('bd'), {url: u => u + '?v=' + v, onStatus: t => { status.textContent = t; status.hidden = !t; }});
 window.viewer = b;
 console.log('building', JSON.stringify(b.stats));

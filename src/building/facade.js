@@ -5,7 +5,7 @@
 //   main plane outside the frame and the plinth → white brick (cara vista) / white render
 //   projecting frame (bands and piers, 45 cm)    → white render
 //   recessed bays (35 cm)                        → porcelain cladding in horizontal courses
-//   balconies                                    → slab and solid grey front, as in render 03
+//   balconies                                    → tall laminated-glass fronts over the slab edge (renders 03/04)
 // Every opening gets a reveal, a sill, an anthracite PVC frame with mullions, glass, a roller shutter (some
 // lowered) and a room behind it that can light up at night.
 import * as T from 'three';
@@ -131,23 +131,32 @@ export function buildFacades(ex, published, building, {seed = 4} = {}) {
     // balconies: merged per level, slab from the bay wall out to 1,2 m, solid grey front and cheeks
     const byLv = {};
     for (const [ua, ub, lv] of f.balconies) (byLv[lv] ||= []).push([ua, ub]);
-    for (const [lv, list] of Object.entries(byLv)) {
+    const mergedBy = Object.fromEntries(Object.entries(byLv).map(([lv, list]) => {
       list.sort((a, b) => a[0] - b[0]);
       const merged = [];
       for (const r of list) { const m = merged.at(-1); if (m && r[0] - m[1] < .7) m[1] = Math.max(m[1], r[1]); else merged.push([...r]); }
-      const y = ex.levels[lv];
+      return [lv, merged];
+    }));
+    for (const [lv, merged] of Object.entries(mergedBy)) {
+      const y = ex.levels[lv], above = mergedBy[String(Number(lv) + 1)] || [], storey = (ex.levels[String(Number(lv) + 1)] ?? y + 3.27) - y;
       for (const [ua, ub] of merged) {
         if (ub - ua < 1) continue;
-        const dIn = REC, dOut = -(PROJ + BALC);
-        { const a = F.P(ua, y, dOut + .1), b = F.P(ub, y, dIn); balconies.push({x: [Math.min(a[0], b[0]), Math.max(a[0], b[0])], z: [Math.min(a[2], b[2]), Math.max(a[2], b[2])], y, soffit: Math.min(y + 3.01, bv1 - .05)}); }
-        F.rect('slabEdge', ua, ub, y - .26, y, dOut);                                           // slab front edge
-        F.flat('slabEdge', ua, ub, y - .26, dOut, dIn, -1);                                     // slab soffit
-        F.flat('terrace', ua, ub, y, dOut + .08, dIn, 1);                                       // balcony floor
-        F.rect('balcony', ua, ub, y, y + 1.05, dOut); F.rect('balcony', ua + .06, ub - .06, y, y + 1.05, dOut + .06, F.out.map(c => -c));
-        F.flat('balcony', ua, ub, y + 1.05, dOut, dOut + .06, 1);
-        for (const [u, dir] of [[ua, -1], [ub, 1]]) {                                           // side cheeks
-          F.jamb('balcony', u, y - .26, y + 1.05, dOut, dIn, dir); F.jamb('balcony', u - dir * .06, y, y + 1.05, dOut + .06, dIn, -dir);
+        const dIn = REC, dOut = -(PROJ + BALC), lo = y - .32, hi = y + 1.08;
+        { const a = F.P(ua, y, dOut + .1), b = F.P(ub, y, dIn); balconies.push({x: [Math.min(a[0], b[0]), Math.max(a[0], b[0])], z: [Math.min(a[2], b[2]), Math.max(a[2], b[2])], y, soffit: Math.min(y + 2.95, bv1 - .05)}); }
+        // the slab (edge seen faintly through the glass, white soffit) and the balcony floor
+        F.rect('slabEdge', ua + .02, ub - .02, y - .28, y, dOut + .05);
+        F.flat('slabEdge', ua, ub, y - .3, dOut, dIn, -1);
+        F.flat('terrace', ua, ub, y, dOut + .05, dIn, 1);
+        // one tall laminated-glass front from below the slab to railing height (renders 03/04, both elevations),
+        // glass returns to the bay wall, a slim aluminium profile on top
+        F.rect('balcony', ua, ub, lo, hi, dOut); F.rect('balcony', ua, ub, lo, hi, dOut + .012, F.out.map(c => -c));
+        // glass returns: continuous up to the balcony above when its end lines up (the framed stacks of render 03)
+        for (const [u, dir] of [[ua, -1], [ub, 1]]) {
+          const stacked = above.some(([a, b]) => Math.abs((dir < 0 ? a : b) - u) < .4), top = stacked ? lo + storey : hi;
+          F.jamb('balcony', u, lo, top, dOut, dIn, dir); F.jamb('balcony', u, lo, top, dOut, dIn, -dir);
         }
+        const a = F.P(ua, 0, dOut - .015), b = F.P(ub, 0, dOut + .03);
+        box('alu', Math.min(a[0], b[0]), Math.max(a[0], b[0]), hi, hi + .035, Math.min(a[2], b[2]), Math.max(a[2], b[2]));
       }
     }
   }

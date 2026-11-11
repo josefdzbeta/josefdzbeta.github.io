@@ -6,7 +6,13 @@ import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {STREET} from './site.js';
 
-const EYE = 1.65, RADIUS = .3, REF_ASPECT = 16 / 9;
+const EYE = 1.65, RADIUS = .3;
+// an elevation: the published drawing spans `width` metres across at its aspect, centred on the building at `y`;
+// shown in the light that falls on that façade, as in the drawings (Morning on the street, Day on the courtyard)
+const elevation = (name, ref, aspect, width, y, side, time) => {
+  const d = 600, fov = 2 * Math.atan(width / aspect / 2 / d) * 180 / Math.PI;
+  return {name, ref, aspect, fov, pos: new T.Vector3(10 + side * d, y, 0), fwd: new T.Vector3(-side, 0, 0), far: true, time};
+};
 
 export function createCameras({renderer, container, ex, plot}) {
   const camera = new T.PerspectiveCamera(40, 1, .3, 3000), canvas = renderer.domElement, half = ex.length / 2;
@@ -20,18 +26,21 @@ export function createCameras({renderer, container, ex, plot}) {
     {name: 'Render 03 · Calle María de Molina', ref: '/assets/ref-mykonos03.jpg', pos: new T.Vector3(71.4, 2.36, 55.81), fwd: dir(-.782, .125, -.61), fov: 30, time: 'Low sun'},
     {name: 'Render 01 · Vista aérea', ref: '/assets/ref-mykonos01.jpg', pos: new T.Vector3(80.82, 45.06, 102.65), fwd: dir(-.568, -.299, -.767), fov: 20, time: 'Evening'},
     {name: 'Render 04 · Calle de noche', ref: '/assets/ref-mykonos04.jpg', pos: new T.Vector3(71.4, 2.36, 55.81), fwd: dir(-.782, .125, -.61), fov: 30, time: 'Night'},
-    {name: 'Patio y piscina', pos: new T.Vector3(-6.8, 2.35, -35.2), fwd: dir(.2, .16, 1), fov: 62},
+    {name: 'Piscina (render 02)', pos: new T.Vector3(-5.2, 2.6, 4.3), fwd: dir(-.2, -.2, 1), fov: 58},
     {name: 'Fachada al patio', pos: new T.Vector3(-34, 1.6, 66), fwd: dir(.62, .2, -.76), fov: 40},
-    {name: 'Alzado a María de Molina', pos: new T.Vector3(150, 11.5, 0), fwd: dir(-1, 0, 0), fov: 14, level: true},
+    elevation('Alzado a María de Molina', '/assets/ref-mykonos-fachada2.jpg', 1243 / 380, 77.06, 11.3, 1, 'Morning'),
+    elevation('Alzado al patio', '/assets/ref-mykonos-fachada1.jpg', 1243 / 400, 77.06, 11.72, -1, 'Day'),
   ];
+  let refAspect = 16 / 9;
   function frameShot(s) {
     camera.position.copy(s.pos); camera.lookAt(s.pos.clone().add(s.fwd));
-    camera.userData.fov = s.fov; setFov(); camera.near = .3;
+    refAspect = s.aspect || 16 / 9; camera.near = s.far ? 100 : .3;            // elevations: 600 m away, keep depth precision
+    camera.userData.fov = s.fov; setFov();
   }
-  // the render's vertical field of view when the view is at least as wide as 16:9, its horizontal one otherwise (photos)
+  // the image's vertical field of view when the view is at least as wide as the image, its horizontal one otherwise
   function setFov() {
-    const f = camera.userData.fov || 40;
-    camera.fov = aspect >= REF_ASPECT ? f : 2 * Math.atan(Math.tan(f * Math.PI / 360) * REF_ASPECT / aspect) * 180 / Math.PI;
+    const f = camera.userData.fov || 40, ra = mode === 'photo' ? refAspect : 16 / 9;
+    camera.fov = aspect >= ra ? f : 2 * Math.atan(Math.tan(f * Math.PI / 360) * ra / aspect) * 180 / Math.PI;
     if (mode !== 'photo') camera.fov = Math.min(camera.fov, 64);                // portrait phones: frame the building, not the sky
     camera.updateProjectionMatrix();
   }
@@ -74,7 +83,6 @@ export function createCameras({renderer, container, ex, plot}) {
     if (mode !== 'walk' || e.target.closest?.('input, textarea, select')) return;
     const k = e.key.toLowerCase();
     if (KEYS.has(k)) { e.type === 'keydown' ? keys.add(k) : keys.delete(k); if (k.startsWith('arrow')) e.preventDefault(); }
-    if (e.type === 'keydown' && k === 'l') api.onKey?.('l');
   };
   addEventListener('keydown', onKey); addEventListener('keyup', onKey);
   addEventListener('blur', () => keys.clear());
@@ -90,7 +98,7 @@ export function createCameras({renderer, container, ex, plot}) {
     api.invalidate?.();
   }
   const hint = document.createElement('div'); hint.className = 'ap-hint';
-  hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Arrastra para mirar · arrastra con dos dedos para caminar' : 'Clic para mirar · WASD para caminar · Mayús para correr · L: solo luz · Esc suelta el ratón';
+  hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Arrastra para mirar · arrastra con dos dedos para caminar' : 'Clic para mirar · WASD para caminar · Mayús para correr · Esc suelta el ratón';
   container.append(hint);
   // ---- photo caption: previous / next shot, and the published render laid over the view
   const caption = document.createElement('div'); caption.className = 'ap-shot';
@@ -103,7 +111,7 @@ export function createCameras({renderer, container, ex, plot}) {
   };
   container.append(caption);
   const layoutOverlay = () => {
-    const wide = aspect >= REF_ASPECT;
+    const wide = aspect >= refAspect;
     Object.assign(overlay.style, wide ? {height: '100%', width: 'auto', left: '50%', top: '0', transform: 'translateX(-50%)'} : {width: '100%', height: 'auto', left: '0', top: '50%', transform: 'translateY(-50%)'});
   };
 
@@ -115,6 +123,7 @@ export function createCameras({renderer, container, ex, plot}) {
       mode = m; keys.clear(); orbit.enabled = m === 'tour';
       container.classList.toggle('ap-walk', m === 'walk');
       caption.hidden = m !== 'photo'; hint.hidden = m !== 'walk'; overlay.hidden = true; caption.querySelector('[data-compare]').classList.remove('on');
+      if (m !== 'photo') camera.near = .3;
       if (m === 'tour') { camera.userData.fov = 40; setFov(); camera.position.set(center.x + 64, 30, center.z + 84); orbit.target.copy(center); orbit.update(); idle = 0; }
       if (m === 'photo') api.shot(shotIndex);
       if (m === 'walk') {
@@ -130,6 +139,7 @@ export function createCameras({renderer, container, ex, plot}) {
       caption.querySelector('span').textContent = `${s.name} (${shotIndex + 1}/${shots.length})`;
       const cmp = caption.querySelector('[data-compare]'); cmp.hidden = !s.ref; cmp.classList.remove('on'); overlay.hidden = true;
       if (s.ref) overlay.src = s.ref;
+      layoutOverlay();
       api.onShot?.(s); api.invalidate?.();
     },
     resize(w, h) { aspect = w / h; camera.aspect = aspect; setFov(); layoutOverlay(); },
