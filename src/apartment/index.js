@@ -72,7 +72,7 @@ export async function createApartment(container, {unit, planURL = null, onStatus
   const renderer = new T.WebGLRenderer({antialias: false, powerPreference: 'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.5 : 2));
   renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.NeutralToneMapping;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap; renderer.shadowMap.autoUpdate = false;
   container.append(renderer.domElement); renderer.domElement.className = 'ap-canvas';
   const scene = new T.Scene(), U = sharedUniforms(), {M} = createMaterials(U);
 

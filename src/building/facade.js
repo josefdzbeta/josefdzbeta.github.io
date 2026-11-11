@@ -6,7 +6,7 @@
 //   projecting frame (bands and piers, 45 cm)    → white render
 //   recessed bays (35 cm)                        → porcelain cladding in horizontal courses
 //   balconies                                    → tall laminated-glass fronts over the slab edge (renders 03/04)
-// Every opening gets a reveal, a sill, an anthracite PVC frame with mullions, glass, a roller shutter (some
+// Every opening gets a reveal, a sill, a light PVC frame with mullions, glass, a roller shutter (some
 // lowered) and a room behind it that can light up at night.
 import * as T from 'three';
 import {Mesher, Parts, place} from '../apartment/geometry.js';
@@ -43,7 +43,7 @@ export function buildFacades(ex, published, building, {seed = 4} = {}) {
     const pier = .6, w = (o.u1 - o.u0 - 2 * pier) / 3;
     return [0, 1, 2].map(i => ({...o, u0: o.u0 + i * (w + pier), u1: o.u0 + i * (w + pier) + w}));
   })}]));
-  const M = new Mesher(), parts = new Parts(), rnd = rng(seed), windows = [], faces = {}, balconies = [];
+  const M = new Mesher(), parts = new Parts(), rnd = rng(seed), crnd = rng(seed + 7), windows = [], faces = {}, balconies = [];
   const L = ex.length, D = ex.depth, TOP = ex.top, half = L / 2, roofY = ex.levels.roof + .35;
   // a quad facing `want`, wound accordingly; st = surface coordinates (metres) per corner for the textures
   const quad = (mat, p, want, st, lm = true) => {
@@ -83,14 +83,14 @@ export function buildFacades(ex, published, building, {seed = 4} = {}) {
     };
     if (o.kind === 'window') pbox('sill', u0 - .04, u1 + .04, v0 - .04, v0, d0 - .04, d0 + .03);
     const df = d1 - FD, dg = df + .035;
-    // anthracite PVC frame and mullions
+    // PVC frame and mullions (light, as render 03 shows them)
     pbox('pvc', u0, u1, v1 - FW, v1, df, d1); pbox('pvc', u0, u1, v0, v0 + FW, df, d1);
     pbox('pvc', u0, u0 + FW, v0, v1, df, d1); pbox('pvc', u1 - FW, u1, v0, v1, df, d1);
     const leaves = Math.max(1, Math.round((u1 - u0) / (o.kind === 'door' ? 1.0 : .8)));
     for (let k = 1; k < leaves; k++) { const uc = u0 + (u1 - u0) * k / leaves; pbox('pvc', uc - FW * .6, uc + FW * .6, v0, v1, df, d1); }
     F.rect('glass', u0 + FW, u1 - FW, v0 + FW, v1 - FW, dg);
     // roller shutter: some up, some part-lowered, a few down (lamas de aluminio, as the memoria)
-    const r = rnd(), lower = r < .5 ? 0 : r < .8 ? .25 + rnd() * .35 : r < .93 ? .7 : 1;
+    const r = rnd(), lower = r < .78 ? 0 : r < .93 ? .2 + rnd() * .25 : r < .98 ? .6 : 1;   // mostly up, as the renders show them
     if (lower > 0) { const vb = v1 - (v1 - v0) * lower; F.rect('shutter', u0 + .01, u1 - .01, vb, v1 - .005, d0 + .06); pbox('alu', u0 + .01, u1 - .01, vb - .04, vb, d0 + .045, d0 + .08); }
     // the room behind: back wall, floor, ceiling and sides, open to the window
     const lv = ex.levels[o.level] ?? v0, top = Math.min(TOP - .6, lv + 2.6), r0 = u0 - .3, r1 = u1 + .3, dr = d1 + 3.2;
@@ -102,6 +102,12 @@ export function buildFacades(ex, published, building, {seed = 4} = {}) {
     quad(room, [P(r1, lv, d1), P(r1, lv, dr), P(r1, top, dr), P(r1, top, d1)], F.U.map(c => -c), [[0, 0], [1, 0], [1, 1], [0, 1]], false);
     // close the wall between the reveal and the room size
     for (const [a0, a1, b0, b1] of subtract([r0, r1, lv, top], [[u0, u1, v0, v1]])) quad('reveal', [P(a0, b0, d1), P(a1, b0, d1), P(a1, b1, d1), P(a0, b1, d1)], out, [[a0, b0], [a1, b0], [a1, b1], [a0, b1]], false);
+    // sheer linen curtains right behind the glass of nearly every unlit window: one leaf drawn, or both (the renders'
+    // windows read light: curtains in daylight, not dark rooms)
+    if (!lit && crnd() < .95) {
+      const k = crnd(), um = (u0 + u1) / 2, dc = dg + .04, a0 = u0 + FW, a1 = u1 - FW, [c0, c1] = k < .4 ? [a0, um + .08] : k < .75 ? [um - .08, a1] : [a0, a1];
+      quad('curtain', [P(c0, v0 + FW, dc), P(c1, v0 + FW, dc), P(c1, v1 - FW, dc), P(c0, v1 - FW, dc)], out, [[0, 0], [1, 0], [1, 1], [0, 1]], false);
+    }
     windows.push({lit, at: P((u0 + u1) / 2, (v0 + v1) / 2, dg)});
   }
 
@@ -181,7 +187,11 @@ export function buildFacades(ex, published, building, {seed = 4} = {}) {
     const len = Math.hypot(x1 - x0, z1 - z0), t = [(x1 - x0) / len, 0, (z1 - z0) / len], n = want.map(c => -c);
     const P = (u, v, d) => [x0 + t[0] * u + n[0] * d, v, z0 + t[2] * u + n[2] * d];
     const F = face(P, want, t), ops = [], k = Math.floor(len / 3.6);
-    for (let q = 0; q < k; q++) { const uc = len * (q + .5) / k, w = len > 5 ? 1.6 : .9; ops.push({u0: uc - w / 2, u1: uc + w / 2, v0: lv5 + .02, v1: lv5 + 2.2, kind: 'door', level: '5'}); }
+    for (let q = 0; q < k; q++) {
+      const uc = len * (q + .5) / k, w = len > 5 ? 1.6 : .9, far = P(uc, 0, 3.9);                // the room behind must fit inside the building
+      if (far[0] < .3 || far[0] > D - .3 || far[2] < -half + .3 || far[2] > half - .3) continue;
+      ops.push({u0: uc - w / 2, u1: uc + w / 2, v0: lv5 + .02, v1: lv5 + 2.2, kind: 'door', level: '5'});
+    }
     F.wall('render', [0, len, lv5, roofY + PH], 0, ops);
     F.rect('render', 0, len, roofY, roofY + PH, PT, n);                                         // roof side of the parapet
     const a = P(0, 0, -.03), b = P(len, 0, PT + .03);

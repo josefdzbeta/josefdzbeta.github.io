@@ -2,31 +2,79 @@
 // cypresses and lounge sets on the level-5 terraces, furnished ground-floor patios, and the outdoor lights of
 // renders 01 and 04 (patio wall lights, balcony soffit downlights) for the bake.
 import * as T from 'three';
-import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {mergeGeometries, mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
 import {STREET} from './site.js';
 import {buildFurniture} from '../apartment/furniture.js';
 
 const rng = seed => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 const flat = list => mergeGeometries(list.map(g => g.index ? g.toNonIndexed() : g), false);
 
-// a compact SUV (4,4 × 1,8 × 1,5 m) along +x: painted body under the beltline and the roof, glass cabin, wheels
-function carGeometry() {
-  const W = 1.8, extrude = (shape, w, bevel = .07) => new T.ExtrudeGeometry(shape, {depth: w - 2 * bevel, bevelEnabled: true, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 3, curveSegments: 6}).translate(0, 0, -(w - 2 * bevel) / 2);
-  const body = new T.Shape();
-  body.moveTo(-2.15, .3); body.lineTo(2.1, .3); body.quadraticCurveTo(2.25, .32, 2.24, .62); body.quadraticCurveTo(2.2, .86, 1.85, .9);
-  body.lineTo(.85, 1.0); body.lineTo(-1.9, 1.02); body.quadraticCurveTo(-2.2, 1.0, -2.2, .7); body.lineTo(-2.15, .3);
-  const cabin = new T.Shape();
-  cabin.moveTo(.85, .98); cabin.quadraticCurveTo(.35, 1.32, .05, 1.4); cabin.lineTo(-1.35, 1.42); cabin.quadraticCurveTo(-1.8, 1.36, -1.95, 1.0); cabin.lineTo(.85, .98);
-  const roof = new T.BoxGeometry(1.38, .05, 1.42).translate(-.64, 1.43, 0);
-  const paint = flat([extrude(body, W), roof]), glass = extrude(cabin, W - .16, .04);
-  const wheels = [], rims = [];
-  for (const [x, z] of [[1.35, .78], [1.35, -.78], [-1.4, .78], [-1.4, -.78]]) {
-    wheels.push(new T.CylinderGeometry(.34, .34, .24, 18).rotateX(Math.PI / 2).translate(x, .34, z));
-    rims.push(new T.CylinderGeometry(.21, .21, .02, 14).rotateX(Math.PI / 2).translate(x, .34, z + Math.sign(z) * .125));
+// a lofted surface through rings of points (same count each), smooth along and around it, flat-capped at the ends;
+// faces turned outward from the axis of each ring (the rings are convex)
+function loft(rings, caps = true) {
+  const pos = [], capPos = [], n = rings[0].length, centre = r => r.reduce((m, p) => m.add(p), new T.Vector3()).multiplyScalar(1 / n);
+  const tri = (out, a, b, c, o) => {
+    const nrm = new T.Vector3().subVectors(b, a).cross(new T.Vector3().subVectors(c, a)), mid = a.clone().add(b).add(c).multiplyScalar(1 / 3);
+    if (nrm.dot(mid.sub(o)) < 0) [b, c] = [c, b];
+    out.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+  };
+  for (let s = 0; s + 1 < rings.length; s++) {
+    const o = centre(rings[s]).add(centre(rings[s + 1])).multiplyScalar(.5);
+    for (let i = 0; i < n; i++) {
+      const a = rings[s][i], b = rings[s][(i + 1) % n], c = rings[s + 1][(i + 1) % n], d = rings[s + 1][i];
+      const oa = o.clone(); oa.x = (a.x + c.x) / 2;                                // outward from the ring's own axis
+      tri(pos, a, b, c, oa); tri(pos, a, c, d, oa);
+    }
   }
-  const lights = flat([new T.BoxGeometry(.04, .09, .32).translate(2.22, .72, .62), new T.BoxGeometry(.04, .09, .32).translate(2.22, .72, -.62)]);
-  const tail = flat([new T.BoxGeometry(.04, .08, .34).translate(-2.21, .86, .6), new T.BoxGeometry(.04, .08, .34).translate(-2.21, .86, -.6)]);
-  return {paint, glass, tyre: flat(wheels), rim: flat(rims), lights, tail};
+  if (caps) for (const [r, other] of [[rings[0], rings[1]], [rings.at(-1), rings.at(-2)]]) {
+    const c = centre(r), away = centre(other);                                    // outward: away from the next ring
+    for (let i = 0; i < n; i++) tri(capPos, c, r[i], r[(i + 1) % n], away);
+  }
+  const side = mergeVertices(new T.BufferGeometry().setAttribute('position', new T.Float32BufferAttribute(pos, 3)), 1e-5); side.computeVertexNormals();
+  if (!caps) return side.toNonIndexed();
+  const cap = new T.BufferGeometry().setAttribute('position', new T.Float32BufferAttribute(capPos, 3)); cap.computeVertexNormals();
+  return flat([side, cap]);
+}
+// a rounded rectangle across the car (z, y) at x: half-width w, from yb to yt, corner radii rb (bottom) and rt (top)
+function ring(x, w, yb, yt, rt, rb) {
+  const pts = [];
+  for (const [cz, cy, r, a0] of [[w - rb, yb + rb, rb, -Math.PI / 2], [w - rt, yt - rt, rt, 0], [-(w - rt), yt - rt, rt, Math.PI / 2], [-(w - rb), yb + rb, rb, Math.PI]])
+    for (let k = 0; k <= 4; k++) { const a = a0 + Math.PI / 2 * k / 4; pts.push(new T.Vector3(x, cy + r * Math.sin(a), cz + r * Math.cos(a))); }
+  return pts;
+}
+// a compact SUV (4,4 × 1,8 × 1,55 m) along +x, as the ones parked in renders 03 and 04: a lofted body with rounded
+// shoulders, tapered nose and tail and a sloping bonnet; the glasshouse narrower than the body (tumblehome) with a
+// raked windscreen and rear window, a painted roof panel and mirrors; black wheel arches, sill cladding and grille;
+// 18" wheels with alloy faces; wrap-round tail lights and slim headlights
+function carGeometry() {
+  // body: [x, half-width, bottom, top (bonnet / beltline)]
+  const B = [[-2.21, .62, .44, .8], [-2.17, .8, .38, .94], [-2.07, .87, .33, 1.0], [-1.9, .9, .31, 1.02], [-1.4, .91, .3, 1.01], [-.4, .91, .3, .99], [.6, .91, .3, .97],
+    [1.3, .9, .3, .93], [1.8, .88, .31, .88], [2.05, .84, .33, .83], [2.17, .76, .36, .76], [2.23, .6, .42, .66]];
+  const body = loft(B.map(([x, w, yb, yt]) => ring(x, w, yb, yt, Math.min(.16, (yt - yb) / 2 - .01), .07)));
+  // glasshouse: rings sheared front to back (bottom at the beltline, top at the roof), narrowing towards the roof
+  const gh = [], roofRings = [];
+  for (let k = 0; k <= 4; k++) {
+    const u = k / 4, xb = .92 + (-1.97 - .92) * u, xt = .12 + (-1.72 - .12) * u, yb = .96, yt = 1.52 - .03 * u * u;
+    gh.push(ring(0, .85, yb, yt, .14, .02).map(p => { const t = (p.y - yb) / (yt - yb); p.z *= 1 - .2 * t; p.x = xb + (xt - xb) * t; return p; }));
+    roofRings.push(ring(xt + .04 - .1 * u, .66, yt - .035, yt + .012, .05, .01));
+  }
+  const glass = loft(gh), roof = loft(roofRings);
+  const mirrors = [.93, -.93].map(z => { const m = new T.BoxGeometry(.2, .11, .13).translate(.72, 1.05, z); m.deleteAttribute('uv'); return m; });
+  const paint = flat([body, roof, ...mirrors]);
+  // black trim: wheel arches, sill cladding, grille and lower bumpers
+  const trim = [new T.BoxGeometry(3.3, .13, 1.84).translate(-.03, .38, 0), new T.BoxGeometry(.06, .2, .95).translate(2.2, .56, 0), new T.BoxGeometry(.08, .12, 1.5).translate(-2.16, .45, 0)];
+  const wheels = [], rims = [];
+  for (const [x, z] of [[1.38, .79], [1.38, -.79], [-1.42, .79], [-1.42, -.79]]) {
+    trim.push(new T.TorusGeometry(.43, .055, 5, 12, Math.PI).translate(x, .36, Math.sign(z) * .9));
+    wheels.push(new T.CylinderGeometry(.36, .36, .23, 20).rotateX(Math.PI / 2).translate(x, .36, z));
+    // alloy face over the dark tyre: rim ring, five double spokes, hub
+    const f = z + Math.sign(z) * .118;
+    rims.push(new T.TorusGeometry(.225, .022, 4, 18).translate(x, .36, f), new T.CylinderGeometry(.055, .055, .03, 10).rotateX(Math.PI / 2).translate(x, .36, f));
+    for (let k = 0; k < 10; k++) rims.push(new T.BoxGeometry(.028, .19, .02).translate(0, .11, 0).rotateZ((Math.floor(k / 2) + (k % 2 ? .09 : -.09)) * Math.PI * 2 / 5).translate(x, .36, f));
+  }
+  const lights = flat([.6, -.6].map(z => new T.BoxGeometry(.05, .06, .34).translate(2.17, .74, z)));
+  const tail = flat([.62, -.62].flatMap(z => [new T.BoxGeometry(.05, .07, .36).translate(-2.15, .9, z), new T.BoxGeometry(.3, .07, .05).translate(-2.0, .9, Math.sign(z) * .875)]));
+  return {paint, glass, tyre: flat([...wheels, ...trim]), rim: flat(rims), lights, tail};
 }
 
 const PAINT = ['#f1f1ee', '#f1f1ee', '#c9cbcd', '#c9cbcd', '#8d9296', '#2c2f33', '#16181b', '#3d4f66', '#7a2a2a', '#e9e4da'];
@@ -97,7 +145,7 @@ export function buildOutdoor({patios, terraces, balconies, lv5}, M, {seed = 41, 
     for (let k = 0; k < n; k++) {
       const t = (k + .5) / n, along = b.z[1] - b.z[0] > b.x[1] - b.x[0];
       const x = along ? (b.x[0] + b.x[1]) / 2 : b.x[0] + t * (b.x[1] - b.x[0]), z = along ? b.z[0] + t * (b.z[1] - b.z[0]) : (b.z[0] + b.z[1]) / 2;
-      lights.push({x, y: b.soffit - .03, z, intensity: 3}); glows.push([x, b.soffit - .01, z, .12, .02, .12]);
+      lights.push({x, y: b.soffit - .03, z, intensity: 3, beam: .55}); glows.push([x, b.soffit - .01, z, .12, .02, .12]);
     }
   }
   const f = buildFurniture(items, M), g = new T.Group(); g.name = 'outdoor'; g.add(...f.meshes);
@@ -140,11 +188,11 @@ export function lavenderTexture(size = 256) {
   const c = Object.assign(document.createElement('canvas'), {width: size, height: size}), x = c.getContext('2d'), r = rng(61);
   for (let k = 0; k < 90; k++) {
     const bx = size * (.1 + r() * .8), top = size * (.05 + r() * .35), lean = (r() - .5) * size * .12;
-    x.strokeStyle = `hsl(${95 + r() * 20}, 18%, ${38 + r() * 14}%)`; x.lineWidth = 1.2 + r();
+    x.strokeStyle = `hsl(${95 + r() * 20}, 14%, ${46 + r() * 14}%)`; x.lineWidth = 1.2 + r();
     x.beginPath(); x.moveTo(bx, size); x.quadraticCurveTo(bx + lean * .3, (size + top) / 2, bx + lean, top); x.stroke();
-    for (let j = 0; j < 7; j++) { const t = j / 7, px = bx + lean * (1 - t * .1), py = top + t * size * .12; x.fillStyle = `hsl(${268 + r() * 22}, ${22 + r() * 16}%, ${56 + r() * 14}%)`; x.beginPath(); x.ellipse(px, py, 2.2 + r() * 1.5, 3.5 + r() * 2, 0, 0, 6.3); x.fill(); }
+    for (let j = 0; j < 7; j++) { const t = j / 7, px = bx + lean * (1 - t * .1), py = top + t * size * .12; x.fillStyle = `hsl(${258 + r() * 22}, ${16 + r() * 14}%, ${62 + r() * 14}%)`; x.beginPath(); x.ellipse(px, py, 2.2 + r() * 1.5, 3.5 + r() * 2, 0, 0, 6.3); x.fill(); }
   }
-  for (let k = 0; k < 60; k++) { x.strokeStyle = `hsl(${100 + r() * 20}, 16%, ${42 + r() * 12}%)`; x.lineWidth = 2; const bx = size * r(); x.beginPath(); x.moveTo(bx, size); x.lineTo(bx + (r() - .5) * 30, size * (.55 + r() * .3)); x.stroke(); }
+  for (let k = 0; k < 60; k++) { x.strokeStyle = `hsl(${100 + r() * 20}, 13%, ${48 + r() * 12}%)`; x.lineWidth = 2; const bx = size * r(); x.beginPath(); x.moveTo(bx, size); x.lineTo(bx + (r() - .5) * 30, size * (.55 + r() * .3)); x.stroke(); }
   const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return t;
 }
 

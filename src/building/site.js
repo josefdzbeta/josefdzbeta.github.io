@@ -42,8 +42,19 @@ export function buildPlot(ex, building) {
     box('lounger', x0, x0 + 1.9, top + .3, top + .38, z, z + .7); box('lounger', x0, x0 + .6, top + .38, top + .7, z, z + .7);
     for (const lx of [x0 + .1, x0 + 1.8]) box('alu', lx - .02, lx + .02, top + .03, top + .3, z + .05, z + .65);
   }
-  // a glass pool fence across the walk at the solarium end (render 02)
-  box('glassFence', poolOut[1], -cp, top, top + 1.1, sol.z[0] - .05, sol.z[0] - .01);
+  // glass pool fences with slim steel posts across both ends of the pool and its walk (render 02)
+  for (const fz of [sol.z[0] - .05, poolOut[2] - .45]) {
+    const fx0 = poolOut[0], fx1 = -cp, n = Math.max(1, Math.round((fx1 - fx0) / 1.1));
+    box('glassFence', fx0, fx1, top + .04, top + 1.1, fz, fz + .02);
+    for (let k = 0; k <= n; k++) { const x = fx0 + (fx1 - fx0) * k / n; box('alu', x - .025, x + .025, top, top + 1.12, fz - .015, fz + .035); }
+  }
+  // two topiary standards in pots at the back of the solarium (render 02)
+  for (const tx of [sol.x[0] + .7, (sol.x[0] + sol.x[1]) / 2 + .4]) {
+    const tz = sol.z[1] - .7;
+    box('pot', tx - .28, tx + .28, top + .03, top + .58, tz - .28, tz + .28);
+    parts.add('trunk', new T.CylinderGeometry(.035, .045, 1.3, 6), place(tx, top + 1.2, tz));
+    parts.add('cypress', new T.IcosahedronGeometry(.6, 2).scale(1, .9, 1), place(tx, top + 2.25, tz));
+  }
   // garage ramp from Calle María de Molina down under the courtyard deck
   // the ramp runs between tall plain white walls (render 01): towards the end patio and along the pedestrian street
   const [rz0, rz1] = ramp.z, yB = ramp.depth, RW = 2.3;
@@ -119,14 +130,18 @@ export function buildPlot(ex, building) {
 }
 
 // ---- the ground: land-use classes of the OpenStreetMap raster, each with its colour, roughness and detail
-const CLASS_COLOR = ['#667f43', '#5e8840', '#9a8366', '#5d5f60', '#b9b3aa', '#cfaaa2', '#9b5a4e', '#b8a585', '#e8e6df', '#b9b3aa'];
+export const CLASS_COLOR = ['#667f43', '#5e8840', '#9a8366', '#5d5f60', '#b9b3aa', '#cfaaa2', '#9b5a4e', '#b8a585', '#e8e6df', '#b9b3aa'];
+// each class's tone against its land-use swatch, in linear light: turf deeper and more saturated (render 03's lawns);
+// asphalt and paving darker (the renders' streets read mid-grey to dark, a little wet)
+const TURF = [.58, .89, .27], PAVED = [.62, .61, .6];
+export const CLASS_TINT = [TURF, TURF, [1, 1, 1], [.62, .6, .57], PAVED, [.62, .59, .58], [1, 1, 1], [1, 1, 1], [1, 1, 1], PAVED];
 const CLASS_ROUGH = [1, .95, 1, .9, .85, .8, .85, .95, .7, .85];
 export function groundMaterial(classTex, extent, hook) {
   const detail = noiseTexture();
   const mat = new T.MeshStandardMaterial({color: '#ffffff', roughness: 1, map: detail});
   mat.onBeforeCompile = sh => {
     sh.uniforms.classMap = {value: classTex}; sh.uniforms.extent = {value: new T.Vector4(...extent)};
-    sh.uniforms.classColor = {value: CLASS_COLOR.map(c => new T.Color(c))}; sh.uniforms.classRough = {value: CLASS_ROUGH};
+    sh.uniforms.classColor = {value: CLASS_COLOR.map((c, i) => new T.Color(c).multiply(new T.Color(...CLASS_TINT[i])))}; sh.uniforms.classRough = {value: CLASS_ROUGH};
     sh.vertexShader = 'varying vec3 vWorld;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n\tvWorld = ( modelMatrix * vec4( transformed, 1. ) ).xyz;');
     sh.fragmentShader = `uniform sampler2D classMap; uniform vec4 extent; uniform vec3 classColor[10]; uniform float classRough[10]; varying vec3 vWorld;
 int groundClass() { vec2 uv = ( vWorld.xz - extent.xz ) / ( extent.yw - extent.xz ); if ( any( lessThan( uv, vec2( 0. ) ) ) || any( greaterThan( uv, vec2( 1. ) ) ) ) return 0; return int( texture2D( classMap, uv ).r * 255. + .5 ); }
@@ -135,9 +150,9 @@ int groundClass() { vec2 uv = ( vWorld.xz - extent.xz ) / ( extent.yw - extent.x
   float dn = texture2D( map, vWorld.xz * .21 ).r * .55 + texture2D( map, vWorld.xz * .043 ).r * .45;
   vec3 gcol = classColor[ gc ];
   if ( gc == 3 || gc == 6 ) gcol *= .82 + .3 * dn;                                   // asphalt
-  else if ( gc == 5 ) { vec2 t = fract( vWorld.xz / vec2( .4, .2 ) ); float j = step( .06, t.x ) * step( .1, t.y );   // promenade: pink and grey paver bands
+  else if ( gc == 5 ) { vec2 t = fract( vWorld.xz / vec2( .4, .2 ) ); float j = step( .06, t.x ) * step( .1, t.y );   // promenade: paver bands
     float band = step( .55, fract( vWorld.x / 1.7 + .3 * step( .5, fract( vWorld.z / 23. ) ) ) );
-    gcol = mix( gcol, vec3( .56, .55, .53 ), band ) * ( .88 + .2 * dn ) * mix( .84, 1., j ); }
+    gcol = mix( vec3( .3, .25, .23 ), vec3( .3, .28, .27 ), band ) * ( .88 + .2 * dn ) * mix( .84, 1., j ); }   // (pinkish-grey, low contrast: render 03)
   else if ( gc == 4 || gc == 9 ) { vec2 t = fract( vWorld.xz / vec2( .4, .2 ) ); float j = step( .06, t.x ) * step( .1, t.y ); gcol *= ( .88 + .2 * dn ) * mix( .82, 1., j ); }   // pavers
   else gcol *= .7 + .55 * dn;                                                          // grass, soil
   diffuseColor.rgb *= gcol;`)
@@ -184,22 +199,28 @@ export function buildContext(ctx, plot, M) {
   // trees: OSM trees within 220 m plus the plot's own; young street trees (crown ≈ 3 m) of leaf cards around a few
   // branches, normals bent outward from the crown's centre so the foliage shades as one volume
   // + the larger street tree that frames render 03 on the right (placed with its calibrated camera)
-  const trees = [...plot.trees, [65.2, 41.6, STREET, 1.6], ...(ctx.trees || []).filter(([x, z]) => Math.hypot(x - 10, z) < 220 && !(x > -9 && x < 28 && z > -38 && z < 43)).map(([x, z]) => [x, z, STREET, .85 + r() * .5])];
+  const trees = [...plot.trees, [65.2, 41.6, STREET, 1.55], ...(ctx.trees || []).filter(([x, z]) => Math.hypot(x - 10, z) < 220 && !(x > -9 && x < 28 && z > -38 && z < 43)).map(([x, z]) => [x, z, STREET, .85 + r() * .5])];
   const {crown, wood} = treeGeometry(r);
   const canopy = new T.InstancedMesh(crown, M.canopy, trees.length), trunk = new T.InstancedMesh(wood, M.trunk, trees.length);
   const m4 = new T.Matrix4(), q = new T.Quaternion(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
   trees.forEach(([x, z, y, sc], i) => {
     const s = sc * (.85 + r() * .35);
-    m4.compose(new T.Vector3(x, y, z), q.setFromAxisAngle(up, r() * 6.28), new T.Vector3(s, s * (.9 + r() * .2), s));
+    const yaw = r() * 6.28, sy = s * (.9 + r() * .2) * (i === plot.trees.length ? .78 : 1);   // (render 03's framing tree: a lower crown, as in its image)
+    m4.compose(new T.Vector3(x, y, z), q.setFromAxisAngle(up, yaw), new T.Vector3(s, sy, s));
     trunk.setMatrixAt(i, m4); canopy.setMatrixAt(i, m4);
     // mostly yellow-green young plane and ash trees, a few purple-leaved plums (render 03)
-    if (r() < .12) canopy.setColorAt(i, col.setHSL(.97, .32, .5)); else canopy.setColorAt(i, col.setHSL(.2 + (r() - .5) * .05, .34 + r() * .14, .74 + (r() - .5) * .1));
+    if (r() < .12) canopy.setColorAt(i, col.setHSL(.97, .32, .5)); else canopy.setColorAt(i, col.setHSL(.2 + (r() - .5) * .05, .36 + r() * .14, .78 + (r() - .5) * .1));
+    // the framing tree of render 03: young bright yellow-green leaves (seen from below, against the light)
+    if (i === plot.trees.length) canopy.setColorAt(i, col.setHSL(.18, .62, .86));
   });
   // crowns cast shadows but do not receive them: self-shadowed leaf cards read as dark blobs, real crowns glow
   canopy.castShadow = trunk.castShadow = true; canopy.receiveShadow = false; g.add(canopy, trunk);
   // shrubs and hedges: the same leaf cards in low mounds
   const shrubs = (ctx.shrubs || []).filter(([x, z]) => Math.hypot(x - 10, z) < 200);
-  const bush = crown.clone().translate(0, -3.15, 0).scale(.55, .45, .55);
+  // (a third of the crown's cards: a shrub is small on screen and there are hundreds)
+  const cardsOf = g => { const p = g.getAttribute('position'), keep = [], n = p.count / 6; for (let c = 0; c < n; c += 3) for (let v = 0; v < 6; v++) keep.push(c * 6 + v); return keep; };
+  const pick = (g, idx) => { const out = new T.BufferGeometry(); for (const [k, a] of Object.entries(g.attributes)) { const d = new a.array.constructor(idx.length * a.itemSize); idx.forEach((i, j) => { for (let c = 0; c < a.itemSize; c++) d[j * a.itemSize + c] = a.array[i * a.itemSize + c]; }); out.setAttribute(k, new T.BufferAttribute(d, a.itemSize)); } return out; };
+  const flatCrown = crown.index ? crown.toNonIndexed() : crown, bush = pick(flatCrown, cardsOf(flatCrown)).translate(0, -3.15, 0).scale(.55, .45, .55);
   const sh = new T.InstancedMesh(bush, M.canopy, shrubs.length);
   shrubs.forEach(([x, z], i) => { const s = .6 + r() * .6; m4.compose(new T.Vector3(x, STREET + s * .55, z), q.setFromAxisAngle(up, r() * 6.28), new T.Vector3(s, s, s)); sh.setMatrixAt(i, m4); sh.setColorAt(i, col.setHSL(.22, .4, .32 + (r() - .5) * .08)); });
   sh.receiveShadow = true; sh.castShadow = true; g.add(sh);
@@ -213,24 +234,42 @@ export function buildContext(ctx, plot, M) {
   return {group: g, lampHeads: heads};
 }
 
-// one young street tree: trunk to 2,3 m, five main branches, a crown of ~70 leaf cards in an ellipsoid (r 1,5 m)
+// one young street tree (plane or ash, as in render 03): a clear trunk to 2,3 m, six limbs with two side shoots each and
+// a leader, the foliage in loose clusters of small leaf cards at the shoot tips and along the limbs — an airy crown
+// (≈3 m across) that the sky shows through, not a solid ball
 function treeGeometry(r) {
-  const cards = [], wood = [], base = 2.2, cy = 3.35;
-  wood.push(new T.CylinderGeometry(.07, .11, base + .4, 7).translate(0, (base + .4) / 2, 0));
-  for (let k = 0; k < 5; k++) {
-    const a = k * 2.4 + r(), len = 1.2 + r() * .5, tilt = .5 + r() * .35;
-    const br = new T.CylinderGeometry(.025, .05, len, 5).translate(0, len / 2, 0).rotateZ(-tilt).rotateY(a).translate(0, base - .1 + r() * .4, 0);
-    wood.push(br);
+  const cards = [], wood = [], clusters = [], base = 2.3, cy = 3.35, Y = new T.Vector3(0, 1, 0), q = new T.Quaternion();
+  wood.push(new T.CylinderGeometry(.045, .075, base + .3, 7).translate(0, (base + .3) / 2, 0));
+  const limb = (from, dir, len, r0, r1) => {                                  // a tapered round branch from `from` along `dir`
+    wood.push(new T.CylinderGeometry(r1, r0, len, 4, 1, true).translate(0, len / 2, 0).applyQuaternion(q.setFromUnitVectors(Y, dir)).translate(from.x, from.y, from.z));   // (open, 4 sides: 8 triangles a limb)
+    return from.clone().addScaledVector(dir, len);
+  };
+  for (let k = 0; k < 6; k++) {
+    const a = k * 1.047 + r() * .5, tilt = .35 + r() * .4, len = 1.25 + r() * .45;
+    const dir = new T.Vector3(Math.sin(tilt) * Math.cos(a), Math.cos(tilt), Math.sin(tilt) * Math.sin(a));
+    const from = new T.Vector3(0, base - .15 + r() * .35, 0);
+    clusters.push([limb(from, dir, len, .035, .015), 4], [from.clone().addScaledVector(dir, len * .55), 2]);
+    for (let j = 0; j < 2; j++) {                                              // side shoots
+      const at = from.clone().addScaledVector(dir, len * (.4 + r() * .4)), d2 = dir.clone().add(new T.Vector3(r() - .5, r() * .5, r() - .5)).normalize();
+      clusters.push([limb(at, d2, .45 + r() * .4, .02, .008), 4]);
+    }
   }
-  for (let k = 0; k < 58; k++) {
-    // a point in the ellipsoid, denser near the surface
-    let p; do { p = new T.Vector3(r() * 2 - 1, r() * 2 - 1, r() * 2 - 1); } while (p.lengthSq() > 1 || p.lengthSq() < .25);
-    p.multiply(new T.Vector3(1.25, 1.15, 1.25));
-    const sz = .7 + r() * .4, card = new T.PlaneGeometry(sz, sz);
-    card.rotateX((r() - .5) * 2.4).rotateY(r() * Math.PI).rotateZ((r() - .5) * 1.2).translate(p.x, cy + p.y, p.z);
-    // normals from the crown centre (soft volumetric shading of the foliage)
-    const pos = card.getAttribute('position'), nrm = card.getAttribute('normal');
-    for (let i = 0; i < pos.count; i++) { const n = new T.Vector3(pos.getX(i), (pos.getY(i) - cy) * 1.3, pos.getZ(i)).normalize(); nrm.setXYZ(i, n.x, n.y, n.z); }
+  clusters.push([limb(new T.Vector3(0, base, 0), Y, cy + .9 - base, .04, .015), 5]);   // the leader
+  // and twigs filling out the ovoid silhouette (render 03's crowns are full ovals, finely leaved)
+  for (let k = 0; k < 14; k++) {
+    let p; do { p = new T.Vector3(r() * 2 - 1, r() * 2 - 1, r() * 2 - 1); } while (p.lengthSq() > 1 || p.lengthSq() < .45);
+    clusters.push([p.multiply(new T.Vector3(1.2, 1.15, 1.2)).add(new T.Vector3(0, cy, 0)), 3]);
+  }
+  for (const [c, n] of clusters) for (let i = 0; i < n; i++) {
+    const sz = .42 + r() * .28, card = new T.PlaneGeometry(sz, sz), p = c.clone().add(new T.Vector3((r() - .5) * .55, (r() - .35) * .4, (r() - .5) * .55));
+    card.rotateX((r() - .5) * 2.4).rotateY(r() * Math.PI).rotateZ((r() - .5) * 1.2).translate(p.x, p.y, p.z);
+    // normals from the crown centre (soft volumetric shading of the foliage), on the card's own front side: a
+    // double-sided card turns its normal round on the back face, so an outward normal stored against the card's
+    // front would point into the crown wherever that back face is seen (half the leaves shaded as if in shadow)
+    const pos = card.getAttribute('position'), nrm = card.getAttribute('normal'), front = new T.Vector3().fromBufferAttribute(nrm, 0);
+    const bent = Array.from({length: pos.count}, (_, v) => new T.Vector3(pos.getX(v), (pos.getY(v) - cy) * 1.3, pos.getZ(v)).normalize());
+    const s = bent.reduce((a, nn) => a + nn.dot(front), 0) < 0 ? -1 : 1;
+    bent.forEach((nn, v) => nrm.setXYZ(v, nn.x * s, nn.y * s, nn.z * s));
     cards.push(card);
   }
   return {crown: mergeGeometries(cards, false), wood: mergeGeometries(wood.map(x => x.index ? x.toNonIndexed() : x), false)};
@@ -239,12 +278,12 @@ function treeGeometry(r) {
 // leaf cluster texture with alpha: small elliptic leaves in a few greens, lighter at the top
 export function leafTexture(size = 512) {
   const c = Object.assign(document.createElement('canvas'), {width: size, height: size}), x = c.getContext('2d'), r = rng(17);
-  for (let k = 0; k < 330; k++) {
+  for (let k = 0; k < 560; k++) {
     const px = size * (.08 + r() * .84), py = size * (.08 + r() * .84), d = Math.hypot(px - size / 2, py - size / 2) / (size / 2);
     if (d > .98 || r() < d * d * .6) continue;
-    const L = 40 + r() * 26 + (1 - py / size) * 10, w = size * (.02 + r() * .012), h = w * (1.8 + r() * .6);
+    const L = 38 + r() * 30 + (1 - py / size) * 10, w = size * (.013 + r() * .009), h = w * (1.7 + r() * .6);
     x.save(); x.translate(px, py); x.rotate(r() * Math.PI * 2);
-    x.fillStyle = `hsl(${74 + r() * 26}, ${30 + r() * 20}%, ${L}%)`;
+    x.fillStyle = `hsl(${70 + r() * 24}, ${38 + r() * 22}%, ${L}%)`;
     x.beginPath(); x.ellipse(0, 0, w, h, 0, 0, Math.PI * 2); x.fill();
     x.strokeStyle = `hsla(80, 30%, ${L - 12}%, .5)`; x.lineWidth = 1; x.beginPath(); x.moveTo(0, -h); x.lineTo(0, h); x.stroke();
     x.restore();

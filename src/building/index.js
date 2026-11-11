@@ -17,6 +17,7 @@ import {buildFacades} from './facade.js';
 import {buildPlot, buildContext, groundMaterial, leafTexture, STREET} from './site.js';
 import {createCameras} from './cameras.js';
 import {buildCars, buildCypresses, buildOutdoor, buildPlanting, buildPeople, lavenderTexture} from './props.js';
+import {SKY_VERT, SKY_FRAG} from './sky.js';
 
 const small = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
 const GROUND_EXTENT = [-260, 280, -270, 270];          // ground_class.png: 20 cm pixels, columns along x, rows along z
@@ -25,34 +26,15 @@ const GROUND_EXTENT = [-260, 280, -270, 270];          // ground_class.png: 20 c
 // from +z towards +x, elevation, colour, irradiance; sky: tint × level; ground: albedo of the streets around;
 // lamps: street lamps and garden lights; lit: share of windows lit; exposure of the camera
 export const PRESETS = {
-  'Low sun': {sun: {az: 118, el: 24, color: '#fff0e0', E: 1.1}, sky: '#bccbe4', skyE: 2.15, ground: .26, lamps: 0, lit: .06, exposure: .98, zenith: '#1166b8', horizon: '#d2dbe0', clouds: .24},
-  Morning: {sun: {az: 125, el: 30, color: '#fff1e2', E: 1.5}, sky: '#bfcde4', skyE: 2.1, ground: .26, lamps: 0, lit: .03, exposure: .95, zenith: '#2a66b4', horizon: '#d6dde2', clouds: .3},
-  Day: {sun: {az: 270, el: 58, color: '#fff8ef', E: 1.7}, sky: '#c4d0e4', skyE: 2.2, ground: .26, lamps: 0, lit: 0, exposure: .9, zenith: '#2563b2', horizon: '#d4dde4', clouds: .25},
-  Evening: {sun: {az: -40, el: -3, color: '#ff9a62', E: 0}, sky: '#bab7d0', skyE: .42, ground: .22, lamps: .9, lit: .5, exposure: 10.5, zenith: '#2c4b80', horizon: '#e4b493', fog: '#80889f', clouds: .4, cloudColor: '#c9a9a6'},
-  Night: {sun: null, sky: '#a8a6c6', skyE: .16, ground: .2, lamps: .6, lit: .45, exposure: 19, zenith: '#5a6472', horizon: '#76808c', fog: '#5b636d', clouds: .35, cloudColor: '#858e99'},
+  'Low sun': {sun: {az: 118, el: 24, color: '#fff0e0', E: 1.1}, sky: '#bccbe4', skyE: 2.15, ground: .26, lamps: 0, lit: .06, exposure: .98, zenith: '#1166b8', horizon: '#d2dbe0', clouds: .24, trace: {sky: 1.2, sun: 1.5, sunColor: '#ffe4c4', exposure: .88, envTint: [1.04, .98, 1.08]}, skyBg: 1.2},
+  Morning: {sun: {az: 125, el: 30, color: '#fff1e2', E: 1.5}, sky: '#bfcde4', skyE: 2.1, ground: .26, lamps: 0, lit: .03, exposure: .95, zenith: '#2a66b4', horizon: '#d6dde2', clouds: .3, trace: {sky: 1.1, exposure: .9}, skyBg: 1.2},
+  Day: {sun: {az: 270, el: 58, color: '#fff8ef', E: 1.7}, sky: '#c4d0e4', skyE: 2.2, ground: .26, lamps: 0, lit: 0, exposure: .9, zenith: '#2563b2', horizon: '#d4dde4', clouds: .25, trace: {sky: 1.1, exposure: .9}, skyBg: 1.2},
+  Evening: {sun: {az: -40, el: -3, color: '#ff9a62', E: 0}, sky: '#b2b7c8', skyE: .42, ground: .22, lamps: .9, lit: .5, exposure: 10.5, zenith: '#2c4b80', horizon: '#e4b493', fog: '#80889f', clouds: .4, cloudColor: '#c9a9a6',
+    trace: {zenith: .3, horizon: 1.35, exposure: 1.5, envTint: [.76, .97, 1.2]}},   // (traced: the dusk light from low in the sky, cooler; the fields darker, as render 01)
+  Night: {sun: null, sky: '#a8a6c6', skyE: .16, ground: .2, lamps: .6, lit: .45, exposure: 19, zenith: '#5a6472', horizon: '#76808c', fog: '#5b636d', clouds: .35, cloudColor: '#858e99',
+    trace: {zenith: .4, horizon: 1.9, exposure: 1.12}},   // (traced: the last light low in the sky lights the walls, the ground stays dark, as render 04)
 };
 
-// the sky: gradient, sun glow, cirrus wisps (value-noise fbm on a plane above the camera)
-const SKY_VERT = 'varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4( position, 1. ); gl_Position = p.xyww; }';
-const SKY_FRAG = /* glsl */`uniform vec3 zenith, horizon, groundCol, sunDir, sunCol, cloudColor; uniform float cloudAmount, gain; varying vec3 vDir;
-float hash2( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
-float vnoise( vec2 p ) { vec2 i = floor( p ), f = fract( p ); f = f * f * ( 3. - 2. * f );
-  return mix( mix( hash2( i ), hash2( i + vec2( 1., 0. ) ), f.x ), mix( hash2( i + vec2( 0., 1. ) ), hash2( i + vec2( 1., 1. ) ), f.x ), f.y ); }
-float fbm( vec2 p ) { float s = 0., a = .5; for ( int k = 0; k < 5; k ++ ) { s += a * vnoise( p ); p = p * 2.03 + vec2( 1.7, 9.2 ); a *= .5; } return s; }
-void main() {
-  vec3 d = normalize( vDir ); float y = d.y;
-  vec3 c = y > 0. ? mix( horizon, zenith, pow( y, .38 ) ) : mix( horizon, groundCol, smoothstep( 0., .06, - y ) );
-  float s = max( dot( d, sunDir ), 0. );
-  c += sunCol * ( pow( s, 6. ) * .35 + pow( s, 90. ) * 1.2 ) * smoothstep( -.03, .02, y );
-  if ( y > 0. && cloudAmount > 0. ) {
-    vec2 cp = d.xz / ( y + .1 ) * 1.4; cp.x *= .32;
-    float k = smoothstep( .56, .86, fbm( cp + vec2( 3.1, 1.3 ) ) ) * cloudAmount * smoothstep( 0., .18, y );
-    c = mix( c, cloudColor * ( .8 + .25 * fbm( cp * 3. ) ) + sunCol * pow( s, 4. ) * .5, k );
-  }
-  gl_FragColor = vec4( c * gain, 1. );
-  #include <tonemapping_fragment>
-  #include <colorspace_fragment>
-}`;
 const GRADE = {                                  // after tone mapping: S-curve and saturation as a photo edit, vignette, grain
   uniforms: {tDiffuse: {value: null}, time: {value: 0}, vignette: {value: .18}, grain: {value: .014}, contrast: {value: .2}, saturation: {value: 1.1}},
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1. ); }',
@@ -91,11 +73,11 @@ function createMaterials(U) {
     // white glazed face brick (cara vista), stretcher bond, fine grey joints
     brick: tiles({px: small ? 512 : 1024, tw: .29, th: .0625, per: 4, color: [40, 3, 95], vary: 1.8, grout: '#b9b6af', joint: .01, bond: 'running', cloud: .05, rough: .55, roughVar: .12, seed: 21}),
     // porcelain cladding of the recessed bays, horizontal courses
-    cladding: tiles({px: 512, tw: 1.2, th: .5, per: 2, color: [33, 32, 84], vary: 2.2, grout: '#8d877d', joint: .005, bond: 'running', cloud: .09, rough: .42, roughVar: .08, seed: 22}),
-    render: stone({color: [40, 7, 93], seed: 19, metres: 1.6, speckle: .25}),
+    cladding: tiles({px: 512, tw: 1.2, th: .5, per: 2, color: [34, 36, 88], vary: 2.2, grout: '#8d877d', joint: .005, bond: 'running', cloud: .09, rough: .42, roughVar: .08, seed: 22}),
+    render: stone({color: [30, 6, 96], seed: 19, metres: 1.6, speckle: .25}),
     pavers: tiles({px: 512, tw: .6, th: .3, per: 4, color: [32, 8, 70], vary: 3, grout: '#9c968d', joint: .004, bond: 'running', speckle: .7, cloud: .1, rough: .85, roughVar: .1, seed: 16}),
     terrace: tiles({px: 512, tw: .6, th: .6, per: 3, color: [35, 6, 76], vary: 2, grout: '#a8a29a', joint: .004, speckle: .5, cloud: .08, rough: .8, seed: 17}),
-    poolTile: tiles({px: 512, tw: .25, th: .25, per: 4, color: [190, 30, 80], vary: 3, grout: '#e8eef0', joint: .004, rough: .2, seed: 18}),
+    poolTile: tiles({px: 512, tw: .25, th: .25, per: 4, color: [200, 42, 76], vary: 3, grout: '#e8eef0', joint: .004, rough: .2, seed: 18}),
     coping: stone({color: [40, 8, 86], seed: 8, metres: 1.2}),
     grass: stone({color: [95, 38, 38], seed: 5, metres: .5, speckle: 1}),
     wicker: weave({color: [36, 8, 70], threads: 40, metres: .25, slub: .2, basket: true, seed: 12}), linen: weave({color: [38, 12, 86], threads: 140, metres: .15, slub: .25}),
@@ -114,11 +96,11 @@ function createMaterials(U) {
     // balcony fronts: laminated glass with a pale green-grey interlayer, as render 03
     balcony: arch({color: '#ffffff', map: glassJoints(), roughness: .12, metalness: 0, envMapIntensity: .9, transparent: true, opacity: .8}),
     terrace: arch({color: '#ffffff', roughness: 1}, tex.terrace),
-    roof: arch({color: '#858d96', roughness: .92}),                      // blue-grey waterproofing (render 01)
+    roof: arch({color: '#5f6c7c', roughness: .92}),                      // blue-grey waterproofing (render 01)
     shutter: arch({color: '#b4b8ba', roughness: .5, metalness: .25}),
     paving: arch({color: '#ffffff', roughness: 1}, tex.pavers),
     coping: arch({color: '#ece8e0', roughness: .8}, tex.coping),
-    poolTile: arch({color: '#ffffff', roughness: 1}, tex.poolTile),
+    poolTile: arch({color: '#ffffff', roughness: 1, emissive: '#000000', emissiveMap: caustics()}, tex.poolTile),
     grass: arch({color: '#ffffff', roughness: 1, normalScale: new T.Vector2(1.5, 1.5)}, tex.grass),
     ramp: arch({color: '#6e6f70', roughness: .9}),
     wallWhite: arch({color: '#ffffff', roughness: 1, normalScale: new T.Vector2(.5, .5)}, tex.render),
@@ -127,16 +109,17 @@ function createMaterials(U) {
     room: std({color: '#9a9288', roughness: .9, envMapIntensity: .12, emissive: '#000000'}),
     roomLit: std({color: '#9a9288', roughness: .9, envMapIntensity: .12, emissive: '#000000', emissiveMap: roomGlow()}),
     roomFloor: std({color: '#6f6052', roughness: .7, envMapIntensity: .12}),
+    curtain: std({color: '#e4e0d6', roughness: 1, envMapIntensity: .3, side: T.DoubleSide}),
     reveal: std({color: '#b8b2a8', roughness: .9, envMapIntensity: .12}),
     dark: std({color: '#1c1d1f', roughness: .9}),
     sill: std({color: '#e7e3dc', roughness: .55}, tex.coping), cap: std({color: '#eeece7', roughness: .6}),
-    pvc: std({color: '#b7babd', roughness: .4, metalness: .3}), garageDoor: std({color: '#c9cac8', roughness: .45, metalness: .3}), alu: std({color: '#9aa0a6', roughness: .35, metalness: .7}),
+    pvc: std({color: '#e4e5e3', roughness: .45, metalness: 0}), garageDoor: std({color: '#c9cac8', roughness: .45, metalness: .3}), alu: std({color: '#9aa0a6', roughness: .35, metalness: .7}),
     slats: std({color: '#8c9196', roughness: .45, metalness: .5}), lounger: std({color: '#f2f0ea', roughness: .6}),
     glassFence: std({color: '#dfe8e6', roughness: .05, transparent: true, opacity: .22, depthWrite: false}),
     // pool water: clear enough to show the tiled basin, gentle ripples (strong ones mirror the sky in blotches)
     water: std({color: '#3fa4dc', roughness: .03, metalness: 0, transparent: true, opacity: .55, normalMap: normalFromNoise(water, 256), normalScale: new T.Vector2(.05, .05), envMapIntensity: .9}),
     neighbour: std({color: '#e6e1d8', roughness: .9}),
-    canopy: std({color: '#ffffff', roughness: .8, map: leafTexture(), alphaTest: .45, side: T.DoubleSide}), trunk: std({color: '#5b4b3c', roughness: .95}),
+    canopy: std({color: '#ffffff', roughness: .8, map: leafTexture(), alphaTest: .45, side: T.DoubleSide}), trunk: std({color: '#6a6057', roughness: .95}),
     lampPole: std({color: '#1d3a6b', roughness: .45, metalness: .5}),
     lampGlow: new T.MeshBasicMaterial({color: '#fff4dc'}),
     // cars and terrace plants
@@ -170,11 +153,30 @@ function glassJoints() {
   x.fillStyle = '#c6d1cd'; x.fillRect(0, 0, 256, 8); x.fillStyle = '#8c9895'; x.fillRect(0, 0, 3, 8);
   const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1 / 1.15, 1); t.anisotropy = 8; return t;
 }
+// sunlight focused by the pool's ripples on its floor (render 02): a tileable web, bright where neighbouring cells of
+// a jittered grid meet (F2 − F1 of a Voronoi field), ≈ 35 cm cells over a 2,1 m repeat. Used as a faint glow scaled with
+// the sun: neither renderer traces real caustics.
+function caustics(size = 256, cells = 6) {
+  let seed = 77; const r = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646, pts = [];
+  for (let j = 0; j < cells; j++) for (let i = 0; i < cells; i++) pts.push([(i + .15 + r() * .7) / cells, (j + .15 + r() * .7) / cells]);
+  const c = Object.assign(document.createElement('canvas'), {width: size, height: size}), x = c.getContext('2d'), img = x.createImageData(size, size), d = img.data;
+  for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+    const u = (i + .5) / size, v = (j + .5) / size; let f1 = 9, f2 = 9;
+    for (const [px, py] of pts) for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+      const dd = Math.hypot(px + ox - u, py + oy - v); if (dd < f1) { f2 = f1; f1 = dd; } else if (dd < f2) f2 = dd;
+    }
+    const e = Math.exp(-(f2 - f1) * cells * 9) * 255, k = (j * size + i) * 4; d[k] = d[k + 1] = d[k + 2] = e; d[k + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1 / 2.1, 1 / 2.1); return t;
+}
 // dark aluminium lattice of the courtyard patio screens (render 02), alpha-tested
 function lattice() {
   const c = Object.assign(document.createElement('canvas'), {width: 64, height: 64}), x = c.getContext('2d');
-  x.fillStyle = '#34373b'; x.fillRect(0, 0, 64, 7); x.fillRect(0, 0, 7, 64);                  // a square grid, 7 cm cells
-  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1 / .07, 1 / .07); t.anisotropy = 8; return t;
+  // expanded metal: diamonds, wider than tall (≈11 × 6 cm), as the screens of render 02
+  x.strokeStyle = '#34373b'; x.lineWidth = 9; x.lineCap = 'square';
+  for (const o of [-64, 0, 64]) { x.beginPath(); x.moveTo(o, 0); x.lineTo(o + 64, 64); x.moveTo(o + 64, 0); x.lineTo(o, 64); x.stroke(); }
+  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1 / .11, 1 / .06); t.anisotropy = 8; return t;
 }
 // a lit room seen from outside: brightest under the ceiling lamp, falling off towards the floor and the corners
 function roomGlow() {
@@ -207,8 +209,14 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   const renderer = new T.WebGLRenderer({antialias: false, powerPreference: 'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.5 : 2));
   renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.NeutralToneMapping;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap; renderer.shadowMap.autoUpdate = false;
   container.append(renderer.domElement); renderer.domElement.className = 'ap-canvas';
+  // a lost GPU context (driver reset, memory pressure) leaves a clear message instead of a frozen picture
+  renderer.domElement.addEventListener('webglcontextlost', e => {
+    e.preventDefault(); paused = true; cancelAnimationFrame(raf);
+    const m = Object.assign(document.createElement('div'), {className: 'loading', textContent: 'La vista 3D se ha interrumpido. Recarga la página para continuar.'});
+    container.append(m);
+  });
   const scene = new T.Scene();
   const U = {skyTint: {value: new T.Color()}, groundTint: {value: new T.Color()}, lampTint: {value: new T.Color()}, groundMap: {value: null}, lampMap: {value: null}};
   const mark = n => performance.mark('building:' + n);                 // stage timings (Performance panel)
@@ -218,7 +226,7 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   onStatus('Construyendo el edificio…');
   const fac = buildFacades(ex, openings, building), plot = buildPlot(ex, building);
   const atlas = packCharts([...fac.mesher.charts, ...plot.mesher.charts], {density: small ? 10 : 22, size: small ? 1024 : 2048});
-  const NO_SHADOW = new Set(['glass', 'room', 'roomLit', 'roomFloor', 'reveal', 'glassFence', 'water']);
+  const NO_SHADOW = new Set(['glass', 'room', 'roomLit', 'roomFloor', 'reveal', 'curtain', 'glassFence', 'water']);
   const lightmapped = [], buildingMeshes = [], plotMeshes = [];
   for (const [src, list] of [[fac, buildingMeshes], [plot, plotMeshes]]) {
     for (const {name, geometry} of src.mesher.geometries()) {
@@ -306,12 +314,49 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   composer.addPass(new OutputPass());
   const grade = new ShaderPass(GRADE); composer.addPass(grade);
 
+  // ---- photorealistic stills: a path tracer (loaded on first use) refines the Photo view while the camera rests
+  // samples to converge: night (many small lights) is slower per sample, so it stops a little earlier
+  // the still is traced at up to 1,5 pixels per CSS pixel on dense screens (crisper frames and joints), with fewer
+  // samples per pixel so the wait stays about the same (the same rays, spread over more pixels)
+  const traceDensity = () => small ? 1 : Math.min(renderer.getPixelRatio(), 1.5);
+  const renderGoal = () => small ? 96 : Math.round((PRESETS[preset].sun?.el > 0 ? 256 : 192) * 1.15 / traceDensity() ** 2);
+  let tracer = null, tracing = false;
+  function lookForTracer() {
+    // trace: the traced still's own balance (its bounce light fills shadows the live view's balance had to lift)
+    const p = PRESETS[preset], tr = p.trace || {}, up = p.sun && p.sun.el > 0, su = skyU, eu = envSky.material.uniforms;
+    const base = {sunDir: su.sunDir.value, sunCol: su.sunCol.value, cloudColor: su.cloudColor.value, cloudAmount: su.cloudAmount.value};
+    const tint = new T.Color(...(tr.envTint || [1, 1, 1]));                       // the sky light's hue in the still (render 03's shade is bluer)
+    return {
+      sky: {...base, zenith: su.zenith.value, horizon: su.horizon.value, groundCol: su.groundCol.value, gain: (p.skyBg ?? 1) / (p.exposure * (tr.exposure ?? 1))},
+      env: {...base, zenith: eu.zenith.value.clone().multiply(tint).multiplyScalar(tr.zenith ?? 1), horizon: eu.horizon.value.clone().multiply(tint).multiplyScalar(tr.horizon ?? 1), groundCol: U.groundTint.value, gain: eu.gain.value * (tr.sky ?? 1)},
+      sun: up ? {color: tr.sunColor ? new T.Color(tr.sunColor) : sun.color, E: p.sun.E * (tr.sun ?? 1)} : null,
+      lamps: p.lamps, lampTint: new T.Color('#ffd9a8'), exposure: p.exposure * (tr.exposure ?? 1),
+    };
+  }
+  async function startRender() {
+    if (cams.mode !== 'photo' || tracing) return;
+    cams.setRenderProgress('prep'); setPR(prFull);
+    await new Promise(r => setTimeout(r, 30));                                // let the label paint before the heavy work
+    if (!tracer) {
+      const {createPathTracer} = await import('./pathtrace.js'); mark('tracer-loaded');
+      tracer = createPathTracer(renderer, {source: scene, skip: new Set([sky, ground]), small,
+        ground: {image: classTex.image, extent: GROUND_EXTENT, near: [-60, 100, -90, 90], holes: [[pool.x[0], pool.x[1], pool.z[0], pool.z[1]], [ramp.x[0] - .2, ramp.x[1], ramp.z[0], ramp.z[1]]]},
+        lights: [...around.lampHeads.map(l => ({x: l.x, y: l.y - .1, z: l.z, intensity: 110, color: '#ffd1a0'})), ...outdoor.lights.map(l => ({...l, intensity: l.intensity * .55, color: '#ffcf96'})),
+          ...planting.lights.map(v => ({x: v.x, y: v.y, z: v.z, intensity: v.w, color: '#ffd8b0'}))]});
+      tracer.build(cams.camera); mark('tracer-built');
+    }
+    tracer.setLook(lookForTracer());
+    tracer.start(cams.camera, renderer.getPixelRatio() / traceDensity());
+    tracing = true;
+  }
+  function stopRender() { if (!tracing) return; tracing = false; cams.setRenderProgress(null); invalidate(); }
+
   // ---- presets, render styles
   let preset = '', dirty = 2;
   const invalidate = () => { dirty = Math.max(dirty, 2); };
   const lum = c => .2126 * c.r + .7152 * c.g + .0722 * c.b;
   function setTime(name) {
-    preset = name; const p = PRESETS[name];
+    stopRender(); preset = name; const p = PRESETS[name];
     bar.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('on', b.dataset.time === name));
     U.skyTint.value.set(p.sky).multiplyScalar(p.skyE);
     // ground radiance: its albedo × (sun on most of it + the open sky's 7π/9 × tint) / π
@@ -333,7 +378,7 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
     lampsU.lampLevel.value = p.lamps;
     skyU.cloudAmount.value = p.clouds || 0; skyU.cloudColor.value.set(p.cloudColor || '#f4f5f6');
     renderer.toneMappingExposure = p.exposure; bloom.threshold = 2 / p.exposure;
-    sky.material.uniforms.gain.value = 1 / p.exposure;
+    sky.material.uniforms.gain.value = (p.skyBg ?? 1) / p.exposure;           // skyBg: the sky as seen, brighter than its light (render 03)
     // environment: the sky scaled to the baked sky's level (captured with the real ground and neighbourhood)
     const mean = envSky.material.uniforms.zenith.value.clone().lerp(envSky.material.uniforms.horizon.value, .45);
     envSky.material.uniforms.gain.value = lum(U.skyTint.value) * .7 / Math.max(lum(mean), 1e-4);
@@ -342,7 +387,8 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
     // windows: a share lit at dusk and night (warm), interiors visible through the glass after dark
     // (glows are set against the exposure: a lit window reads ≈ 1,3 × white, a lamp head blooms)
     M.roomLit.emissive.set('#ffcf98'); M.roomLit.emissiveIntensity = p.lit > .2 ? 1.6 / p.exposure : 0;
-    M.glass.opacity = up && p.sun.el > 6 ? .8 : .5; M.balcony.opacity = up ? .8 : .78; M.canopy.envMapIntensity = up ? 1 : .45;   // laminated glass: translucent by day, dark grey at night (render 04)
+    M.poolTile.emissive.set('#e6faff'); M.poolTile.emissiveIntensity = up ? .22 * p.sun.E * Math.sin(p.sun.el * Math.PI / 180) : 0;   // caustics in the sun
+    M.glass.opacity = up && p.sun.el > 6 ? .8 : .5; M.balcony.opacity = up ? .8 : .78; M.canopy.envMapIntensity = up ? 1 : .45; M.canopy.color.setScalar(up || p.lamps > .7 ? 1 : .5);   // (night: crowns dark but for the lamps, render 04)   // laminated glass: translucent by day, dark grey at night (render 04)
     M.lampGlow.color.set(p.lamps ? '#fff1d8' : '#d8d6d0').multiplyScalar(p.lamps ? 6 / p.exposure : .25 / p.exposure);
     M.taillight.color.set(p.lamps ? '#ff2a1a' : '#5a0d0d').multiplyScalar(p.lamps ? .8 / p.exposure : .3 / p.exposure);
     M.headlight.color.set('#d9dcdf').multiplyScalar(.35 / p.exposure);
@@ -358,7 +404,8 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   };
   container.append(bar);
   cams.onMode = m => { bar.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === m)); invalidate(); };
-  cams.onShot = s => { if (s.time && s.time !== preset) setTime(s.time); };
+  cams.onShot = s => { stopRender(); if (s.time && s.time !== preset) setTime(s.time); };
+  cams.onRender = () => tracing ? stopRender() : startRender();
   cams.invalidate = invalidate;
 
   // ---- loop (renders only when something changed)
@@ -368,14 +415,22 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   const setPR = v => { if (renderer.getPixelRatio() === v) return; renderer.setPixelRatio(v); composer.setPixelRatio(v); resize(); };
   const resize = () => {
     const w = container.clientWidth, h = container.clientHeight; if (!w || !h) return;
-    renderer.setSize(w, h, false); composer.setSize(w, h); cams.resize(w, h); invalidate();
+    stopRender(); renderer.setSize(w, h, false); composer.setSize(w, h); cams.resize(w, h); invalidate();
   };
   const ro = new ResizeObserver(resize); ro.observe(container); resize();
   function frame(now) {
     if (paused) return;
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000); last = now;
-    if (cams.update(dt)) { dirty = Math.max(dirty, 1); still = 0; setPR(prMove); }
+    const moved = cams.update(dt);
+    if (tracing) {                                                            // the path tracer owns the canvas until the view moves
+      if (!moved) {
+        if (tracer.samples < renderGoal()) { tracer.step(); tracer.show(null, renderGoal()); cams.setRenderProgress(tracer.samples / renderGoal()); }
+        return;
+      }
+      stopRender();
+    }
+    if (moved) { dirty = Math.max(dirty, 1); still = 0; setPR(prMove); }
     else if ((still += dt) > .3 && renderer.getPixelRatio() !== prFull) setPR(prFull);
     if (!dirty) return;
     dirty--;
@@ -391,8 +446,8 @@ export async function createBuilding(container, {base = '/models/mykonos/', url 
   return {
     pause() { paused = true; cancelAnimationFrame(raf); if (document.pointerLockElement) document.exitPointerLock(); },
     resume() { if (!paused) return; paused = false; last = performance.now(); invalidate(); raf = requestAnimationFrame(frame); },
-    setTime, setMode: m => cams.setMode(m), shot: i => cams.shot(i), cams, scene, renderer, stats, uniforms: U, presets: PRESETS,
+    setTime, setMode: m => cams.setMode(m), shot: i => cams.shot(i), render: startRender, stopRender, get tracer() { return tracer; }, cams, scene, renderer, stats, uniforms: U, presets: PRESETS,
     internals: {M, baker, fac, plot, around, sun, sky, composer, passes: {gtao, bloom, grade}, lightmapped},
-    dispose() { cancelAnimationFrame(raf); ro.disconnect(); cams.dispose(); baker.dispose(); pmrem.dispose(); envRT?.dispose(); composer.dispose(); renderer.dispose(); scene.traverse(o => o.geometry?.dispose()); container.replaceChildren(); },
+    dispose() { tracer?.dispose(); cancelAnimationFrame(raf); ro.disconnect(); cams.dispose(); baker.dispose(); pmrem.dispose(); envRT?.dispose(); composer.dispose(); renderer.dispose(); scene.traverse(o => o.geometry?.dispose()); container.replaceChildren(); },
   };
 }

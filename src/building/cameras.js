@@ -24,9 +24,9 @@ export function createCameras({renderer, container, ex, plot}) {
   const dir = (x, y, z) => new T.Vector3(x, y, z).normalize();
   const shots = [
     {name: 'Render 03 · Calle María de Molina', ref: '/assets/ref-mykonos03.jpg', pos: new T.Vector3(71.4, 2.36, 55.81), fwd: dir(-.782, .125, -.61), fov: 30, time: 'Low sun'},
-    {name: 'Render 01 · Vista aérea', ref: '/assets/ref-mykonos01.jpg', pos: new T.Vector3(80.82, 45.06, 102.65), fwd: dir(-.568, -.299, -.767), fov: 20, time: 'Evening'},
+    {name: 'Render 01 · Vista aérea', ref: '/assets/ref-mykonos01.jpg', pos: new T.Vector3(53.92, 38.66, 44.59), fwd: dir(-.6539, -.519, -.5505), fov: 44.95, time: 'Evening'},   // solved from 7 roof, frame and bay corners (≈7 px rms)
     {name: 'Render 04 · Calle de noche', ref: '/assets/ref-mykonos04.jpg', pos: new T.Vector3(71.4, 2.36, 55.81), fwd: dir(-.782, .125, -.61), fov: 30, time: 'Night'},
-    {name: 'Piscina (render 02)', pos: new T.Vector3(-5.2, 2.6, 4.3), fwd: dir(-.2, -.2, 1), fov: 58},
+    {name: 'Piscina (render 02)', pos: new T.Vector3(-7, 3, 4.6), fwd: dir(.04, -.27, 1), fov: 60, time: 'Day'},   // framed by eye: the render's pool is not the plan's
     {name: 'Fachada al patio', pos: new T.Vector3(-34, 1.6, 66), fwd: dir(.62, .2, -.76), fov: 40},
     elevation('Alzado a María de Molina', '/assets/ref-mykonos-fachada2.jpg', 1243 / 380, 77.06, 11.3, 1, 'Morning'),
     elevation('Alzado al patio', '/assets/ref-mykonos-fachada1.jpg', 1243 / 400, 77.06, 11.72, -1, 'Day'),
@@ -100,16 +100,23 @@ export function createCameras({renderer, container, ex, plot}) {
   const hint = document.createElement('div'); hint.className = 'ap-hint';
   hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Arrastra para mirar · arrastra con dos dedos para caminar' : 'Clic para mirar · WASD para caminar · Mayús para correr · Esc suelta el ratón';
   container.append(hint);
-  // ---- photo caption: previous / next shot, and the published render laid over the view
+  // ---- photo caption: previous / next shot, the path-traced render, and the published render laid over the view
   const caption = document.createElement('div'); caption.className = 'ap-shot';
-  caption.innerHTML = '<button data-step="-1" aria-label="Vista anterior">‹</button><span></span><button data-compare hidden>Comparar</button><button data-step="1" aria-label="Vista siguiente">›</button>';
+  caption.innerHTML = '<button data-step="-1" aria-label="Vista anterior">‹</button><span></span><button data-render title="Render fotorrealista (trazado de rayos)">Render</button><button data-compare hidden>Comparar</button><button data-step="1" aria-label="Vista siguiente">›</button>';
   const overlay = document.createElement('img'); overlay.className = 'bd-ref'; overlay.alt = ''; overlay.hidden = true; container.append(overlay);
   caption.onclick = e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.step) api.shot(shotIndex + Number(b.dataset.step));
     else if ('compare' in b.dataset) { overlay.hidden = !overlay.hidden; b.classList.toggle('on', !overlay.hidden); }
+    else if ('render' in b.dataset) api.onRender?.();
   };
   container.append(caption);
+  // the render button reports the path tracer's progress: null (idle), 'prep', 0…1
+  api.setRenderProgress = v => {
+    const b = caption.querySelector('[data-render]');
+    b.textContent = v === null ? 'Render' : v === 'prep' ? 'Preparando…' : v >= 1 ? 'Render ✓' : `Render ${Math.round(v * 100)} %`;
+    b.classList.toggle('on', v !== null);
+  };
   const layoutOverlay = () => {
     const wide = aspect >= refAspect;
     Object.assign(overlay.style, wide ? {height: '100%', width: 'auto', left: '50%', top: '0', transform: 'translateX(-50%)'} : {width: '100%', height: 'auto', left: '0', top: '50%', transform: 'translateY(-50%)'});

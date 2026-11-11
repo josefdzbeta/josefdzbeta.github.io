@@ -150,12 +150,13 @@ export function createBaker(renderer, atlasSize, {depthSize = 2048} = {}) {
     }
     return run(targets[target], jobs, onProgress);
   }
-  // lamps: I(θ) = I0 cos^1.5 θ, the source jittered over a 4 cm disc
+  // lamps: I(θ) = I0 cos^1.5 θ, the source jittered over a 4 cm disc; a lamp with a `beam` (half-angle, rad) is a
+  // narrower downlight: cos^n θ falling to a quarter at the beam's edge
   function bakeLamps(lamps, per = 10, onProgress, {target = 'lamp'} = {}) {
     const jobs = [];
     for (const lp of lamps) for (let k = 0; k < per; k++) {
-      const a = k * 2.399963, rr = .04 * Math.sqrt((k + .5) / per);
-      jobs.push({spot: true, pos: new T.Vector3(lp.x + Math.cos(a) * rr, lp.y, lp.z + Math.sin(a) * rr), radiance: new T.Color(lp.color || '#fff').multiplyScalar((lp.intensity ?? 1) / per)});
+      const a = k * 2.399963, rr = .04 * Math.sqrt((k + .5) / per), beam = lp.beam ? {cone: Math.log(.25) / Math.log(Math.cos(lp.beam)), fov: Math.min(150, lp.beam * 2 * 1.8 * 180 / Math.PI)} : {};
+      jobs.push({spot: true, ...beam, pos: new T.Vector3(lp.x + Math.cos(a) * rr, lp.y, lp.z + Math.sin(a) * rr), radiance: new T.Color(lp.color || '#fff').multiplyScalar((lp.intensity ?? 1) / per)});
     }
     return run(targets[target], jobs, onProgress);
   }

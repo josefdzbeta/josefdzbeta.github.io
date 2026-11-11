@@ -411,7 +411,7 @@ function setup(container, {shadows = true} = {}) {
   const scene = new T.Scene(); scene.background = new T.Color('#d9dcd6');
   const renderer = new T.WebGLRenderer({antialias: !small, alpha: false, powerPreference: 'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.25 : 1.6));
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap; renderer.shadowMap.autoUpdate = false;
   renderer.outputColorSpace = T.SRGBColorSpace; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = .78;
   setAnisotropy(renderer.capabilities.getMaxAnisotropy());
   container.prepend(renderer.domElement);
