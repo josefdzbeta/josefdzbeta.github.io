@@ -236,7 +236,7 @@ export async function createApartment(container, {unit, planURL = null, onStatus
   function setStyle(s) {
     style = style === s ? 'final' : s;
     U.clay.value = style === 'lighting' ? 1 : 0;
-    scene.overrideMaterial = style === 'matcap' ? matcap : style === 'wire' ? wire : null;
+    renderPass.overrideMaterial = style === 'matcap' ? matcap : style === 'wire' ? wire : null;   // GTAOPass resets scene.overrideMaterial
     scene.background = style === 'wire' ? new T.Color('#16191d') : null; sky.visible = style !== 'wire' && style !== 'matcap';
     bar.querySelectorAll('[data-style]').forEach(b => b.classList.toggle('on', b.dataset.style === style));
     invalidate();

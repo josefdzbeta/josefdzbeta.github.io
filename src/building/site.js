@@ -1,0 +1,232 @@
+// The plot and its surroundings. The plot follows exterior.json's site (measured on the renders and the basement
+// plan): raised paving, courtyard pool and solarium, the garage ramp at the Portal 1 end, the slatted plot fences
+// and the walls between the ground-floor patios (traced rails). Around it, OpenStreetMap (ODbL), reflected
+// north–south to match Bamaire's plans: the ground by land use (a 20 cm raster), neighbouring buildings with their
+// heights, trees and shrubs, and street lamps along Calle María de Molina.
+import * as T from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {Mesher, Parts, place} from '../apartment/geometry.js';
+import {subtract} from './facade.js';
+
+const rng = seed => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+export const STREET = -.31;                                                // street level (the plot is raised to +0,7)
+
+export function buildPlot(ex, building) {
+  const M = new Mesher(), parts = new Parts(), half = ex.length / 2, st = ex.site || {};
+  const [zN, zP] = st.plotZ || [-half - 2, half + 7.5], px = st.patioX?.[1] ?? ex.depth + 6.5, cx = -8, top = .7, D = ex.depth;
+  const pool = st.pool, sol = st.solarium, ramp = st.ramp, coping = .4;
+  // a box whose visible faces are lightmapped quads (top, and the sides that are not against the ground)
+  const slab = (mat, x0, x1, y0, y1, z0, z1, sides = true) => {
+    M.floor(mat, x0, x1, z0, z1, y1, true);
+    if (!sides) return;
+    M.wallZ(mat, x0, x1, y0, y1, z1, 1); M.wallZ(mat, x0, x1, y0, y1, z0, -1); M.wallX(mat, z0, z1, y0, y1, x1, 1); M.wallX(mat, z0, z1, y0, y1, x0, -1);
+  };
+  const box = (mat, x0, x1, y0, y1, z0, z1) => parts.add(mat, new T.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), place((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
+  // raised paving: courtyard (minus pool and solarium), street-side patios, end strips, deck over the ramp tunnel
+  const poolOut = [pool.x[0] - coping, pool.x[1] + coping, pool.z[0] - coping, pool.z[1] + coping];
+  for (const r of subtract([cx, 0, zN, half], [poolOut, [sol.x[0], sol.x[1], sol.z[0], sol.z[1]]])) slab('paving', r[0], r[1], STREET, top, r[2], r[3], false);
+  slab('paving', D, px, STREET, top, -half, half, false); slab('paving', cx, px, STREET, top, zN, -half, false); slab('paving', cx, px, STREET, top, half, ramp.z[0] - .2, false);
+  slab('paving', cx, ramp.x[0], STREET, top, ramp.z[0] - .2, zP, false); slab('paving', ramp.x[0], px, STREET, top, ramp.z[1], zP, false);
+  // pool: coping, tiled basin, water; solarium of artificial grass with loungers; glass fence
+  for (const r of subtract(poolOut, [[pool.x[0], pool.x[1], pool.z[0], pool.z[1]]])) slab('coping', r[0], r[1], top, top + .04, r[2], r[3]);
+  M.floor('poolTile', pool.x[0], pool.x[1], pool.z[0], pool.z[1], top - 1.4, true);
+  M.wallZ('poolTile', pool.x[0], pool.x[1], top - 1.4, top, pool.z[0], 1); M.wallZ('poolTile', pool.x[0], pool.x[1], top - 1.4, top, pool.z[1], -1);
+  M.wallX('poolTile', pool.z[0], pool.z[1], top - 1.4, top, pool.x[0], 1); M.wallX('poolTile', pool.z[0], pool.z[1], top - 1.4, top, pool.x[1], -1);
+  const water = new T.Mesh(new T.PlaneGeometry(pool.x[1] - pool.x[0], pool.z[1] - pool.z[0]).rotateX(-Math.PI / 2), null);
+  water.position.set((pool.x[0] + pool.x[1]) / 2, top - .12, (pool.z[0] + pool.z[1]) / 2); water.name = 'water';
+  slab('grass', sol.x[0], sol.x[1], top, top + .03, sol.z[0], sol.z[1], false);
+  for (let k = 0; k < 4; k++) {
+    const z = sol.z[0] + 1 + k * 1.3;
+    box('lounger', sol.x[0] + .6, sol.x[0] + 2.5, top + .3, top + .38, z, z + .7); box('lounger', sol.x[0] + .6, sol.x[0] + 1.2, top + .38, top + .7, z, z + .7);
+    for (const lx of [sol.x[0] + .7, sol.x[0] + 2.4]) box('alu', lx - .02, lx + .02, top + .03, top + .3, z + .05, z + .65);
+  }
+  for (const [x0, x1, z0, z1] of [[poolOut[1] + .05, poolOut[1] + .09, poolOut[2], sol.z[1]], [poolOut[0], poolOut[1] + .09, poolOut[2] - .04, poolOut[2]]]) box('glassFence', x0, x1, top, top + 1.1, z0, z1);
+  // garage ramp from Calle María de Molina down under the courtyard deck
+  const [rz0, rz1] = ramp.z, yB = ramp.depth;
+  const rq = (a, b, c, d, n) => M.quad('ramp', a, b, c, d, n, [a[0], a[2], b[0], b[2], c[0], c[2], d[0], d[2]]);
+  rq([ramp.top, STREET, rz1], [ramp.x[1], STREET, rz1], [ramp.x[1], STREET, rz0], [ramp.top, STREET, rz0], [0, 1, 0]);
+  rq([ramp.bottom, yB, rz1], [ramp.top, STREET, rz1], [ramp.top, STREET, rz0], [ramp.bottom, yB, rz0], [.12, .99, 0]);
+  rq([cx, yB, rz1], [ramp.bottom, yB, rz1], [ramp.bottom, yB, rz0], [cx, yB, rz0], [0, 1, 0]);
+  for (const [z, n] of [[rz0, 1], [rz1, -1]]) {
+    const prof = [[ramp.x[1], STREET], [ramp.top, STREET], [ramp.bottom, yB], [ramp.x[0] - .2, yB]];
+    for (let k = 0; k < prof.length - 1; k++) {
+      const [xa, ya] = prof[k], [xb, yb] = prof[k + 1];
+      if (n > 0) M.quad('wallWhite', [xb, yb, z], [xa, ya, z], [xa, 1.0, z], [xb, 1.0, z], [0, 0, 1], [xb, yb, xa, ya, xa, 1, xb, 1]);
+      else M.quad('wallWhite', [xa, ya, z], [xb, yb, z], [xb, 1.0, z], [xa, 1.0, z], [0, 0, -1], [xa, ya, xb, yb, xb, 1, xa, 1]);
+    }
+  }
+  M.quad('dark', [ramp.x[0], yB, rz1], [ramp.x[0], yB, rz0], [ramp.x[0], top - .3, rz0], [ramp.x[0], top - .3, rz1], [1, 0, 0], [0, 0, 1, 0, 1, 1, 0, 1], {lm: false});
+  // plot fences: low white base and tall grey aluminium slats between white posts (render 03); a white wall with a
+  // grey sectional door closes the garage ramp
+  const fences = [[ramp.x[0], px + .15, rz0, rz1]], BASE = .2, TOPF = 2.3;
+  const fence = (x0, x1, z0, z1) => {
+    fences.push([x0, x1, z0, z1]);
+    slab('wallWhite', x0, x1, STREET, BASE, z0, z1);
+    const along = x1 - x0 > z1 - z0, len = along ? x1 - x0 : z1 - z0, n = Math.floor(len / .12);
+    const bar = new T.BoxGeometry(along ? .05 : .07, TOPF - BASE - .02, along ? .07 : .05);
+    for (let k = 0; k < n; k++) { const t = (k + .5) / n; if ((k % 40) < 1) continue; parts.add('slats', bar, place(along ? x0 + t * len : (x0 + x1) / 2, (BASE + TOPF) / 2, along ? (z0 + z1) / 2 : z0 + t * len)); }
+    for (let k = 0; k <= Math.floor(n / 40); k++) {                                          // white posts every ≈ 4,8 m
+      const t = Math.min(1, k * 40 / n), cx0 = along ? x0 + t * len : (x0 + x1) / 2, cz0 = along ? (z0 + z1) / 2 : z0 + t * len;
+      slab('wallWhite', cx0 - .12, cx0 + .12, BASE, TOPF, cz0 - .12, cz0 + .12);
+    }
+  };
+  slab('wallWhite', px - .15, px + .15, STREET, TOPF, rz0 - 1.2, rz0); slab('wallWhite', px - .15, px + .15, STREET, TOPF, rz1, rz1 + 1.2);
+  slab('wallWhite', px - .15, px + .15, 2.25, TOPF, rz0, rz1);
+  for (let k = 0; k < 6; k++) box('garageDoor', px - .05, px + .05, STREET + k * .425 + .01, STREET + (k + 1) * .425 - .01, rz0, rz1);
+  fence(px - .15, px + .15, zN, rz0 - 1.2); fence(px - .15, px + .15, rz1 + 1.2, zP); fence(cx - .15, cx + .15, zN, zP); fence(cx, px, zP - .15, zP + .15); fence(cx, px, zN - .15, zN + .15);
+  // walls between the ground-floor patios: the traced rails that run out from the façades (Portal 2 mirrored)
+  const dividers = [];
+  for (const pu of building?.levels?.B?.units || []) {
+    const c = pu.cell || building.cell;
+    for (const [x0, y0, x1, y1] of pu.rail || []) {
+      if (y0 !== y1) continue;
+      let X0 = pu.x + Math.min(x0, x1) * c, X1 = pu.x + Math.max(x0, x1) * c, Z0 = pu.y + y0 * c;
+      if (X1 > D) X0 = Math.max(X0, D); else if (X0 < 0) X1 = Math.min(X1, 0); else continue;
+      if (X1 - X0 < 1) continue;
+      for (const m of [1, -1]) { const r = [X0, X1, m * Z0 - .1, m * Z0 + .1]; slab('wallWhite', r[0], r[1], top, 1.75, r[2], r[3]); fences.push(r); if (X0 >= D) dividers.push(m * Z0); }
+    }
+  }
+  // trees along the street and in the courtyard, as in the renders
+  const trees = [];
+  for (let z = zN + 4; z < zP; z += 9) trees.push([px + 2, z, STREET, 1]);
+  for (let z = -half + 20; z < half; z += 12) trees.push([cx - 3, z, STREET, 1]);
+  const inside = (x, z) => x > cx && x < px && z > zN && z < zP;
+  // the street-side patios between their dividing walls (for furniture and lights)
+  const cuts = [...new Set([zN + .2, ...dividers.sort((a, b) => a - b), ramp.z[0] - .2])].sort((a, b) => a - b), patios = [];
+  for (let k = 0; k < cuts.length - 1; k++) if (cuts[k + 1] - cuts[k] > 2.6) patios.push({x: [D, px - .15], z: [cuts[k] + .1, cuts[k + 1] - .1], y: top});
+  return {mesher: M, parts, water, trees, fences, inside, patios, lamps: Array.from({length: Math.floor((zP - zN + 20) / 24)}, (_, k) => [px + 2.6, zN - 8 + k * 24])};
+}
+
+// ---- the ground: land-use classes of the OpenStreetMap raster, each with its colour, roughness and detail
+const CLASS_COLOR = ['#77904f', '#6c9849', '#9a8366', '#5d5f60', '#b9b3aa', '#cfaaa2', '#9b5a4e', '#b8a585', '#e8e6df', '#b9b3aa'];
+const CLASS_ROUGH = [1, .95, 1, .9, .85, .8, .85, .95, .7, .85];
+export function groundMaterial(classTex, extent, hook) {
+  const detail = noiseTexture();
+  const mat = new T.MeshStandardMaterial({color: '#ffffff', roughness: 1, map: detail});
+  mat.onBeforeCompile = sh => {
+    sh.uniforms.classMap = {value: classTex}; sh.uniforms.extent = {value: new T.Vector4(...extent)};
+    sh.uniforms.classColor = {value: CLASS_COLOR.map(c => new T.Color(c))}; sh.uniforms.classRough = {value: CLASS_ROUGH};
+    sh.vertexShader = 'varying vec3 vWorld;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n\tvWorld = ( modelMatrix * vec4( transformed, 1. ) ).xyz;');
+    sh.fragmentShader = `uniform sampler2D classMap; uniform vec4 extent; uniform vec3 classColor[10]; uniform float classRough[10]; varying vec3 vWorld;
+int groundClass() { vec2 uv = ( vWorld.xz - extent.xz ) / ( extent.yw - extent.xz ); if ( any( lessThan( uv, vec2( 0. ) ) ) || any( greaterThan( uv, vec2( 1. ) ) ) ) return 0; return int( texture2D( classMap, uv ).r * 255. + .5 ); }
+` + sh.fragmentShader
+      .replace('#include <map_fragment>', `int gc = clamp( groundClass(), 0, 9 );
+  float dn = texture2D( map, vWorld.xz * .21 ).r * .55 + texture2D( map, vWorld.xz * .043 ).r * .45;
+  vec3 gcol = classColor[ gc ];
+  if ( gc == 3 || gc == 6 ) gcol *= .82 + .3 * dn;                                   // asphalt
+  else if ( gc == 5 ) { vec2 t = fract( vWorld.xz / vec2( .4, .2 ) ); float j = step( .06, t.x ) * step( .1, t.y );   // promenade: pink and grey paver bands
+    float band = step( .55, fract( vWorld.x / 1.7 + .3 * step( .5, fract( vWorld.z / 23. ) ) ) );
+    gcol = mix( gcol, vec3( .56, .55, .53 ), band ) * ( .88 + .2 * dn ) * mix( .84, 1., j ); }
+  else if ( gc == 4 || gc == 9 ) { vec2 t = fract( vWorld.xz / vec2( .4, .2 ) ); float j = step( .06, t.x ) * step( .1, t.y ); gcol *= ( .88 + .2 * dn ) * mix( .82, 1., j ); }   // pavers
+  else gcol *= .7 + .55 * dn;                                                          // grass, soil
+  diffuseColor.rgb *= gcol;`)
+      .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = classRough[ gc ];');
+    hook?.(sh);
+  };
+  mat.customProgramCacheKey = () => 'ground';
+  return mat;
+}
+function noiseTexture() {
+  const S = 256, c = Object.assign(document.createElement('canvas'), {width: S, height: S}), x = c.getContext('2d'), r = rng(9);
+  const img = x.createImageData(S, S);
+  // value noise, two octaves, tileable
+  const lat = n => Float32Array.from({length: n * n}, r), L1 = lat(16), L2 = lat(64);
+  const smp = (L, n, u, v) => { const fx = u * n, fy = v * n, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0, q = (i, j) => L[((j % n + n) % n) * n + ((i % n + n) % n)];
+    const a = q(x0, y0) + (q(x0 + 1, y0) - q(x0, y0)) * tx, b = q(x0, y0 + 1) + (q(x0 + 1, y0 + 1) - q(x0, y0 + 1)) * tx; return a + (b - a) * ty; };
+  for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) { const v = (smp(L1, 16, i / S, j / S) * .6 + smp(L2, 64, i / S, j / S) * .4) * 255, k = (j * S + i) * 4; img.data[k] = img.data[k + 1] = img.data[k + 2] = v; img.data[k + 3] = 255; }
+  x.putImageData(img, 0, 0);
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.anisotropy = 8; return t;
+}
+
+// ---- neighbouring buildings (extruded from OpenStreetMap with their heights), trees, shrubs, street lamps
+export function buildContext(ctx, plot, M) {
+  const g = new T.Group(); g.name = 'context';
+  const r = rng(13), half = 34.5;
+  // buildings: walls with a window grid, flat roofs
+  const walls = [], roofs = [];
+  for (const b of ctx.buildings || []) {
+    const pts = b.pts.map(([x, z]) => new T.Vector2(x, -z));
+    const shape = new T.Shape(pts), h = Math.max(3, b.height || 6);
+    const geo = new T.ExtrudeGeometry(shape, {depth: h, bevelEnabled: false}).rotateX(-Math.PI / 2).translate(0, STREET, 0);
+    // side UVs in metres (u along the wall, v up) for the window grid
+    const pos = geo.getAttribute('position'), nrm = geo.getAttribute('normal'), uv = geo.getAttribute('uv');
+    for (let i = 0; i < pos.count; i++) {
+      const up = Math.abs(nrm.getY(i)) > .5;
+      uv.setXY(i, up ? pos.getX(i) : (Math.abs(nrm.getX(i)) > Math.abs(nrm.getZ(i)) ? pos.getZ(i) : pos.getX(i)), up ? pos.getZ(i) : pos.getY(i) - STREET);
+    }
+    (b.kind === 'university' || b.kind === 'commercial' ? roofs : walls).push(geo);
+  }
+  const all = [...walls, ...roofs];
+  if (all.length) {
+    const m = new T.Mesh(mergeGeometries(all.map(x => x.index ? x.toNonIndexed() : x), false), M.neighbour); m.receiveShadow = true; m.castShadow = true; g.add(m);
+  }
+  // trees: OSM trees within 220 m plus the plot's own; young street trees (crown ≈ 3 m) of leaf cards around a few
+  // branches, normals bent outward from the crown's centre so the foliage shades as one volume
+  // + the larger street tree that frames render 03 on the right (placed with its calibrated camera)
+  const trees = [...plot.trees, [65.2, 41.6, STREET, 1.6], ...(ctx.trees || []).filter(([x, z]) => Math.hypot(x - 10, z) < 220 && !(x > -9 && x < 28 && z > -38 && z < 43)).map(([x, z]) => [x, z, STREET, .85 + r() * .5])];
+  const {crown, wood} = treeGeometry(r);
+  const canopy = new T.InstancedMesh(crown, M.canopy, trees.length), trunk = new T.InstancedMesh(wood, M.trunk, trees.length);
+  const m4 = new T.Matrix4(), q = new T.Quaternion(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
+  trees.forEach(([x, z, y, sc], i) => {
+    const s = sc * (.85 + r() * .35);
+    m4.compose(new T.Vector3(x, y, z), q.setFromAxisAngle(up, r() * 6.28), new T.Vector3(s, s * (.9 + r() * .2), s));
+    trunk.setMatrixAt(i, m4); canopy.setMatrixAt(i, m4);
+    // mostly yellow-green young plane and ash trees, a few purple-leaved plums (render 03)
+    if (r() < .12) canopy.setColorAt(i, col.setHSL(.97, .32, .5)); else canopy.setColorAt(i, col.setHSL(.2 + (r() - .5) * .05, .34 + r() * .14, .74 + (r() - .5) * .1));
+  });
+  // crowns cast shadows but do not receive them: self-shadowed leaf cards read as dark blobs, real crowns glow
+  canopy.castShadow = trunk.castShadow = true; canopy.receiveShadow = false; g.add(canopy, trunk);
+  // shrubs and hedges: the same leaf cards in low mounds
+  const shrubs = (ctx.shrubs || []).filter(([x, z]) => Math.hypot(x - 10, z) < 200);
+  const bush = crown.clone().translate(0, -3.15, 0).scale(.55, .45, .55);
+  const sh = new T.InstancedMesh(bush, M.canopy, shrubs.length);
+  shrubs.forEach(([x, z], i) => { const s = .6 + r() * .6; m4.compose(new T.Vector3(x, STREET + s * .55, z), q.setFromAxisAngle(up, r() * 6.28), new T.Vector3(s, s, s)); sh.setMatrixAt(i, m4); sh.setColorAt(i, col.setHSL(.22, .4, .32 + (r() - .5) * .08)); });
+  sh.receiveShadow = true; sh.castShadow = true; g.add(sh);
+  // street lamps along Calle María de Molina (tall dark blue poles, as in the renders)
+  const lampGeo = mergeGeometries([new T.CylinderGeometry(.06, .09, 8, 10).translate(0, 4, 0), new T.CylinderGeometry(.03, .03, 1.1, 8).rotateZ(Math.PI / 2).translate(.5, 7.9, 0), new T.BoxGeometry(.55, .1, .22).translate(1.05, 7.85, 0)].map(x => x.toNonIndexed()), false);
+  const lamps = new T.InstancedMesh(lampGeo, M.lampPole, plot.lamps.length), heads = [];
+  plot.lamps.forEach(([x, z], i) => { m4.compose(new T.Vector3(x, STREET, z), q.identity(), new T.Vector3(1, 1, 1)); lamps.setMatrixAt(i, m4); heads.push(new T.Vector3(x + 1.05, STREET + 7.78, z)); });
+  lamps.castShadow = true; g.add(lamps);
+  const glow = new T.InstancedMesh(new T.BoxGeometry(.48, .02, .18), M.lampGlow, heads.length);
+  heads.forEach((p, i) => { m4.compose(p, q.identity(), new T.Vector3(1, 1, 1)); glow.setMatrixAt(i, m4); }); g.add(glow);
+  return {group: g, lampHeads: heads};
+}
+
+// one young street tree: trunk to 2,3 m, five main branches, a crown of ~70 leaf cards in an ellipsoid (r 1,5 m)
+function treeGeometry(r) {
+  const cards = [], wood = [], base = 2.2, cy = 3.35;
+  wood.push(new T.CylinderGeometry(.07, .11, base + .4, 7).translate(0, (base + .4) / 2, 0));
+  for (let k = 0; k < 5; k++) {
+    const a = k * 2.4 + r(), len = 1.2 + r() * .5, tilt = .5 + r() * .35;
+    const br = new T.CylinderGeometry(.025, .05, len, 5).translate(0, len / 2, 0).rotateZ(-tilt).rotateY(a).translate(0, base - .1 + r() * .4, 0);
+    wood.push(br);
+  }
+  for (let k = 0; k < 58; k++) {
+    // a point in the ellipsoid, denser near the surface
+    let p; do { p = new T.Vector3(r() * 2 - 1, r() * 2 - 1, r() * 2 - 1); } while (p.lengthSq() > 1 || p.lengthSq() < .25);
+    p.multiply(new T.Vector3(1.25, 1.15, 1.25));
+    const sz = .7 + r() * .4, card = new T.PlaneGeometry(sz, sz);
+    card.rotateX((r() - .5) * 2.4).rotateY(r() * Math.PI).rotateZ((r() - .5) * 1.2).translate(p.x, cy + p.y, p.z);
+    // normals from the crown centre (soft volumetric shading of the foliage)
+    const pos = card.getAttribute('position'), nrm = card.getAttribute('normal');
+    for (let i = 0; i < pos.count; i++) { const n = new T.Vector3(pos.getX(i), (pos.getY(i) - cy) * 1.3, pos.getZ(i)).normalize(); nrm.setXYZ(i, n.x, n.y, n.z); }
+    cards.push(card);
+  }
+  return {crown: mergeGeometries(cards, false), wood: mergeGeometries(wood.map(x => x.index ? x.toNonIndexed() : x), false)};
+}
+
+// leaf cluster texture with alpha: small elliptic leaves in a few greens, lighter at the top
+export function leafTexture(size = 512) {
+  const c = Object.assign(document.createElement('canvas'), {width: size, height: size}), x = c.getContext('2d'), r = rng(17);
+  for (let k = 0; k < 330; k++) {
+    const px = size * (.08 + r() * .84), py = size * (.08 + r() * .84), d = Math.hypot(px - size / 2, py - size / 2) / (size / 2);
+    if (d > .98 || r() < d * d * .6) continue;
+    const L = 40 + r() * 26 + (1 - py / size) * 10, w = size * (.02 + r() * .012), h = w * (1.8 + r() * .6);
+    x.save(); x.translate(px, py); x.rotate(r() * Math.PI * 2);
+    x.fillStyle = `hsl(${74 + r() * 26}, ${30 + r() * 20}%, ${L}%)`;
+    x.beginPath(); x.ellipse(0, 0, w, h, 0, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = `hsla(80, 30%, ${L - 12}%, .5)`; x.lineWidth = 1; x.beginPath(); x.moveTo(0, -h); x.lineTo(0, h); x.stroke();
+    x.restore();
+  }
+  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; return t;
+}

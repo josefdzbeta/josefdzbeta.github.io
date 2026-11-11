@@ -311,6 +311,15 @@
 .ap-shot button{border:0;background:rgba(255,255,255,.12);color:#fff;width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
 .ap-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);padding:9px 14px;border-radius:999px;background:rgba(28,30,33,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:rgba(255,255,255,.88);font:12px/1.2 system-ui,sans-serif;white-space:nowrap;display:none;z-index:3}
 .ap.ap-walk .ap-hint{display:block}
+.bd-viewer{height:min(76svh,780px);min-height:460px;margin:0 2.7%}
+.bd-viewer .loading{color:#e9e7e1;z-index:1}
+.building-note{margin:14px 2.7% 0}
+@media(max-width:700px){.bd-viewer{margin:0;height:72svh;min-height:420px}.building-note{margin:12px 0 0}}
+.ap .bd-ref{position:absolute;z-index:2;pointer-events:none;opacity:.5;max-width:none;display:block}
+.ap .bd-ref[hidden]{display:none}
+.ap-shot button[data-compare]{width:auto;padding:0 12px;border-radius:999px;font-size:12px}
+.ap-shot button[data-compare][hidden]{display:none}
+.ap-shot button.on{background:#fff;color:#1c1e21}
 @media(max-width:700px){.ap-bar{top:8px;right:8px;left:8px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.ap-bar::-webkit-scrollbar{display:none}.ap-group{flex:none}.ap-group button{padding:7px 8px;font-size:11px}.ap-hint{white-space:normal;text-align:center;width:max-content;max-width:calc(100% - 32px)}}
 /* the dwelling viewer inside the Mykonos explorer */
 .viewer .ap-in-viewer{position:absolute;inset:0;z-index:2}

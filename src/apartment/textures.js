@@ -44,6 +44,8 @@ const grayCanvas = (vals, w, h, f = v => v) => {
   ctx.putImageData(img, 0, 0);
   return c;
 };
+// height canvases are read back for the normal maps: they are created CPU-side (willReadFrequently), so the
+// readback never waits on a busy GPU
 const readGray = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, out = new Float32Array(c.width * c.height); for (let k = 0; k < out.length; k++) out[k] = d[4 * k] / 255; return out; };
 
 function pack({albedo, height, rough, size, strength = 2, aniso = 8}) {
@@ -57,7 +59,7 @@ function pack({albedo, height, rough, size, strength = 2, aniso = 8}) {
 // ---- SPC vinyl plank (oak print, synchronised embossing): 1220 × 203 mm, light grey-washed oak --------------
 export function oakPlanks({px = 2048, metres = 2.44, seed = 11, tone = [34, 16, 80]} = {}) {
   const r = rng(seed), s = px / metres, A = canvas(px), Hc = canvas(px), R = canvas(px);
-  const a = A.getContext('2d'), h = Hc.getContext('2d'), q = R.getContext('2d');
+  const a = A.getContext('2d'), h = Hc.getContext('2d', {willReadFrequently: true}), q = R.getContext('2d');
   const pw = 1.22 * s, ph = .2033 * s, rows = Math.round(px / ph);
   h.fillStyle = '#808080'; h.fillRect(0, 0, px, px); q.fillStyle = '#7a7a7a'; q.fillRect(0, 0, px, px);
   for (let row = 0; row < rows; row++) {
@@ -100,7 +102,7 @@ export function oakPlanks({px = 2048, metres = 2.44, seed = 11, tone = [34, 16, 
 export function tiles({px = 1024, tw = .6, th = .6, per = 2, color = [0, 0, 92], vary = 2, grout = '#c9c6c0', joint = .003,
   bond = 'stack', speckle = 0, cloud = .04, rough = .3, roughVar = .08, seed = 3} = {}) {
   const r = rng(seed), metres = Math.max(tw, th) * per, s = px / metres, A = canvas(px), Hc = canvas(px), R = canvas(px);
-  const a = A.getContext('2d'), h = Hc.getContext('2d'), q = R.getContext('2d');
+  const a = A.getContext('2d'), h = Hc.getContext('2d', {willReadFrequently: true}), q = R.getContext('2d');
   a.fillStyle = grout; a.fillRect(0, 0, px, px); h.fillStyle = '#303030'; h.fillRect(0, 0, px, px); q.fillStyle = '#d0d0d0'; q.fillRect(0, 0, px, px);
   const n = noise(256, 256, {cells: 6, octaves: 5, seed}), nc = grayCanvas(n, 256, 256);
   const jw = Math.max(1.5, joint * s), cols = Math.round(metres / tw), rows = Math.round(metres / th);
@@ -149,7 +151,7 @@ export function weave({px = 512, metres = .2, threads = 90, slub = .35, seed = 9
 
 // ---- solid wood (teak terrace furniture, oak furniture) ----------------------------------------------------
 export function woodGrain({px = 1024, metres = 1, seed = 21, tone = [28, 45, 45], contrast = 12} = {}) {
-  const r = rng(seed), A = canvas(px), Hc = canvas(px), a = A.getContext('2d'), h = Hc.getContext('2d');
+  const r = rng(seed), A = canvas(px), Hc = canvas(px), a = A.getContext('2d'), h = Hc.getContext('2d', {willReadFrequently: true});
   a.fillStyle = hsl(...tone); a.fillRect(0, 0, px, px); h.fillStyle = '#808080'; h.fillRect(0, 0, px, px);
   for (let k = 0; k < 420; k++) {
     const y = r() * px, amp = 2 + r() * 10, wl = 60 + r() * 300, p0 = r() * 6.28, dark = r() < .6;

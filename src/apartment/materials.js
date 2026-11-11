@@ -28,7 +28,7 @@ const LIGHTMAP_CHUNK = /* glsl */`
 #endif
 `;
 
-function hook(mat, U, {lightmapped = false} = {}) {
+export function hook(mat, U, {lightmapped = false} = {}) {
   mat.onBeforeCompile = sh => {
     sh.uniforms.clay = U.clay;
     sh.fragmentShader = 'uniform float clay;\n' + sh.fragmentShader.replace('#include <color_fragment>',

@@ -20,7 +20,7 @@ El prototipo **no acredita stock actual**. La geometría de vivienda está **tra
 
 Consultar `dist/docs/content-inventory.md`, `dist/docs/source-index.json`, `dist/docs/production-requirements.md` y `QA.md`.
 
-Contenido: `dist/data.json`. Interacción: `src/app.js`. Modelos: `src/explorer.js`. Diseño: `dist/style.css`. El build no reemplaza los archivos de contenido y estilos.
+Contenido: `dist/data.json`. Interacción: `src/app.js`. Edificio 3D: `src/building/`. Interiores del configurador: `src/explorer.js`. Diseño: `dist/style.css`. El build no reemplaza los archivos de contenido y estilos.
 
 Publicación privada registrada en `.openai/hosting.json`. No se modificó el sitio oficial bamaire.es.
 
@@ -52,7 +52,18 @@ python scripts/plans/exterior.py ../research/source-images/mykonos dist/models/m
 blender -b -P scripts/blender/validate_and_export.py -- dist/models/mykonos ../research/qa/blender/mykonos
 ```
 
-Viviendas en three.js (`src/apartment/`, desde el 10 de noviembre de 2026; los renders de Blender anteriores están archivados en `../archive/renders-2026-11-10/`, fuera de la web): cada vivienda se construye en el navegador a partir de su plano trazado, todo como BufferGeometry con materiales PBR y texturas procedurales a escala real:
+Edificio Mykonos en three.js (`src/building/`, desde el 11 de noviembre de 2026; sustituye al explorador de plantas y viviendas de la ficha de Mykonos): solo el edificio y su entorno, generados en el navegador como BufferGeometry con materiales PBR.
+
+- `facade.js` levanta las cuatro fachadas de `exterior.json` y `facade-openings.json`: ladrillo cara vista blanco, marco de revoco blanco volado 45 cm, paños retranqueados de porcelánico, balcones con frente de vidrio, y cada hueco con mocheta, alféizar, carpintería, vidrio, persiana y una estancia detrás (algunas iluminadas de noche). En cubierta, las terrazas de la planta 5 (trazadas de `building.json`, ajustadas a los huecos de fachada que las abren), petos, albardillas y casetones.
+- `site.js`: parcela elevada con piscina, solárium, valla de lamas sobre zócalo blanco, puerta de garaje y rampa, muros entre patios; alrededor, OpenStreetMap (ODbL) reflejado como los planos: el suelo por usos (ráster de 20 cm), edificios vecinos con su altura, árboles de tarjetas de hojas, arbustos y farolas azules en la calle María de Molina. `props.js`: coches aparcados y cipreses en las terrazas.
+- `index.js` hornea en la GPU (con `src/apartment/bake.js`) la luz del cielo y la del suelo por separado, una vez (≈0,2–0,6 s): cada hora del día solo cambia sus tintes, el sol en tiempo real (sombras 4096²), el cielo (degradado fotográfico con cirros) y el entorno de reflejos. Barra: Tour / Photo / Walk · Matcap / Lighting only / Wireframe · Low sun / Morning / Day / Evening / Night. Resolución adaptativa al moverse.
+- `cameras.js`: Tour (órbita, gira sola en reposo), Photo (cámaras calibradas de los renders 03, 01 y 04 con el render superpuesto al 50 % con «Comparar», más patio y piscina, fachada al patio y alzado) y Walk (clic para mirar, WASD, Mayús para correr; choca con el edificio y las vallas).
+
+```sh
+node scripts/building-dev.mjs    # → http://localhost:4173/dev/building.html
+```
+
+Viviendas en three.js (`src/apartment/`, no se muestran en la web desde el 11 de noviembre de 2026; desde el 10 de noviembre de 2026; los renders de Blender anteriores están archivados en `../archive/renders-2026-11-10/`, fuera de la web): cada vivienda se construye en el navegador a partir de su plano trazado, todo como BufferGeometry con materiales PBR y texturas procedurales a escala real:
 
 - `plan.js` lee la rejilla trazada (celdas de 5 cm) como vóxeles en bandas de altura (alféizar, antepecho, dintel de puerta y de ventana, techo, forjado) y clasifica cada hueco (ventana, puerta balconera, puerta interior, marco de terraza).
 - `architecture.js` saca de un único paso muros, mochetas, alféizares, dinteles, techos y suelos (cada cara con su propia carta de lightmap), y construye carpinterías de PVC, puertas lacadas y persianas de lamas de aluminio.

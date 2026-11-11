@@ -372,7 +372,7 @@ export function buildFurniture(items, materials, roomAt = () => -1) {
   const P = new Parts(), lamps = [], inst = clutter(materials), mirrors = [];
   const ctx = {inst, lamps, materials, mirrors, artwork: seed => { const k = 'art-' + seed; materials[k] ||= artMaterial(seed); return k; }};
   for (const it of items) {
-    it.at = (x, y, z) => new T.Vector3(x, y, z).applyMatrix4(place(it.x, 0, it.z, it.yaw || 0));
+    it.at = (x, y, z) => new T.Vector3(x, y, z).applyMatrix4(place(it.x, it.y || 0, it.z, it.yaw || 0));
     it.room = roomAt(it.x, it.z);
     BUILD[it.k]?.(placer(P, it, it.room), it, ctx);
   }
